@@ -15,6 +15,9 @@ class Point {
         void set_x(int x_new);
         void set_y(int y_new);
 
+        void increment_x(const unsigned& value = 1);
+        void increment_y(const int& value = 1);
+
         int get_x() const;
         int get_y() const;
 
@@ -23,7 +26,7 @@ class Point {
 
 class Board {
     private:
-        bool **map;
+        unsigned **map;
         unsigned x_dimension;
         unsigned y_dimension;
 
@@ -35,7 +38,7 @@ class Board {
         unsigned get_y_dim() const;
 
         bool is_empty(const Point& point) const;
-        void change_point(const Point& point);
+        void change_point(const Point& point, const unsigned& new_value = 0);
 
         ~Board();        
 };
