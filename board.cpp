@@ -51,7 +51,7 @@ bool Board::is_empty(const Point& point) const {
     if (map[point.get_x()][point.get_y()] == 0)
         return true;
     else 
-        return false
+        return false;
 };
 
 void Board::change_point(const Point& point, const unsigned& new_value = 0) {
