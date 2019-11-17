@@ -1,5 +1,5 @@
 #include <iostream>
-#include "board.hpp"
+#include "figures.hpp"
 
 int main(int argc, char const *argv[])
 {
