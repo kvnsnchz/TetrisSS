@@ -1,5 +1,5 @@
 #include "board.hpp"
-#include <iostream>
+
 using namespace std;
 Board::Board() {
     initialize();
@@ -17,6 +17,10 @@ void Board::initialize(){
         for (int j = 0; j < y_dimension; j++)
             map[i][j] = 0;
 
+    add_figure();
+}
+
+void Board::add_figure(){
     figure = new Figure_O(y_dimension);
 
     for (int i = 0; i < figure->get_points().size(); i++) 
@@ -70,6 +74,60 @@ bool Board::step_down() {
         change_point(*figure->get_points()[i], figure->get_color_code() * factor);
         
     return is_free;
+};
+
+void Board::step_left() {
+    bool is_free = true;
+    
+    for (int i = 0; i < figure->get_points().size(); i++) {
+        if(figure->get_points()[i]->get_y() - 1 < 0){
+            is_free = false;
+            break;
+        }
+
+        if (!is_empty(Point(figure->get_points()[i]->get_x(), figure->get_points()[i]->get_y() - 1))) {
+            is_free = false;
+            break;
+        };
+    };
+
+    if(is_free) {
+        for (int i = 0; i < figure->get_points().size(); i++) {
+            change_point(*figure->get_points()[i]);
+            figure->get_points()[i]->increment_y(-1);
+        }
+    }
+
+    for (int i = 0; i < figure->get_points().size(); i++)
+        change_point(*figure->get_points()[i], figure->get_color_code());
+    
+};
+
+void Board::step_right() {
+    bool is_free = true;
+    
+    for (int i = 0; i < figure->get_points().size(); i++) {
+        if(figure->get_points()[i]->get_y() + 1 >= y_dimension){
+            is_free = false;
+            break;
+        }
+
+        if (!is_empty(Point(figure->get_points()[i]->get_x(), figure->get_points()[i]->get_y() + 1))) {
+            is_free = false;
+            break;
+        };
+    };
+    
+    if(is_free) {
+        for (int i = 0; i < figure->get_points().size(); i++) {
+            change_point(*figure->get_points()[i]);
+            figure->get_points()[i]->increment_y();
+        }
+    }
+
+    for (int i = 0; i < figure->get_points().size(); i++)
+        change_point(*figure->get_points()[i], figure->get_color_code());
+        
 };
 
 Board::~Board() {};
