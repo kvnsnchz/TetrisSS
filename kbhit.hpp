@@ -3,8 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int kbhit(void)
-{
+int kbhit(void) {
   struct termios oldt, newt;
   int ch;
   int oldf;

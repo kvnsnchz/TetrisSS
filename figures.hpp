@@ -36,15 +36,80 @@ class Figure {
         vector<Point *> get_points() const;
         unsigned get_color_code() const;
         virtual void initialize(unsigned) = 0;
+
+        // print our figure:
+        virtual void print() = 0;
+        
 };
 
-// Square definition:
+// Square figure definition:
 class Figure_O: public Figure {
     public:
-        Figure_O(const unsigned& y_dim):Figure(1) {
+        Figure_O(const unsigned& y_dim): Figure(1) {
             initialize(y_dim);
         };
         
         virtual void initialize(unsigned);
 
+        virtual void print();
+};
+
+// Stick figure definition:
+class Figure_I: public Figure {
+    public:
+        Figure_I(const unsigned& y_dim):Figure(2) {
+            initialize(y_dim);
+        };
+        
+        virtual void initialize(unsigned);
+
+        virtual void print();
+};
+
+// T figure definition:
+class Figure_T: public Figure {
+    public:
+        Figure_T(const unsigned& y_dim):Figure(3) {
+            initialize(y_dim);
+        };
+        
+        virtual void initialize(unsigned);
+
+        virtual void print();
+};
+
+// L figure definition:
+class Figure_L: public Figure {
+    public:
+        Figure_L(const unsigned& y_dim):Figure(4) {
+            initialize(y_dim);
+        };
+        
+        virtual void initialize(unsigned);
+
+        virtual void print();
+};
+
+// J figure definition:
+class Figure_J: public Figure {
+    public:
+        Figure_J(const unsigned& y_dim):Figure(5) {
+            initialize(y_dim);
+        };
+        
+        virtual void initialize(unsigned);
+
+        virtual void print();
+};
+
+// Z figure definition:
+class Figure_Z: public Figure {
+    public:
+        Figure_Z(const unsigned& y_dim):Figure(6) {
+            initialize(y_dim);
+        };
+        
+        virtual void initialize(unsigned);
+
+        virtual void print();
 };
