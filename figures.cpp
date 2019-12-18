@@ -110,3 +110,16 @@ void Figure_Z::print() {
     cout << " " << color_code << " " << color_code << "   \n";
     cout << "   " << color_code << " " << color_code << " " << endl;
 };
+
+// S figure initialization:
+void Figure_S::initialize(unsigned y_dim) {
+    points.push_back(new Point(0, y_dim / 2 - 1));
+    points.push_back(new Point(0, y_dim / 2));
+    points.push_back(new Point(1, y_dim / 2 - 2));
+    points.push_back(new Point(1, y_dim / 2 - 1));
+}
+
+void Figure_S::print() {
+    cout << "   " << color_code << " " << color_code << " \n";
+    cout << " " << color_code << " " << color_code << "   " << endl;
+};

@@ -32,8 +32,8 @@ Figure* Board::create_figure() {
 
     // Randomly choosing a figure of certain type according to figure_number value:
     // 0 - Figure_0; 1 - Figure_I; 2 - Figure_T;
-    // 3 - Figure_L; 4 - Figure_J; 5 - Figure_Z.
-    unsigned figure_number = rand() % 6;
+    // 3 - Figure_L; 4 - Figure_J; 5 - Figure_Z; 6 - Figure_S.
+    unsigned figure_number = rand() % 7;
     
     // Using switch to construct chosen figure:
     switch (figure_number) {
@@ -54,6 +54,9 @@ Figure* Board::create_figure() {
         break;
     case 5:
         new_figure = new Figure_Z(y_dimension);
+        break;
+    case 6:
+        new_figure = new Figure_S(y_dimension);
         break;
     default:
         break;
@@ -185,7 +188,7 @@ void Board::step_right() {
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < y_dimension; j++)
-        if (map[2][j] > 6)
+        if (map[2][j] > 7)
              return true;
     
     return false;

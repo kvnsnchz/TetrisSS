@@ -113,3 +113,15 @@ class Figure_Z: public Figure {
 
         virtual void print();
 };
+
+// S figure definition:
+class Figure_S: public Figure {
+    public:
+        Figure_S(const unsigned& y_dim):Figure(7) {
+            initialize(y_dim);
+        };
+        
+        virtual void initialize(unsigned);
+
+        virtual void print();
+};
