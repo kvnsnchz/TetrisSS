@@ -15,7 +15,7 @@ class Point {
         void set_x(int x_new);
         void set_y(int y_new);
 
-        void increment_x(const unsigned& value = 1);
+        void increment_x(const int& value = 1);
         void increment_y(const int& value = 1);
 
         int get_x() const;
@@ -45,8 +45,8 @@ class Figure {
 // Square figure definition:
 class Figure_O: public Figure {
     public:
-        Figure_O(const unsigned& y_dim): Figure(1) {
-            initialize(y_dim);
+        Figure_O(const unsigned& x_dim): Figure(1) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);
@@ -57,8 +57,8 @@ class Figure_O: public Figure {
 // Stick figure definition:
 class Figure_I: public Figure {
     public:
-        Figure_I(const unsigned& y_dim):Figure(2) {
-            initialize(y_dim);
+        Figure_I(const unsigned& x_dim):Figure(2) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);
@@ -69,8 +69,8 @@ class Figure_I: public Figure {
 // T figure definition:
 class Figure_T: public Figure {
     public:
-        Figure_T(const unsigned& y_dim):Figure(3) {
-            initialize(y_dim);
+        Figure_T(const unsigned& x_dim):Figure(3) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);
@@ -81,8 +81,8 @@ class Figure_T: public Figure {
 // L figure definition:
 class Figure_L: public Figure {
     public:
-        Figure_L(const unsigned& y_dim):Figure(4) {
-            initialize(y_dim);
+        Figure_L(const unsigned& x_dim):Figure(4) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);
@@ -93,8 +93,8 @@ class Figure_L: public Figure {
 // J figure definition:
 class Figure_J: public Figure {
     public:
-        Figure_J(const unsigned& y_dim):Figure(5) {
-            initialize(y_dim);
+        Figure_J(const unsigned& x_dim):Figure(5) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);
@@ -105,8 +105,8 @@ class Figure_J: public Figure {
 // Z figure definition:
 class Figure_Z: public Figure {
     public:
-        Figure_Z(const unsigned& y_dim):Figure(6) {
-            initialize(y_dim);
+        Figure_Z(const unsigned& x_dim):Figure(6) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);
@@ -117,8 +117,8 @@ class Figure_Z: public Figure {
 // S figure definition:
 class Figure_S: public Figure {
     public:
-        Figure_S(const unsigned& y_dim):Figure(7) {
-            initialize(y_dim);
+        Figure_S(const unsigned& x_dim):Figure(7) {
+            initialize(x_dim);
         };
         
         virtual void initialize(unsigned);

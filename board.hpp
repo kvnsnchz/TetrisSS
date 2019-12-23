@@ -5,10 +5,18 @@ using namespace std;
 
 class Board {
     private:
+        // game board map - two-dimensional matrix
+        // our future figures are going to move through:
         unsigned **map;
+        // x (horizontal) board dimension:
         unsigned x_dimension;
+        // y (vertical) board dimension:
         unsigned y_dimension;
+        // Score of the match:
+        long score;
+        // The figure which is present on the map and moving alongside the game board right now:
         Figure* current_figure;
+        // The figure which will be added on the game board after the fall of the current feafure:
         Figure* next_figure;
 
         friend ostream& operator <<(ostream& stream, const Board& board);
@@ -25,6 +33,8 @@ class Board {
         unsigned get_x_dim() const;
         unsigned get_y_dim() const;
 
+        long get_score() const;
+
         Figure* get_next_figure() const;
         void set_current_figure(Figure* figure);
         void set_next_figure(Figure* figure);
@@ -35,6 +45,9 @@ class Board {
         bool step_down();
         void step_left();
         void step_right();
+
+        // Check for the full lines and erase them if they are:
+        void erase_lines();
 
         // adding game over condition function:
         bool game_over();

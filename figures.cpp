@@ -8,7 +8,7 @@ void Point::set_y(int y_new) {
     y = y_new;
 };
 
-void Point::increment_x(const unsigned& value) {
+void Point::increment_x(const int& value) {
     x += value;
 };
 
@@ -35,11 +35,11 @@ unsigned Figure::get_color_code() const{
 }
 
 // Square figure initialization:
-void Figure_O::initialize(unsigned y_dim) {
-    points.push_back(new Point(0, y_dim / 2 - 1));
-    points.push_back(new Point(0, y_dim / 2));
-    points.push_back(new Point(1, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2));
+void Figure_O::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2 - 1, 0));
+    points.push_back(new Point(x_dim / 2, 0));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
 }
 
 void Figure_O::print() {
@@ -48,11 +48,11 @@ void Figure_O::print() {
 };
 
 // Stick figure initialization:
-void Figure_I::initialize(unsigned y_dim) {
-    points.push_back(new Point(1, y_dim / 2 - 2));
-    points.push_back(new Point(1, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2));
-    points.push_back(new Point(1, y_dim / 2 + 1));
+void Figure_I::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2 - 2, 1));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(new Point(x_dim / 2 + 1, 1));
 }
 
 void Figure_I::print() {
@@ -60,11 +60,11 @@ void Figure_I::print() {
 };
 
 // T figure initialization:
-void Figure_T::initialize(unsigned y_dim) {
-    points.push_back(new Point(0, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2 - 2));
-    points.push_back(new Point(1, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2));
+void Figure_T::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2 - 1, 0));
+    points.push_back(new Point(x_dim / 2 - 2, 1));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
 }
 
 void Figure_T::print() {
@@ -73,11 +73,11 @@ void Figure_T::print() {
 };
 
 // L figure initialization:
-void Figure_L::initialize(unsigned y_dim) {
-    points.push_back(new Point(0, y_dim / 2));
-    points.push_back(new Point(1, y_dim / 2 - 2));
-    points.push_back(new Point(1, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2));
+void Figure_L::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2, 0));
+    points.push_back(new Point(x_dim / 2 - 2, 1));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
 }
 
 void Figure_L::print() {
@@ -86,11 +86,11 @@ void Figure_L::print() {
 };
 
 // J figure initialization:
-void Figure_J::initialize(unsigned y_dim) {
-    points.push_back(new Point(0, y_dim / 2 - 2));
-    points.push_back(new Point(1, y_dim / 2 - 2));
-    points.push_back(new Point(1, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2));
+void Figure_J::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2 - 2, 0));
+    points.push_back(new Point(x_dim / 2 - 2, 1));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
 }
 
 void Figure_J::print() {
@@ -99,11 +99,11 @@ void Figure_J::print() {
 };
 
 // Z figure initialization:
-void Figure_Z::initialize(unsigned y_dim) {
-    points.push_back(new Point(0, y_dim / 2 - 2));
-    points.push_back(new Point(0, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2 - 1));
-    points.push_back(new Point(1, y_dim / 2));
+void Figure_Z::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2 - 2, 0));
+    points.push_back(new Point(x_dim / 2 - 1, 0));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
 }
 
 void Figure_Z::print() {
@@ -112,11 +112,11 @@ void Figure_Z::print() {
 };
 
 // S figure initialization:
-void Figure_S::initialize(unsigned y_dim) {
-    points.push_back(new Point(0, y_dim / 2 - 1));
-    points.push_back(new Point(0, y_dim / 2));
-    points.push_back(new Point(1, y_dim / 2 - 2));
-    points.push_back(new Point(1, y_dim / 2 - 1));
+void Figure_S::initialize(unsigned x_dim) {
+    points.push_back(new Point(x_dim / 2 - 1, 0));
+    points.push_back(new Point(x_dim / 2, 0));
+    points.push_back(new Point(x_dim / 2 - 2, 1));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
 }
 
 void Figure_S::print() {

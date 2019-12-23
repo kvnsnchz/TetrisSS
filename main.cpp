@@ -5,13 +5,17 @@
 void game(){
     Board *game_board = new Board();
 
-    while(true){
+    while(true) {
+        // display game board:
         cout << "\033[2J\033[1;1H";
         cout << *game_board << endl;
 
         // display next figure:
         cout << "Next figure:\n";
         game_board->get_next_figure()->print();
+        
+        // display score:
+        cout << "Score: " << game_board->get_score() << endl;
         
         if(kbhit()) {
             switch (getchar()){
@@ -27,6 +31,9 @@ void game(){
         } else {
             // if we can move down no more:
             if(!game_board->step_down()) {
+                // check for the full lines:
+                game_board->erase_lines();
+                
                 // if we reached game over condition:
                 if (game_board->game_over()) {
                     cout << " Game Over!!!" << endl;
