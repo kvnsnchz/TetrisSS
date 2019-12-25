@@ -1,25 +1,27 @@
 #include <iostream>
 #include <vector>
+#include <SFML/Graphics.hpp>
 
+using namespace sf;
 using namespace std;
 
 class Point {
     private:
-        int x;
-        int y;
+        unsigned x;
+        unsigned y;
     public:
         Point(): x(0), y(0) {};
-        Point(int x_0, int y_0): x(x_0), y(y_0) {};
+        Point(unsigned x_0, unsigned y_0): x(x_0), y(y_0) {};
         Point(const Point& start_point): x(start_point.x), y(start_point.y) {};
 
-        void set_x(int x_new);
-        void set_y(int y_new);
+        void set_x(unsigned x_new);
+        void set_y(unsigned y_new);
 
-        void increment_x(const int& value = 1);
-        void increment_y(const int& value = 1);
+        void increment_x(const unsigned& value = 1);
+        void increment_y(const unsigned& value = 1);
 
-        int get_x() const;
-        int get_y() const;
+        unsigned get_x() const;
+        unsigned get_y() const;
 
         ~Point();
 };
@@ -29,12 +31,16 @@ class Figure {
     protected:
         vector<Point *> points;
         unsigned color_code;
+        // figure's graphical grid:
+        RectangleShape grid[4][2];
     public:
         Figure(){};
         Figure(const unsigned& code) : color_code(code) {}
 
         vector<Point *> get_points() const;
         unsigned get_color_code() const;
+        RectangleShape** get_grid() const;
+        
         virtual void initialize(unsigned) = 0;
 
         // print our figure:

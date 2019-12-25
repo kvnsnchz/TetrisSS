@@ -1,13 +1,12 @@
-#include <iostream>
 #include "figures.hpp"
-
-using namespace std;
 
 class Board {
     private:
         // game board map - two-dimensional matrix
         // our future figures are going to move through:
         unsigned **map;
+        // graphic game board:
+        RectangleShape **grid;
         // x (horizontal) board dimension:
         unsigned x_dimension;
         // y (vertical) board dimension:
@@ -21,10 +20,10 @@ class Board {
 
         friend ostream& operator <<(ostream& stream, const Board& board);
     public:
-        Board();
+        Board(RenderWindow& window);
 
         // game board initialization:
-        void initialize();
+        void initialize(RenderWindow& window);
         // new figure creation function:
         Figure* create_figure();
         // adding figure on top of the board:
@@ -39,8 +38,11 @@ class Board {
         void set_current_figure(Figure* figure);
         void set_next_figure(Figure* figure);
 
+        // draw game board:
+        void print_board(RenderWindow& window);
+
         bool is_empty(const Point& point) const;
-        void change_point(const Point& point, const unsigned& new_value = 0);
+        void change_point(const Point& point, const int& new_value = 0);
 
         bool step_down();
         void step_left();
