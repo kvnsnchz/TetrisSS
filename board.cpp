@@ -38,10 +38,7 @@ void Board::initialize(RenderWindow& window){
     for(unsigned i = 0; i < x_dimension; i++) {
         for(unsigned j = 2; j < y_dimension; j++) {
             grid[i][j].setSize(boardCellSize);
-            grid[i][j].setOutlineColor(sf::Color::Black);
-            grid[i][j].setOutlineThickness(1.0f);
-
-            grid[i][j].setPosition(i * boardCellSize.x + 5.0f, (j - 2) * boardCellSize.y + 5.0f);
+            grid[i][j].setPosition(i * boardCellSize.x + (i + 1) * 5.0f, (j - 2) * boardCellSize.y + (j - 1) * 5.0f);
 
             window.draw(grid[i][j]);
         }
@@ -127,35 +124,35 @@ void Board::print_board(RenderWindow& window) {
         for(unsigned j = 2; j < y_dimension; j++) {
             switch(map[i][j]) {
                 case 0:
-                    grid[i][j].setFillColor(Color::White);
+                    grid[i][j].setFillColor(Color(121, 163, 249, 180));
                     break;
                 case 1:
                 case 10:
-                    grid[i][j].setFillColor(Color::Yellow);
+                    grid[i][j].setFillColor(Color(255, 216, 0, 255));
                     break;
                 case 2:
                 case 20:
-                    grid[i][j].setFillColor(Color::Cyan);
+                    grid[i][j].setFillColor(Color(28, 230, 199, 255));
                     break;
                 case 3:
                 case 30:
-                    grid[i][j].setFillColor(Color::Magenta);
+                    grid[i][j].setFillColor(Color(248, 131, 6, 255));
                     break;
                 case 4:
                 case 40:
-                    grid[i][j].setFillColor(Color::Black);
+                    grid[i][j].setFillColor(Color(248, 6, 248, 255));
                     break;
                 case 5:
                 case 50:
-                    grid[i][j].setFillColor(Color::Blue);
+                    grid[i][j].setFillColor(Color(134, 33, 255, 255));
                     break;
                 case 6:
                 case 60:
-                    grid[i][j].setFillColor(Color::Green);
+                    grid[i][j].setFillColor(Color(220, 0, 20, 255));
                     break;
                 case 7:
                 case 70:
-                    grid[i][j].setFillColor(Color::Red);
+                    grid[i][j].setFillColor(Color(46, 228, 25, 255));
                     break;
                 default:
                     break;
@@ -178,9 +175,9 @@ void Board::print_board(RenderWindow& window) {
     Text next_figure_title;
     next_figure_title.setFont(font);
     next_figure_title.setString("Next Figure:");
-    next_figure_title.setPosition(x_dimension * (boardCellSize.x + 1) + 5.0f, 25.0f);
+    next_figure_title.setPosition(x_dimension * (boardCellSize.x + 1) + (x_dimension + 1) * 5.0f, 25.0f);
     next_figure_title.setCharacterSize(50);
-    next_figure_title.setFillColor(Color::Red);
+    next_figure_title.setFillColor(Color(242, 0, 0, 255));
     next_figure_title.setStyle(Text::Bold);
     window.draw(next_figure_title);
 
@@ -194,9 +191,9 @@ void Board::print_board(RenderWindow& window) {
     Text score_title;
     score_title.setFont(font);
     score_title.setString("Score: \n" + to_string(score));
-    score_title.setPosition(x_dimension * (boardCellSize.x + 1) + 5.0f, 250.0f);
+    score_title.setPosition(x_dimension * (boardCellSize.x + 1) + (x_dimension + 1) * 5.0f, 250.0f);
     score_title.setCharacterSize(50);
-    score_title.setFillColor(Color::Red);
+    score_title.setFillColor(Color(242, 0, 0, 255));
     score_title.setStyle(Text::Bold);
     window.draw(score_title);
 };
@@ -299,6 +296,9 @@ void Board::step_right() {
 void Board::erase_lines() {
     // full lines counter:
     unsigned full_lines = 0;
+    // second full lines counter in case of a gap
+    // between full lines:
+    unsigned previous_full_lines = 0;
     // the number of the lowest full line :
     unsigned lowest_line = 0;
     // full line trigger:
@@ -340,22 +340,13 @@ void Board::erase_lines() {
                         else
                             map[j][i] = 0;
 
-                // change score value according to the number of erased lignes:
-                switch (full_lines) {
-                    case 1:
-                        score += 40;
-                        break;
-                    case 2:
-                        score += 100;
-                        break;
-                    default:
-                        break;
-                }
-
+                // remember the number of full lines in the previous sequence
+                // to calculate a score correctly in the end:
+                previous_full_lines = full_lines;
                 // reset a number of the full lines (new full lines sequence):
                 full_lines = 1;
                 // change lowest full line value:
-                lowest_line = i;   
+                lowest_line = i;
             }
         }
     }
@@ -376,7 +367,7 @@ void Board::erase_lines() {
     }
 
     // change score value according to the number of erased lignes:
-    switch (full_lines) {
+    switch (full_lines + previous_full_lines) {
         // if no line has been erased - adding 4 points 
         // (like the figure descent reward),
         // which is equal to the figure size:

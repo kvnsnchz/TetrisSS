@@ -1,9 +1,27 @@
 #include <unistd.h>
 #include "board.hpp"
 
-void game() {
-    RenderWindow window(VideoMode(1000, 1000), "TetrisSS 1.0");
+void game(const Vector2f& resolution) {
+    // create the game window
+    // which size depends on user's screen resolution:
+    RenderWindow window(VideoMode(resolution.x / 2, min(45.0f * 20 + 5.0f, resolution.y)), "TetrisSS 1.0");
+    // create the game board: 
     Board *game_board = new Board(window);
+
+    // set the background image:
+    Texture texture;
+    try {
+        if (!texture.loadFromFile("background/bg2.jpg")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, background image not found!" << endl;
+    }
+
+    // create a background itself:
+    Sprite background;
+    background.setTexture(texture);
+    background.setColor(Color(255, 255, 255, 200));
 
     while (window.isOpen()) {
         Event event;
@@ -32,8 +50,13 @@ void game() {
             }
         }
 
+        // clear game window:
         window.clear();
+        // draw background:
+        window.draw(background);
+        // draw a board:
         game_board->print_board(window);
+        // display what we have just drawed:
         window.display();
 
         // if we can't move down no more:
@@ -62,7 +85,10 @@ void game() {
 }
 
 int main(int argc, char const *argv[]) {
-    game();
+    // get user's resolution:
+    Vector2f resolution(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height);
+
+    game(resolution);
 
     return 0;
 }

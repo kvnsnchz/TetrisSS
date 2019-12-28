@@ -42,10 +42,6 @@ class Figure {
         RectangleShape** get_grid() const;
         
         virtual void initialize(unsigned) = 0;
-
-        // print our figure:
-        virtual void print() = 0;
-        
 };
 
 // Square figure definition:
@@ -56,8 +52,6 @@ class Figure_O: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
 
 // Stick figure definition:
@@ -68,8 +62,6 @@ class Figure_I: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
 
 // T figure definition:
@@ -80,8 +72,6 @@ class Figure_T: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
 
 // L figure definition:
@@ -92,8 +82,6 @@ class Figure_L: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
 
 // J figure definition:
@@ -104,8 +92,6 @@ class Figure_J: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
 
 // Z figure definition:
@@ -116,8 +102,6 @@ class Figure_Z: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
 
 // S figure definition:
@@ -128,6 +112,4 @@ class Figure_S: public Figure {
         };
         
         virtual void initialize(unsigned);
-
-        virtual void print();
 };
