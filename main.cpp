@@ -1,10 +1,13 @@
 #include <unistd.h>
 #include "board.hpp"
 
-void game(const Vector2f& resolution) {
+void game() {
+    // get user's resolution:
+    Vector2f resolution(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height);
+
     // create the game window
     // which size depends on user's screen resolution:
-    RenderWindow window(VideoMode(resolution.x / 2, min(45.0f * 20 + 5.0f, resolution.y)), "TetrisSS 1.0");
+    RenderWindow window(VideoMode(min(41.0f * 14 + 20.0f, resolution.x / 2), min(41.0f * 20 + 9.0f, resolution.y)), "TetrisSS 1.0");
     // create the game board: 
     Board *game_board = new Board(window);
 
@@ -85,10 +88,7 @@ void game(const Vector2f& resolution) {
 }
 
 int main(int argc, char const *argv[]) {
-    // get user's resolution:
-    Vector2f resolution(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height);
-
-    game(resolution);
+    game();
 
     return 0;
 }

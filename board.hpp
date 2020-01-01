@@ -7,6 +7,8 @@ class Board {
         unsigned **map;
         // graphic game board:
         RectangleShape **grid;
+        // 2D size of each cell:
+        Vector2f cell_size;
         // x (horizontal) board dimension:
         unsigned x_dimension;
         // y (vertical) board dimension:

@@ -2,7 +2,7 @@
 #include <random>
 #include <algorithm>
 
-Vector2f boardCellSize(40.0f, 40.0f);
+// Vector2f cell_size(40.0f, 40.0f);
 // Next figure graphic variable,
 // she is declared globally because she needs to be called
 // from different methods (needs to be updated):
@@ -13,10 +13,14 @@ Board::Board(RenderWindow& window) {
 };
 
 // Initialize game board 20x10,
-// two more y coordinates to create figures outside (on top of) game board:
+// two more y coordinates to create figures outside (on top of) the game board:
 void Board::initialize(RenderWindow& window){
     x_dimension = 10;
     y_dimension = 22;
+
+    // initialize cell size:
+    cell_size.x = min(min(40.0f, (float) VideoMode::getDesktopMode().width), min(40.0f, (float) VideoMode::getDesktopMode().height));
+    cell_size.y = min(min(40.0f, (float) VideoMode::getDesktopMode().width), min(40.0f, (float) VideoMode::getDesktopMode().height));
 
     // initialize map and board:
     map = new unsigned *[x_dimension];
@@ -37,8 +41,8 @@ void Board::initialize(RenderWindow& window){
     // draw the initial grid:
     for(unsigned i = 0; i < x_dimension; i++) {
         for(unsigned j = 2; j < y_dimension; j++) {
-            grid[i][j].setSize(boardCellSize);
-            grid[i][j].setPosition(i * boardCellSize.x + (i + 1) * 5.0f, (j - 2) * boardCellSize.y + (j - 1) * 5.0f);
+            grid[i][j].setSize(cell_size);
+            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - 2) * cell_size.y + j - 2 + 5.0f);
 
             window.draw(grid[i][j]);
         }
@@ -62,25 +66,25 @@ Figure* Board::create_figure() {
     // Using switch to construct chosen figure:
     switch (figure_number) {
     case 1:
-        new_figure = new Figure_O(x_dimension);
+        new_figure = new Figure_O(x_dimension, cell_size);
         break;
     case 2:
-        new_figure = new Figure_I(x_dimension);
+        new_figure = new Figure_I(x_dimension, cell_size);
         break;
     case 3:
-        new_figure = new Figure_T(x_dimension);
+        new_figure = new Figure_T(x_dimension, cell_size);
         break;
     case 4:
-        new_figure = new Figure_L(x_dimension);
+        new_figure = new Figure_L(x_dimension, cell_size);
         break;
     case 5:
-        new_figure = new Figure_J(x_dimension);
+        new_figure = new Figure_J(x_dimension, cell_size);
         break;
     case 6:
-        new_figure = new Figure_Z(x_dimension);
+        new_figure = new Figure_Z(x_dimension, cell_size);
         break;
     case 7:
-        new_figure = new Figure_S(x_dimension);
+        new_figure = new Figure_S(x_dimension, cell_size);
         break;
     default:
         break;
@@ -175,7 +179,7 @@ void Board::print_board(RenderWindow& window) {
     Text next_figure_title;
     next_figure_title.setFont(font);
     next_figure_title.setString("Next Figure:");
-    next_figure_title.setPosition(x_dimension * (boardCellSize.x + 1) + (x_dimension + 1) * 5.0f, 25.0f);
+    next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 25.0f);
     next_figure_title.setCharacterSize(50);
     next_figure_title.setFillColor(Color(242, 0, 0, 255));
     next_figure_title.setStyle(Text::Bold);
@@ -191,7 +195,7 @@ void Board::print_board(RenderWindow& window) {
     Text score_title;
     score_title.setFont(font);
     score_title.setString("Score: \n" + to_string(score));
-    score_title.setPosition(x_dimension * (boardCellSize.x + 1) + (x_dimension + 1) * 5.0f, 250.0f);
+    score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 200.0f);
     score_title.setCharacterSize(50);
     score_title.setFillColor(Color(242, 0, 0, 255));
     score_title.setStyle(Text::Bold);
