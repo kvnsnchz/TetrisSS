@@ -63,7 +63,7 @@ void Figure_O::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -88,7 +88,7 @@ void Figure_I::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -113,7 +113,7 @@ void Figure_T::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -138,7 +138,7 @@ void Figure_L::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -163,7 +163,7 @@ void Figure_J::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -188,7 +188,7 @@ void Figure_Z::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -213,7 +213,7 @@ void Figure_S::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     for (unsigned i = 0; i < 4; i++)
         for (unsigned j = 0; j < 2; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, ((j + 2) * cell_size.y) + j + 1 + 5.0f);
+            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 

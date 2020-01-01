@@ -19,8 +19,8 @@ void Board::initialize(RenderWindow& window){
     y_dimension = 22;
 
     // initialize cell size:
-    cell_size.x = min(min(40.0f, (float) VideoMode::getDesktopMode().width), min(40.0f, (float) VideoMode::getDesktopMode().height));
-    cell_size.y = min(min(40.0f, (float) VideoMode::getDesktopMode().width), min(40.0f, (float) VideoMode::getDesktopMode().height));
+    cell_size.x = min(min(20.0f, (float) VideoMode::getDesktopMode().width), min(20.0f, (float) VideoMode::getDesktopMode().height));
+    cell_size.y = min(min(20.0f, (float) VideoMode::getDesktopMode().width), min(20.0f, (float) VideoMode::getDesktopMode().height));
 
     // initialize map and board:
     map = new unsigned *[x_dimension];
