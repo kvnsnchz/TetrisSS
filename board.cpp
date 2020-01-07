@@ -2,7 +2,6 @@
 #include <random>
 #include <algorithm>
 
-// Vector2f cell_size(40.0f, 40.0f);
 // Next figure graphic variable,
 // she is declared globally because she needs to be called
 // from different methods (needs to be updated):
@@ -19,8 +18,8 @@ void Board::initialize(RenderWindow& window){
     y_dimension = 22;
 
     // initialize cell size according the user's screen resolution:
-    cell_size.x = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 29.0f) / 20));
-    cell_size.y = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 29.0f) / 20));
+    cell_size.x = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 129.0f) / 20));
+    cell_size.y = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 129.0f) / 20));
 
     // initialize map and board:
     map = new unsigned *[x_dimension];
