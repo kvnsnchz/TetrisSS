@@ -18,9 +18,9 @@ void Board::initialize(RenderWindow& window){
     x_dimension = 10;
     y_dimension = 22;
 
-    // initialize cell size:
-    cell_size.x = min(min(20.0f, (float) VideoMode::getDesktopMode().width), min(20.0f, (float) VideoMode::getDesktopMode().height));
-    cell_size.y = min(min(20.0f, (float) VideoMode::getDesktopMode().width), min(20.0f, (float) VideoMode::getDesktopMode().height));
+    // initialize cell size according the user's screen resolution:
+    cell_size.x = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 29.0f) / 20));
+    cell_size.y = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 29.0f) / 20));
 
     // initialize map and board:
     map = new unsigned *[x_dimension];
@@ -298,18 +298,32 @@ void Board::step_right() {
 
 // Check for the full lines and erase them if they are exist:
 void Board::erase_lines() {
+    // initialize the indices of the highest and lowest possible full lines
+    // (according to the y coordinates of the current figure):
+    unsigned begin = 22;
+    unsigned end = 2;
+
+    // calculate these indices:
+    for (unsigned i = 0; i < 4; i++) {
+        if (begin > current_figure->get_points()[i]->get_y())
+            begin = current_figure->get_points()[i]->get_y();
+        if (end < current_figure->get_points()[i]->get_y())
+    for (unsigned i = 0; i < 4; i++) 
+            end = current_figure->get_points()[i]->get_y();
+    }
+
     // full lines counter:
     unsigned full_lines = 0;
     // second full lines counter in case of a gap
     // between full lines:
     unsigned previous_full_lines = 0;
-    // the number of the lowest full line :
+    // the index of the lowest full line :
     unsigned lowest_line = 0;
     // full line trigger:
     bool is_full = true;
 
     // starting check from the first visible line:
-    for (unsigned i = 2; i < y_dimension; i++) {
+    for (unsigned i = begin; i <= end; i++) {
         for (unsigned j = 0; j < x_dimension; j++) {
             // if a current cell is occupied - do not touch a trigger:
             if (map[j][i] >= 10)
