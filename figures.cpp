@@ -2,21 +2,40 @@
 
 // Vector2f cell_size(40.0f, 40.0f);
 
-void Point::set_x(unsigned x_new) {
+void Point::set_x(unsigned& x_new) {
     x = x_new;
 };
 
-void Point::set_y(unsigned y_new) {
+void Point::set_y(unsigned& y_new) {
     y = y_new;
 };
 
-void Point::increment_x(const unsigned& value) {
+void Point::increment_x(const int& value) {
     x += value;
 };
 
-void Point::increment_y(const unsigned& value) {
+void Point::increment_y(const int& value) {
     y += value;
 };
+
+void Point::rotate(const bool& right, const Point* reference){
+    if(reference == NULL){
+        return;
+    }
+
+    int old_x;
+
+    if(right){
+        old_x = x;
+        x = (y - reference->get_y()) * (-1) + reference->get_x();
+        y = (old_x - reference->get_x()) + reference->get_y();
+        return;
+    }
+
+    old_x = x;
+    x = (y - reference->get_y()) + reference->get_x();
+    y = (old_x - reference->get_x()) * (-1) + reference->get_y();
+}
 
 unsigned Point::get_x() const {
     return x;
@@ -30,6 +49,10 @@ Point::~Point() {};
 
 vector<Point *> Figure::get_points() const{
     return points;
+}
+
+Point* Figure::get_point_reference() const{
+    return point_reference;
 }
 
 unsigned Figure::get_color_code() const{
@@ -56,7 +79,7 @@ void Figure_O::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     points.push_back(new Point(x_dim / 2, 0));
     points.push_back(new Point(x_dim / 2 - 1, 1));
     points.push_back(new Point(x_dim / 2, 1));
-
+    
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
@@ -77,10 +100,11 @@ void Figure_O::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // Stick figure initialization:
 void Figure_I::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = new Point(x_dim / 2, 1);
     points.push_back(new Point(x_dim / 2 - 2, 1));
     points.push_back(new Point(x_dim / 2 - 1, 1));  
-    points.push_back(new Point(x_dim / 2, 1));
     points.push_back(new Point(x_dim / 2 + 1, 1));
+    points.push_back(point_reference);
 
     // initialize the figure`s grid:
     // set each cell`s size, position 
@@ -102,10 +126,11 @@ void Figure_I::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // T figure initialization:
 void Figure_T::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = new Point(x_dim / 2 - 1, 1);
     points.push_back(new Point(x_dim / 2 - 1, 0));
     points.push_back(new Point(x_dim / 2 - 2, 1));
-    points.push_back(new Point(x_dim / 2 - 1, 1));
     points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(point_reference);
 
     // initialize the figure`s grid:
     // set each cell`s size, position 
@@ -127,10 +152,11 @@ void Figure_T::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // L figure initialization:
 void Figure_L::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = new Point(x_dim / 2 - 1, 1);
     points.push_back(new Point(x_dim / 2, 0));
-    points.push_back(new Point(x_dim / 2 - 2, 1));
-    points.push_back(new Point(x_dim / 2 - 1, 1));
     points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(point_reference);
+    points.push_back(new Point(x_dim / 2 - 2, 1));
 
     // initialize the figure`s grid:
     // set each cell`s size, position 
@@ -152,10 +178,11 @@ void Figure_L::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // J figure initialization:
 void Figure_J::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = new Point(x_dim / 2 - 1, 1);
     points.push_back(new Point(x_dim / 2 - 2, 0));
     points.push_back(new Point(x_dim / 2 - 2, 1));
-    points.push_back(new Point(x_dim / 2 - 1, 1));
     points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(point_reference);
 
     // initialize the figure`s grid:
     // set each cell`s size, position 
@@ -177,10 +204,11 @@ void Figure_J::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // Z figure initialization:
 void Figure_Z::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = new Point(x_dim / 2 - 1, 1);
     points.push_back(new Point(x_dim / 2 - 2, 0));
     points.push_back(new Point(x_dim / 2 - 1, 0));
-    points.push_back(new Point(x_dim / 2 - 1, 1));
     points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(point_reference);
 
     // initialize the figure`s grid:
     // set each cell`s size, position 
@@ -202,10 +230,11 @@ void Figure_Z::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // S figure initialization:
 void Figure_S::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = new Point(x_dim / 2 - 1, 1);
     points.push_back(new Point(x_dim / 2 - 1, 0));
-    points.push_back(new Point(x_dim / 2, 0));
     points.push_back(new Point(x_dim / 2 - 2, 1));
-    points.push_back(new Point(x_dim / 2 - 1, 1));
+    points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(point_reference);
 
     // initialize the figure`s grid:
     // set each cell`s size, position 

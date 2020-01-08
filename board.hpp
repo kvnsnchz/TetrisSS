@@ -49,7 +49,7 @@ class Board {
         bool step_down();
         void step_left();
         void step_right();
-
+        void rotate(const bool& right = true);
         // Check for the full lines and erase them if they are:
         void erase_lines();
 

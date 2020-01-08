@@ -295,6 +295,16 @@ void Board::step_right() {
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
 };
 
+void Board::rotate(const bool& right){
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
+        change_point(*current_figure->get_points()[i]);
+        current_figure->get_points()[i]->rotate(right, current_figure->get_point_reference());
+    }
+
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+        change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+}
+
 // Check for the full lines and erase them if they are exist:
 void Board::erase_lines() {
     // initialize the indices of the highest and lowest possible full lines

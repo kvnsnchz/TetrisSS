@@ -55,6 +55,13 @@ void game() {
                             game_board->step_down();
                             // usleep(50000);
                             break;
+                        case Keyboard::G:
+                            game_board->rotate(false);
+                            break;
+                        case Keyboard::H:
+                            game_board->rotate(true);
+                            // usleep(50000);
+                            break;
                         default:
                             break;
                     }
