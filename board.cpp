@@ -316,8 +316,7 @@ void Board::erase_lines() {
     for (unsigned i = 0; i < 4; i++) {
         if (begin > current_figure->get_points()[i]->get_y())
             begin = current_figure->get_points()[i]->get_y();
-        if (end < current_figure->get_points()[i]->get_y())
-    for (unsigned i = 0; i < 4; i++) 
+        if (end < current_figure->get_points()[i]->get_y()) 
             end = current_figure->get_points()[i]->get_y();
     }
 
