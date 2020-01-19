@@ -41,7 +41,7 @@ class Board {
         void set_next_figure(Figure* figure);
 
         // draw game board:
-        void print_board(RenderWindow& window);
+        void print_board(RenderWindow& window, const Font& font);
 
         bool is_empty(const Point& point) const;
         void change_point(const Point& point, const int& new_value = 0);
@@ -49,9 +49,9 @@ class Board {
         bool step_down();
         void step_left();
         void step_right();
-
+        void rotate(const bool& right = true);
         // Check for the full lines and erase them if they are:
-        void erase_lines();
+        void erase_lines(const unsigned& complexity);
 
         // adding game over condition function:
         bool game_over();

@@ -122,7 +122,7 @@ void Board::set_next_figure(Figure* figure) {
 };
 
 // print game board:
-void Board::print_board(RenderWindow& window) {
+void Board::print_board(RenderWindow& window, const Font& font) {
     for(unsigned i = 0; i < x_dimension; i++) {
         for(unsigned j = 2; j < y_dimension; j++) {
             switch(map[i][j]) {
@@ -166,15 +166,6 @@ void Board::print_board(RenderWindow& window) {
     }   
 
     // update next figure:
-    Font font;
-    try {
-        if (!font.loadFromFile("amatic/Amatic-Bold.ttf")) 
-            throw 0;
-    } catch (int e) {
-        if (e == 0)
-            cout << "Sorry, font file not found!" << endl;
-    } 
-    
     Text next_figure_title;
     next_figure_title.setFont(font);
     next_figure_title.setString("Next Figure:");
@@ -295,8 +286,18 @@ void Board::step_right() {
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
 };
 
+void Board::rotate(const bool& right){
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
+        change_point(*current_figure->get_points()[i]);
+        current_figure->get_points()[i]->rotate(right, current_figure->get_point_reference());
+    }
+
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+        change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+}
+
 // Check for the full lines and erase them if they are exist:
-void Board::erase_lines() {
+void Board::erase_lines(const unsigned& complexity) {
     // initialize the indices of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
     unsigned begin = 22;
@@ -307,7 +308,6 @@ void Board::erase_lines() {
         if (begin > current_figure->get_points()[i]->get_y())
             begin = current_figure->get_points()[i]->get_y();
         if (end < current_figure->get_points()[i]->get_y())
-    for (unsigned i = 0; i < 4; i++) 
             end = current_figure->get_points()[i]->get_y();
     }
 
@@ -383,25 +383,25 @@ void Board::erase_lines() {
                     map[j][i] = 0;
     }
 
-    // change score value according to the number of erased lignes:
+    // change score value according to the number of erased lignes and also complexity:
     switch (full_lines + previous_full_lines) {
         // if no line has been erased - adding 4 points 
         // (like the figure descent reward),
         // which is equal to the figure size:
         case 0:
-            score += 4;
+            score += 4 + 2 * (complexity - 1);
             break;
         case 1:
-            score += 40;
+            score += 40 * complexity;
             break;
         case 2:
-            score += 100;
+            score += 100 * complexity;
             break;
         case 3:
-            score += 300;
+            score += 300 * complexity;
             break;
         case 4:
-            score += 1200;
+            score += 1200 * complexity;
             break;
         default:
             break;

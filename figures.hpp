@@ -14,11 +14,13 @@ class Point {
         Point(unsigned x_0, unsigned y_0): x(x_0), y(y_0) {};
         Point(const Point& start_point): x(start_point.x), y(start_point.y) {};
 
-        void set_x(unsigned x_new);
-        void set_y(unsigned y_new);
+        void set_x(unsigned&);
+        void set_y(unsigned&);
 
-        void increment_x(const unsigned& value = 1);
-        void increment_y(const unsigned& value = 1);
+        void increment_x(const int& value = 1);
+        void increment_y(const int& value = 1);
+
+        void rotate(const bool&, const Point*);
 
         unsigned get_x() const;
         unsigned get_y() const;
@@ -30,6 +32,7 @@ class Point {
 class Figure {
     protected:
         vector<Point *> points;
+        Point* point_reference;
         unsigned color_code;
         // figure's graphical grid:
         RectangleShape grid[4][2];
@@ -38,9 +41,10 @@ class Figure {
         Figure(const unsigned& code) : color_code(code) {}
 
         vector<Point *> get_points() const;
+        Point* get_point_reference() const;
         unsigned get_color_code() const;
         RectangleShape** get_grid() const;
-        
+
         virtual void initialize(const unsigned&, const Vector2f&) = 0;
 };
 
