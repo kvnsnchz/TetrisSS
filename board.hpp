@@ -1,5 +1,13 @@
 #include "figures.hpp"
 
+enum overflow {
+    NONE,
+    OVERFLOW_RIGHT,
+    OVERFLOW_LEFT,
+    OVERFLOW_DOWN,
+    OVERFLOW_UP
+};
+
 class Board {
     private:
         // game board map - two-dimensional matrix
@@ -44,12 +52,12 @@ class Board {
         void print_board(RenderWindow& window);
 
         bool is_empty(const Point& point) const;
-        void change_point(const Point& point, const int& new_value = 0);
-
+        overflow change_point(const Point& point, const int& new_value = 0);
+        void change_points_rotated(const overflow&);
         bool step_down();
         void step_left();
         void step_right();
-        void rotate(const bool& right = true);
+        void rotate(bool right);
         // Check for the full lines and erase them if they are:
         void erase_lines();
 

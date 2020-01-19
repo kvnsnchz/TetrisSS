@@ -2,11 +2,11 @@
 
 // Vector2f cell_size(40.0f, 40.0f);
 
-void Point::set_x(unsigned& x_new) {
+void Point::set_x(int& x_new) {
     x = x_new;
 };
 
-void Point::set_y(unsigned& y_new) {
+void Point::set_y(int& y_new) {
     y = y_new;
 };
 
@@ -37,11 +37,11 @@ void Point::rotate(const bool& right, const Point* reference){
     y = (old_x - reference->get_x()) * (-1) + reference->get_y();
 }
 
-unsigned Point::get_x() const {
+int Point::get_x() const {
     return x;
 };
 
-unsigned Point::get_y() const {
+int Point::get_y() const {
     return y;
 };
 
@@ -70,6 +70,11 @@ RectangleShape** Figure::get_grid() const {
             result[i][j] = grid[i][j];
 
     return result;
+}
+
+bool Figure_Simple_Rotation::get_next_rotation(){
+    already_rotated = !already_rotated;
+    return already_rotated;
 }
 
 // Square figure initialization:
@@ -233,7 +238,7 @@ void Figure_S::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     point_reference = new Point(x_dim / 2 - 1, 1);
     points.push_back(new Point(x_dim / 2 - 1, 0));
     points.push_back(new Point(x_dim / 2 - 2, 1));
-    points.push_back(new Point(x_dim / 2, 1));
+    points.push_back(new Point(x_dim / 2, 0));
     points.push_back(point_reference);
 
     // initialize the figure`s grid:

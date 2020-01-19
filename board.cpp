@@ -202,14 +202,30 @@ void Board::print_board(RenderWindow& window) {
 };
 
 bool Board::is_empty(const Point& point) const {
+    if(point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension){
+        return false;
+    }
+
     if (map[point.get_x()][point.get_y()] == 0 || map[point.get_x()][point.get_y()] == current_figure->get_color_code())
         return true;
     else 
         return false;
 };
 
-void Board::change_point(const Point& point, const int& new_value) {
+overflow Board::change_point(const Point& point, const int& new_value) {
+    if(point.get_x() < 0 )
+        return OVERFLOW_LEFT;
+    if(point.get_x() >= x_dimension)
+        return OVERFLOW_RIGHT;
+    if(point.get_y() < 0)
+        return OVERFLOW_UP;
+    if(point.get_y() >= y_dimension)
+        return OVERFLOW_DOWN;
+    //if(map[point.get_x()][point.get_y()] != 0)
+      //  return OVERFLOW_DOWN;
+
     map[point.get_x()][point.get_y()] = new_value;
+    return NONE;
 };
 
 bool Board::step_down() {
@@ -295,14 +311,46 @@ void Board::step_right() {
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
 };
 
-void Board::rotate(const bool& right){
+void Board::change_points_rotated(const overflow& overf){
+    overflow _overf;
+
+    if(overf != NONE)
+        for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
+            change_point(*current_figure->get_points()[i]);
+            if(overf == OVERFLOW_DOWN)
+                current_figure->get_points()[i]->increment_y(-1);
+            if(overf == OVERFLOW_LEFT)
+                current_figure->get_points()[i]->increment_x(1);
+            if(overf == OVERFLOW_RIGHT)
+                current_figure->get_points()[i]->increment_x(-1);
+        }
+
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++){
+        _overf = change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+        if(_overf != NONE){
+            break;
+           
+        }
+    }
+    
+    if(_overf != NONE)
+        change_points_rotated(_overf);
+
+    return;
+}
+
+void Board::rotate(bool right){
+    
+    if(dynamic_cast<Figure_Simple_Rotation*>(current_figure)){
+       right = ((Figure_Simple_Rotation*)current_figure)->get_next_rotation();
+    }
+
     for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
         change_point(*current_figure->get_points()[i]);
         current_figure->get_points()[i]->rotate(right, current_figure->get_point_reference());
     }
 
-    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
-        change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+    change_points_rotated(NONE);
 }
 
 // Check for the full lines and erase them if they are exist:
