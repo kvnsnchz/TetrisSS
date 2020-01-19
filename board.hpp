@@ -22,15 +22,17 @@ class Board {
 
         friend ostream& operator <<(ostream& stream, const Board& board);
     public:
-        Board(RenderWindow& window);
+        Board(RenderWindow& window, const Vector2f& initial_cell_size);
 
         // game board initialization:
-        void initialize(RenderWindow& window);
+        void initialize(RenderWindow& window, const Vector2f& initial_cell_size);
         // new figure creation function:
         Figure* create_figure();
         // adding figure on top of the board:
         void add_figure();
         
+        void set_cell_size(const Vector2f& new_cell_size);
+
         unsigned get_x_dim() const;
         unsigned get_y_dim() const;
 
@@ -41,7 +43,7 @@ class Board {
         void set_next_figure(Figure* figure);
 
         // draw game board:
-        void print_board(RenderWindow& window, const Font& font);
+        void print_board(RenderWindow& window, const Font& font, const double& font_size);
 
         bool is_empty(const Point& point) const;
         void change_point(const Point& point, const int& new_value = 0);
