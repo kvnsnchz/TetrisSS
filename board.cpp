@@ -7,15 +7,18 @@
 // from different methods (needs to be updated):
 RectangleShape** figure_to_draw;
 
-Board::Board(RenderWindow& window, const Vector2f& initial_cell_size) {
-    initialize(window, initial_cell_size);
+Board::Board(RenderWindow& window, const unsigned& initial_complexity, const Vector2f& initial_cell_size) {
+    initialize(window, initial_complexity, initial_cell_size);
 };
 
 // Initialize game board 20x10,
 // two more y coordinates to create figures outside (on top of) the game board:
-void Board::initialize(RenderWindow& window, const Vector2f& initial_cell_size){
+void Board::initialize(RenderWindow& window, const unsigned& initial_complexity, const Vector2f& initial_cell_size){
     x_dimension = 10;
     y_dimension = 22;
+
+    // initialize game complexity:
+    complexity = initial_complexity;
 
     // initialize cell size:
     cell_size.x = initial_cell_size.x;
@@ -95,16 +98,23 @@ Figure* Board::create_figure() {
 void Board::add_figure() {
     for (unsigned i = 0; i < current_figure->get_points().size(); i++) 
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
-}
+};
+
+unsigned Board::get_complexity() {
+    return complexity;
+};
+
+void Board::set_complexity(const unsigned& new_complexity) {
+    complexity = new_complexity;
+};
 
 void Board::set_cell_size(const Vector2f& new_cell_size) {
     cell_size.x = new_cell_size.x;
     cell_size.y = new_cell_size.y;
 
     // Update next figures' cell size:
-    for (unsigned i = 0; i < 4; i++) {
-        // current_figure[i].
-    }
+    for (unsigned i = 0; i < 4; i++)
+        next_figure->set_grid(x_dimension, new_cell_size);
 };
 
 unsigned Board::get_x_dim() const {
@@ -162,7 +172,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
                     break;
                 case 5:
                 case 50:
-                    grid[i][j].setFillColor(Color(134, 33, 255, 255));
+                    grid[i][j].setFillColor(Color(144, 12, 63, 255));
                     break;
                 case 6:
                 case 60:
@@ -200,7 +210,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     Text score_title;
     score_title.setFont(font);
     score_title.setString("Score: \n" + to_string(score));
-    score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 200.0f);
+    score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + 2 * cell_size.y + 30.0f);
     score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
     score_title.setFillColor(Color(144, 12, 63, 255));

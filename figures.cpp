@@ -1,7 +1,5 @@
 #include "figures.hpp"
 
-// Vector2f cell_size(40.0f, 40.0f);
-
 void Point::set_x(int& x_new) {
     x = x_new;
 };
@@ -60,17 +58,25 @@ unsigned Figure::get_color_code() const{
 }
 
 RectangleShape** Figure::get_grid() const {
-    RectangleShape** result = new RectangleShape *[4];
-    for (unsigned i = 0; i < 4; i++) {
-        result[i] = new RectangleShape [2];
+    RectangleShape** result = new RectangleShape *[FIGURE_GRID_WIDTH];
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++) {
+        result[i] = new RectangleShape [FIGURE_GRID_HEIGHT];
     }
 
-    for (unsigned i = 0; i < 4; i++) 
-        for (unsigned j = 0; j < 2; j++)
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++) 
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++)
             result[i][j] = grid[i][j];
 
     return result;
 }
+
+void Figure::set_grid(const unsigned& x_dim, const Vector2f& new_cell_size) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
+            grid[i][j].setSize(new_cell_size);
+            grid[i][j].setPosition((x_dim + i) * (new_cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (new_cell_size.y + 1) + 5.0f);
+        }
+};
 
 bool Figure_Simple_Rotation::get_next_rotation(){
     already_rotated = !already_rotated;
@@ -88,10 +94,10 @@ void Figure_O::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -114,10 +120,10 @@ void Figure_I::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -140,10 +146,10 @@ void Figure_T::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -166,10 +172,10 @@ void Figure_L::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -192,18 +198,18 @@ void Figure_J::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[0][0].setFillColor(Color(134, 33, 255, 255));
-    grid[0][1].setFillColor(Color(134, 33, 255, 255));
-    grid[1][1].setFillColor(Color(134, 33, 255, 255));
-    grid[2][1].setFillColor(Color(134, 33, 255, 255)); 
+    grid[0][0].setFillColor(Color(144, 12, 63, 255));
+    grid[0][1].setFillColor(Color(144, 12, 63, 255));
+    grid[1][1].setFillColor(Color(144, 12, 63, 255));
+    grid[2][1].setFillColor(Color(144, 12, 63, 255)); 
 }
 
 // Z figure initialization:
@@ -218,10 +224,10 @@ void Figure_Z::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 
@@ -244,10 +250,10 @@ void Figure_S::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // initialize the figure`s grid:
     // set each cell`s size, position 
     // and initial color (same as background):
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++) {
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(x_dim * (cell_size.x + 1) + (i * cell_size.x) + i + x_dim + 1 + 5.0f, j * cell_size.y + j + 1 + 85.0f);
+            grid[i][j].setPosition((x_dim + i) * (cell_size.x + 1) + x_dim + 1 + 5.0f, (j + 2) * (cell_size.y + 1) + 5.0f);
             grid[i][j].setFillColor(Color(255, 255, 255, 0));
         };
 

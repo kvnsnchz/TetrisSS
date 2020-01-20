@@ -4,24 +4,25 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // button size:
-    double button_size = min(60.0f, 3.5f * (window.getSize().x - 425.0f) / 10);
+    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
 
     // initialize cell size according the current window size:
-    Vector2f cell_size(min(min(40.0f, (float) (window.getSize().x - 3.5 * button_size / 10 - 24.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
-                    min(min(40.0f, (float) (window.getSize().x - 3.5 * button_size / 10 - 24.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
-    // create the game board: 
-    Board *game_board = new Board(window, cell_size);
+    Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
-    // Initialize to main menu button:
-    Text to_main_menu;
-    to_main_menu.setFont(font);
-    to_main_menu.setString("Main menu");
-    to_main_menu.setCharacterSize(5 * button_size / 6);
-    to_main_menu.setOutlineThickness(button_size / 6);
-    to_main_menu.setStyle(Text::Bold);
-    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
-    to_main_menu.setPosition((cell_size.x + 1) * 10 + 19.0f, 20 * button_size / 6 + 125.0f);
+    // create the game board: 
+    Board* game_board = new Board(window, complexity, cell_size);
+
+    // Initialize pause button:
+    Text pause;
+    pause.setFont(font);
+    pause.setString("Pause");
+    pause.setCharacterSize(5 * button_size / 6);
+    pause.setOutlineThickness(button_size / 6);
+    pause.setStyle(Text::Bold);
+    pause.setFillColor(Color(144, 12, 63, 255));
+    pause.setOutlineColor(Color(218, 247, 166, 255));
+    pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
 
     while (window.isOpen()) {
         Event event;
@@ -35,17 +36,17 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+                    pause.setFillColor(Color(144, 12, 63, 255));
+                    pause.setOutlineColor(Color(218, 247, 166, 255));
 
                     // If appropriate mouse position was captured:
-                    if ((Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left >= 0) &&
-                        (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top >= 0) &&
-                        (Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left <= to_main_menu.getGlobalBounds().width) &&
-                        (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top <= to_main_menu.getGlobalBounds().height)) {
-                        // focus new single game button:
-                        to_main_menu.setFillColor(Color(255, 195, 0, 255));
-                        to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                    if ((Mouse::getPosition(window).x - pause.getGlobalBounds().left >= 0) &&
+                        (Mouse::getPosition(window).y - pause.getGlobalBounds().top >= 0) &&
+                        (Mouse::getPosition(window).x - pause.getGlobalBounds().left <= pause.getGlobalBounds().width) &&
+                        (Mouse::getPosition(window).y - pause.getGlobalBounds().top <= pause.getGlobalBounds().height)) {
+                        // focus pause button:
+                        pause.setFillColor(Color(255, 195, 0, 255));
+                        pause.setOutlineColor(Color(8, 0, 93, 255));
                         focused_button_counter = 1;
                     }
                     break;
@@ -53,9 +54,9 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                     switch (event.key.code) {
                         case Mouse::Left:
                             // If appropriate mouse position was captured:
-                            // 1) to_main_menu game:
-                            if ((Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left <= to_main_menu.getGlobalBounds().width) &&
-                                (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top <= to_main_menu.getGlobalBounds().height))
+                            // 1) pause game:
+                            if ((Mouse::getPosition(window).x - pause.getGlobalBounds().left <= pause.getGlobalBounds().width) &&
+                                (Mouse::getPosition(window).y - pause.getGlobalBounds().top <= pause.getGlobalBounds().height))
                                 main_menu(window, background, font);
                             break;
                         default:
@@ -77,19 +78,19 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                         break;
 
                                     // focus main menu button:
-                                    to_main_menu.setFillColor(Color(255, 195, 0, 255));
-                                    to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                                    pause.setFillColor(Color(255, 195, 0, 255));
+                                    pause.setOutlineColor(Color(8, 0, 93, 255));
                                     focused_button_counter++;
                                     break;
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
-                                        // execute to_main_menu button:
+                                        // execute pause button:
                                         main_menu(window, background, font);
 
                                     // unfocus main menu button:
-                                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-                                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+                                    pause.setFillColor(Color(144, 12, 63, 255));
+                                    pause.setOutlineColor(Color(218, 247, 166, 255));
                                     focused_button_counter = 0;
                                     break;
                                 default:
@@ -127,22 +128,22 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                     // set minimal window size:
                     if ((window.getSize().y < 600) || (window.getSize().x < 400))
                         window.setSize(Vector2u(400, 600));
-                        
-                    // button size:
-                    button_size = min(60.0f, 3.5f * (window.getSize().x - 425.0f) / 10);
                     
                     // update view:
                     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
                     // update cell size:
-                    cell_size.x = min(min(40.0f, (float) (window.getSize().x - 3.5 * button_size / 10 - 24.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                    cell_size.y = min(min(40.0f, (float) (window.getSize().x - 3.5 * button_size / 10 - 24.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                     game_board->set_cell_size(cell_size);
 
+                    // update button size:
+                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+
                     // update all the buttons and their positions:
-                    to_main_menu.setCharacterSize(5 * button_size / 6);
-                    to_main_menu.setOutlineThickness(button_size / 6);
-                    to_main_menu.setPosition((cell_size.x + 1) * 10 + 19.0f, 4 * button_size + 125.0f);
+                    pause.setCharacterSize(5 * button_size / 6);
+                    pause.setOutlineThickness(button_size / 6);
+                    pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                     break;
                 default:
                     break;
@@ -160,36 +161,17 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
-        // draw to main menu button:
-        window.draw(to_main_menu);
-        // display what we have just drawed:
-        window.display();
+        // draw pause button:
+        window.draw(pause);
 
         // if we can't move down no more:
         if (!game_board->step_down()) {
             // check for the full lines:
             game_board->erase_lines(complexity);
-                    
-            // if we reached game over condition:
-            if (game_board->game_over()) {
-                // // set the background image:
-                // Texture texture;
-                // try {
-                //     if (!texture.loadFromFile("background/game_over.png")) 
-                //         throw 0;
-                // } catch (int e) {
-                //     if (e == 0)
-                //         cout << "Sorry, game over image not found!" << endl;
-                // }
 
-                // // create a background itself:
-                // Sprite game_over;
-                // game_over.setTexture(texture);
-                // window.draw(game_over);
-                cout << " Game Over!!!" << endl;
-                usleep(1000000);
-                break;
-            }
+            // if we have reached game over condition:
+            if (game_board->game_over())
+                game_over_menu(window, background, game_board, font);
 
             // putting next figure into a current figure:
             game_board->set_current_figure(game_board->get_next_figure());
@@ -199,11 +181,337 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
             game_board->set_next_figure(game_board->create_figure());
         }
 
+        // display what we have just drawn:
+        window.display();
+
         // set delay according to the complexity:
         usleep(300000 / complexity);
     }
 
     delete game_board;
+}
+
+void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board, const Font& font) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // number of buttons:
+    const unsigned number_of_buttons = 4;
+    // button size:
+    double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
+        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+
+    // initalize the game over background:
+    RectangleShape game_over_background;
+    game_over_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
+    game_over_background.setFillColor(Color(255, 255, 255, 100));
+
+    // set the game over image:
+    Texture texture;
+    try {
+        if (!texture.loadFromFile("background/game_over.png")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, game over image not found!" << endl;
+    }
+
+    // create a game over sprite itself:
+    Sprite game_over;
+    game_over.setTexture(texture);
+    game_over.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.2);
+    game_over.setColor(Color(255, 255, 255, 100));
+
+    // Initialize restart button:
+    Text restart;
+    restart.setFont(font);
+    restart.setString("Restart");
+    restart.setCharacterSize(5 * button_size / 6);
+    restart.setOutlineThickness(button_size / 6);
+    restart.setStyle(Text::Bold); 
+    restart.setFillColor(Color(144, 12, 63, 255));
+    restart.setOutlineColor(Color(218, 247, 166, 255));
+    restart.setPosition((window.getSize().x - restart.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15));
+
+    // Initialize choose complexity button:
+    Text choose_complexity;
+    choose_complexity.setFont(font);
+    choose_complexity.setString("Choose Complexity");
+    choose_complexity.setCharacterSize(5 * button_size / 6);
+    choose_complexity.setOutlineThickness(button_size / 6);
+    choose_complexity.setStyle(Text::Bold); 
+    choose_complexity.setFillColor(Color(144, 12, 63, 255));
+    choose_complexity.setOutlineColor(Color(218, 247, 166, 255));
+    choose_complexity.setPosition((window.getSize().x - choose_complexity.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + button_size + 15);
+
+    // Initialize to_main_menu button:
+    Text to_main_menu;
+    to_main_menu.setFont(font);
+    to_main_menu.setString("Main Menu");
+    to_main_menu.setCharacterSize(5 * button_size / 6);
+    to_main_menu.setOutlineThickness(button_size / 6);
+    to_main_menu.setStyle(Text::Bold);
+    to_main_menu.setFillColor(Color(144, 12, 63, 255));
+    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+    to_main_menu.setPosition((window.getSize().x - to_main_menu.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 2);
+
+    // Initialize exit button:
+    Text exit;
+    exit.setFont(font);
+    exit.setString("Exit");
+    exit.setCharacterSize(5 * button_size / 6);
+    exit.setOutlineThickness(button_size / 6);
+    exit.setStyle(Text::Bold);
+    exit.setFillColor(Color(144, 12, 63, 255));
+    exit.setOutlineColor(Color(218, 247, 166, 255));
+    exit.setPosition((window.getSize().x - exit.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 3);
+
+
+    while (window.isOpen()) {
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    restart.setFillColor(Color(144, 12, 63, 255));
+                    restart.setOutlineColor(Color(218, 247, 166, 255));
+                    choose_complexity.setFillColor(Color(144, 12, 63, 255));
+                    choose_complexity.setOutlineColor(Color(218, 247, 166, 255));
+                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
+                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+                    exit.setFillColor(Color(144, 12, 63, 255));
+                    exit.setOutlineColor(Color(218, 247, 166, 255));
+
+                    // If appropriate mouse position was captured:
+                    if ((Mouse::getPosition(window).x - restart.getGlobalBounds().left >= 0) &&
+                        (Mouse::getPosition(window).y - restart.getGlobalBounds().top >= 0) &&
+                        (Mouse::getPosition(window).x - restart.getGlobalBounds().left <= restart.getGlobalBounds().width) &&
+                        (Mouse::getPosition(window).y - restart.getGlobalBounds().top <= restart.getGlobalBounds().height)) {
+                        // focus restart button:
+                        restart.setFillColor(Color(255, 195, 0, 255));
+                        restart.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 1;
+                    } else if ((Mouse::getPosition(window).x - choose_complexity.getGlobalBounds().left >= 0) &&
+                               (Mouse::getPosition(window).y - choose_complexity.getGlobalBounds().top >= 0) &&
+                               (Mouse::getPosition(window).x - choose_complexity.getGlobalBounds().left <= choose_complexity.getGlobalBounds().width) &&
+                               (Mouse::getPosition(window).y - choose_complexity.getGlobalBounds().top <= choose_complexity.getGlobalBounds().height)) {
+                        // focus new choose_complexity game button:
+                        choose_complexity.setFillColor(Color(255, 195, 0, 255));
+                        choose_complexity.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 2;
+                    } else if ((Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left >= 0) &&
+                               (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top >= 0) &&
+                               (Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left <= to_main_menu.getGlobalBounds().width) &&
+                               (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top <= to_main_menu.getGlobalBounds().height)) {
+                        // focus to_main_menu button:
+                        to_main_menu.setFillColor(Color(255, 195, 0, 255));
+                        to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 3;
+                    } else if ((Mouse::getPosition(window).x - exit.getGlobalBounds().left >= 0) &&
+                               (Mouse::getPosition(window).y - exit.getGlobalBounds().top >= 0) &&
+                               (Mouse::getPosition(window).x - exit.getGlobalBounds().left <= exit.getGlobalBounds().width) &&
+                               (Mouse::getPosition(window).y - exit.getGlobalBounds().top <= exit.getGlobalBounds().height)) {
+                        // focus exit button:
+                        exit.setFillColor(Color(255, 195, 0, 255));
+                        exit.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 4;
+                    }
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) Restart game:
+                            if ((Mouse::getPosition(window).x - restart.getGlobalBounds().left >= 0) &&
+                                (Mouse::getPosition(window).y - restart.getGlobalBounds().top >= 0) &&
+                                (Mouse::getPosition(window).x - restart.getGlobalBounds().left <= restart.getGlobalBounds().width) &&
+                                (Mouse::getPosition(window).y - restart.getGlobalBounds().top <= restart.getGlobalBounds().height))
+                                game(window, background, font, game_board->get_complexity());
+                            // 2) Go to cemplexity menu:
+                            else if ((Mouse::getPosition(window).x - choose_complexity.getGlobalBounds().left >= 0) &&
+                                     (Mouse::getPosition(window).y - choose_complexity.getGlobalBounds().top >= 0) &&
+                                     (Mouse::getPosition(window).x - choose_complexity.getGlobalBounds().left <= choose_complexity.getGlobalBounds().width) &&
+                                     (Mouse::getPosition(window).y - choose_complexity.getGlobalBounds().top <= choose_complexity.getGlobalBounds().height))
+                                complexity_menu(window, background, font);
+                            // 3) Go to main menu:
+                            else if ((Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left >= 0) &&
+                                     (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top >= 0) &&
+                                     (Mouse::getPosition(window).x - to_main_menu.getGlobalBounds().left <= to_main_menu.getGlobalBounds().width) &&
+                                     (Mouse::getPosition(window).y - to_main_menu.getGlobalBounds().top <= to_main_menu.getGlobalBounds().height))
+                                main_menu(window, background, font);
+                            // 4) Exit:
+                            else if ((Mouse::getPosition(window).x - exit.getGlobalBounds().left >= 0) &&
+                                     (Mouse::getPosition(window).y - exit.getGlobalBounds().top >= 0) &&
+                                     (Mouse::getPosition(window).x - exit.getGlobalBounds().left <= exit.getGlobalBounds().width) &&
+                                     (Mouse::getPosition(window).y - exit.getGlobalBounds().top <= exit.getGlobalBounds().height))
+                                window.close();
+                            break;
+                        default:
+                            break;
+                    }
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // focus restart button:
+                                    restart.setFillColor(Color(255, 195, 0, 255));
+                                    restart.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute restart button:
+                                        game(window, background, font, game_board->get_complexity());
+
+                                    // unfocus restart button:
+                                    restart.setFillColor(Color(144, 12, 63, 255));
+                                    restart.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus choose_complexity button:
+                                    choose_complexity.setFillColor(Color(255, 195, 0, 255));
+                                    choose_complexity.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 2:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute choose_complexity button:
+                                        complexity_menu(window, background, font);
+
+                                    // unfocus choose_complexity button:
+                                    choose_complexity.setFillColor(Color(144, 12, 63, 255));
+                                    choose_complexity.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus to_main_menu button:
+                                    to_main_menu.setFillColor(Color(255, 195, 0, 255));
+                                    to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 3:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute to_main_menu button:
+                                        main_menu(window, background, font);
+
+                                    // unfocus to_main_menu button:
+                                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
+                                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus exit button:
+                                    exit.setFillColor(Color(255, 195, 0, 255));
+                                    exit.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 4:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute exit button:
+                                        window.close();
+
+                                    // unfocus exit button:
+                                    exit.setFillColor(Color(144, 12, 63, 255));
+                                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus restart button:
+                                    restart.setFillColor(Color(255, 195, 0, 255));
+                                    restart.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter = 1;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        default:
+                            break;
+                    }
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if ((window.getSize().y < 600) || (window.getSize().x < 400))
+                        window.setSize(Vector2u(400, 600));
+            
+                    // update button size:
+                    button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
+                        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update game over background size:
+                    game_over_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
+
+                    // update game over sprite size:
+                    game_over.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.2);
+
+                    // update all the buttons and their positions:
+                    restart.setCharacterSize(5 * button_size / 6);
+                    restart.setOutlineThickness(button_size / 6);
+                    restart.setPosition((window.getSize().x - restart.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15));
+                    
+                    choose_complexity.setCharacterSize(5 * button_size / 6);
+                    choose_complexity.setOutlineThickness(button_size / 6);
+                    choose_complexity.setPosition((window.getSize().x - choose_complexity.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + button_size + 15);
+                    
+                    to_main_menu.setCharacterSize(5 * button_size / 6);
+                    to_main_menu.setOutlineThickness(button_size / 6);
+                    to_main_menu.setPosition((window.getSize().x - to_main_menu.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 2);
+                    
+                    exit.setCharacterSize(5 * button_size / 6);
+                    exit.setOutlineThickness(button_size / 6);
+                    exit.setPosition((window.getSize().x - exit.getGlobalBounds().width) / 2, 
+                            1 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 3);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // clear game window:
+        window.clear();
+
+        // draw background:
+        window.draw(background);
+
+        // update view:
+        window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+        // draw a board:
+        game_board->print_board(window, font, 5 * button_size / 6);
+        
+        // draw game over:
+        window.draw(game_over_background);
+        window.draw(game_over);
+
+        // draw restart button:
+        window.draw(restart);
+        // draw choose complexity button:
+        window.draw(choose_complexity);
+        // draw main menu button:
+        window.draw(to_main_menu);
+        // draw exit button:
+        window.draw(exit);
+
+        // display what we have just drawn:
+        window.display();
+    }
 }
 
 void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
@@ -326,7 +634,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                (Mouse::getPosition(window).y - multiplayer.getGlobalBounds().top >= 0) &&
                                (Mouse::getPosition(window).x - multiplayer.getGlobalBounds().left <= multiplayer.getGlobalBounds().width) &&
                                (Mouse::getPosition(window).y - multiplayer.getGlobalBounds().top <= multiplayer.getGlobalBounds().height)) {
-                        // focus new multiplayer game button:
+                        // focus choose complexity button:
                         multiplayer.setFillColor(Color(255, 195, 0, 255));
                         multiplayer.setOutlineColor(Color(8, 0, 93, 255));
                         focused_button_counter = 2;
@@ -374,7 +682,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                 (Mouse::getPosition(window).x - singleplayer.getGlobalBounds().left <= singleplayer.getGlobalBounds().width) &&
                                 (Mouse::getPosition(window).y - singleplayer.getGlobalBounds().top <= singleplayer.getGlobalBounds().height))
                                 complexity_menu(window, background, font);
-                            // 2) Start new multiplayer game:
+                            // 2) Start choose complexity:
                             else if ((Mouse::getPosition(window).x - multiplayer.getGlobalBounds().left >= 0) &&
                                      (Mouse::getPosition(window).y - multiplayer.getGlobalBounds().top >= 0) &&
                                      (Mouse::getPosition(window).x - multiplayer.getGlobalBounds().left <= multiplayer.getGlobalBounds().width) &&
