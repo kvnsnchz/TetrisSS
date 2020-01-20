@@ -24,13 +24,13 @@ void Board::initialize(RenderWindow& window){
     // initialize map and board:
     map = new unsigned *[x_dimension];
     grid = new RectangleShape *[x_dimension];
-    for (unsigned i = 0; i < x_dimension; i++) {
+    for (int i = 0; i < x_dimension; i++) {
         map[i] = new unsigned [y_dimension];
         grid[i] = new RectangleShape [y_dimension];
     }
 
-    for (unsigned i = 0; i < x_dimension; i++)
-        for (unsigned j = 0; j < y_dimension; j++)
+    for (int i = 0; i < x_dimension; i++)
+        for (int j = 0; j < y_dimension; j++)
             map[i][j] = 0;
 
     current_figure = create_figure();
@@ -38,8 +38,8 @@ void Board::initialize(RenderWindow& window){
     add_figure();
 
     // draw the initial grid:
-    for(unsigned i = 0; i < x_dimension; i++) {
-        for(unsigned j = 2; j < y_dimension; j++) {
+    for(int i = 0; i < x_dimension; i++) {
+        for(int j = 2; j < y_dimension; j++) {
             grid[i][j].setSize(cell_size);
             grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - 2) * cell_size.y + j - 2 + 5.0f);
 
@@ -97,11 +97,11 @@ void Board::add_figure() {
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
 }
 
-unsigned Board::get_x_dim() const {
+int Board::get_x_dim() const {
     return x_dimension;
 };
 
-unsigned Board::get_y_dim() const {
+int Board::get_y_dim() const {
     return y_dimension;
 };
 
@@ -123,8 +123,8 @@ void Board::set_next_figure(Figure* figure) {
 
 // print game board:
 void Board::print_board(RenderWindow& window) {
-    for(unsigned i = 0; i < x_dimension; i++) {
-        for(unsigned j = 2; j < y_dimension; j++) {
+    for(int i = 0; i < x_dimension; i++) {
+        for(int j = 2; j < y_dimension; j++) {
             switch(map[i][j]) {
                 case 0:
                     grid[i][j].setFillColor(Color(121, 163, 249, 180));
@@ -201,18 +201,7 @@ void Board::print_board(RenderWindow& window) {
     window.draw(score_title);
 };
 
-bool Board::is_empty(const Point& point) const {
-    if(point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension){
-        return false;
-    }
-
-    if (map[point.get_x()][point.get_y()] == 0 || map[point.get_x()][point.get_y()] == current_figure->get_color_code())
-        return true;
-    else 
-        return false;
-};
-
-overflow Board::change_point(const Point& point, const int& new_value) {
+overflow Board::is_empty(const Point& point) const {
     if(point.get_x() < 0 )
         return OVERFLOW_LEFT;
     if(point.get_x() >= x_dimension)
@@ -221,11 +210,22 @@ overflow Board::change_point(const Point& point, const int& new_value) {
         return OVERFLOW_UP;
     if(point.get_y() >= y_dimension)
         return OVERFLOW_DOWN;
-    //if(map[point.get_x()][point.get_y()] != 0)
-      //  return OVERFLOW_DOWN;
+    //if(point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension){
+      //  return false;
+   // }
+
+    if (map[point.get_x()][point.get_y()] == 0 || map[point.get_x()][point.get_y()] == current_figure->get_color_code())
+        return NONE;
+    else 
+        return OVERFLOW_DOWN;
+};
+
+void Board::change_point(const Point& point, const int& new_value, const bool& from_rotation) {
+    if(point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension){
+        return;
+    }
 
     map[point.get_x()][point.get_y()] = new_value;
-    return NONE;
 };
 
 bool Board::step_down() {
@@ -237,7 +237,7 @@ bool Board::step_down() {
             break;
         }
 
-        if (!is_empty(Point(current_figure->get_points()[i]->get_x(), current_figure->get_points()[i]->get_y() + 1))) {
+        if (is_empty(Point(current_figure->get_points()[i]->get_x(), current_figure->get_points()[i]->get_y() + 1)) != NONE) {
             is_free = false;
             break;
         };
@@ -267,7 +267,7 @@ void Board::step_left() {
             break;
         }
 
-        if (!is_empty(Point(current_figure->get_points()[i]->get_x() - 1, current_figure->get_points()[i]->get_y()))) {
+        if (is_empty(Point(current_figure->get_points()[i]->get_x() - 1, current_figure->get_points()[i]->get_y())) != NONE) {
             is_free = false;
             break;
         };
@@ -294,7 +294,7 @@ void Board::step_right() {
             break;
         }
 
-        if (!is_empty(Point(current_figure->get_points()[i]->get_x() + 1, current_figure->get_points()[i]->get_y()))) {
+        if (is_empty(Point(current_figure->get_points()[i]->get_x() + 1, current_figure->get_points()[i]->get_y())) != NONE) {
             is_free = false;
             break;
         };
@@ -316,9 +316,10 @@ void Board::change_points_rotated(const overflow& overf){
 
     if(overf != NONE)
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
-            change_point(*current_figure->get_points()[i]);
+           // change_point(*current_figure->get_points()[i]);
             if(overf == OVERFLOW_DOWN)
                 current_figure->get_points()[i]->increment_y(-1);
+                
             if(overf == OVERFLOW_LEFT)
                 current_figure->get_points()[i]->increment_x(1);
             if(overf == OVERFLOW_RIGHT)
@@ -326,15 +327,17 @@ void Board::change_points_rotated(const overflow& overf){
         }
 
     for (unsigned i = 0; i < current_figure->get_points().size(); i++){
-        _overf = change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+        _overf = is_empty(*current_figure->get_points()[i]);
         if(_overf != NONE){
             break;
-           
         }
     }
     
-    if(_overf != NONE)
+    if(_overf != NONE && _overf != OVERFLOW_UP)
         change_points_rotated(_overf);
+    else
+        for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+            change_point(*current_figure->get_points()[i], current_figure->get_color_code()); 
 
     return;
 }
@@ -357,8 +360,8 @@ void Board::rotate(bool right){
 void Board::erase_lines() {
     // initialize the indices of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
-    unsigned begin = 22;
-    unsigned end = 2;
+    int begin = 22;
+    int end = 2;
 
     // calculate these indices:
     for (unsigned i = 0; i < 4; i++) {
@@ -369,18 +372,18 @@ void Board::erase_lines() {
     }
 
     // full lines counter:
-    unsigned full_lines = 0;
+    int full_lines = 0;
     // second full lines counter in case of a gap
     // between full lines:
     unsigned previous_full_lines = 0;
     // the index of the lowest full line :
-    unsigned lowest_line = 0;
+    int lowest_line = 0;
     // full line trigger:
     bool is_full = true;
 
     // starting check from the first visible line:
-    for (unsigned i = begin; i <= end; i++) {
-        for (unsigned j = 0; j < x_dimension; j++) {
+    for (int i = begin; i <= end; i++) {
+        for (int j = 0; j < x_dimension; j++) {
             // if a current cell is occupied - do not touch a trigger:
             if (map[j][i] >= 10)
                 is_full = true;
@@ -405,8 +408,8 @@ void Board::erase_lines() {
                 // starting from our previous full line,
                 // we are moving the part of a map above that line
                 // by the number of steps which is equal to full lines number:
-                for (unsigned i = lowest_line; i > 0; i--)
-                    for(unsigned j = 0; j < x_dimension; j++)
+                for (int i = lowest_line; i > 0; i--)
+                    for(int j = 0; j < x_dimension; j++)
                         // lowering existent lines:  
                         if (i >= full_lines)
                             map[j][i] = map[j][i - full_lines];
@@ -430,8 +433,8 @@ void Board::erase_lines() {
         // starting from the lowest full line,
         // we are moving the part of a map above this line
         // by the number of steps which is equal to full lines number:
-        for (unsigned i = lowest_line; i > 0; i--)
-            for(unsigned j = 0; j < x_dimension; j++)
+        for (int i = lowest_line; i > 0; i--)
+            for(int j = 0; j < x_dimension; j++)
                 // lowering existent lines:  
                 if (i >= full_lines)
                     map[j][i] = map[j][i - full_lines];
@@ -467,7 +470,7 @@ void Board::erase_lines() {
 
 // end of game condition:
 bool Board::game_over() {
-    for (unsigned j = 0; j < x_dimension; j++)
+    for (int j = 0; j < x_dimension; j++)
         if (map[j][2] >= 10)
              return true;
     
@@ -479,9 +482,9 @@ Board::~Board() {};
 ostream& operator <<(ostream& stream, const Board& board) {
     // display a game board starting from the 2nd x coordinate,
     // indices 0 and 1 are reserver for new figure creation zone:
-    for (unsigned i = 2; i < board.y_dimension; i++) {
+    for (int i = 2; i < board.y_dimension; i++) {
         stream << "| ";
-        for (unsigned j = 0; j < board.x_dimension; j++) {
+        for (int j = 0; j < board.x_dimension; j++) {
             if(board.map[j][i] < 10)
                 stream << " " << board.map[j][i] << " "; 
             else

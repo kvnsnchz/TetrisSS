@@ -18,9 +18,9 @@ class Board {
         // 2D size of each cell:
         Vector2f cell_size;
         // x (horizontal) board dimension:
-        unsigned x_dimension;
+        int x_dimension;
         // y (vertical) board dimension:
-        unsigned y_dimension;
+        int y_dimension;
         // Score of the match:
         long score;
         // The figure which is present on the map and moving alongside the game board right now:
@@ -39,8 +39,8 @@ class Board {
         // adding figure on top of the board:
         void add_figure();
         
-        unsigned get_x_dim() const;
-        unsigned get_y_dim() const;
+        int get_x_dim() const;
+        int get_y_dim() const;
 
         long get_score() const;
 
@@ -51,8 +51,8 @@ class Board {
         // draw game board:
         void print_board(RenderWindow& window);
 
-        bool is_empty(const Point& point) const;
-        overflow change_point(const Point& point, const int& new_value = 0);
+        overflow is_empty(const Point& point) const;
+        void change_point(const Point& point, const int& new_value = 0, const bool& from_rotation = false);
         void change_points_rotated(const overflow&);
         bool step_down();
         void step_left();
