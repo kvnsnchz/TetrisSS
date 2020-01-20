@@ -7,23 +7,23 @@ using namespace std;
 
 class Point {
     private:
-        unsigned x;
-        unsigned y;
+        int x;
+        int y;
     public:
         Point(): x(0), y(0) {};
-        Point(unsigned x_0, unsigned y_0): x(x_0), y(y_0) {};
+        Point(int x_0, int y_0): x(x_0), y(y_0) {};
         Point(const Point& start_point): x(start_point.x), y(start_point.y) {};
 
-        void set_x(unsigned&);
-        void set_y(unsigned&);
+        void set_x(int&);
+        void set_y(int&);
 
         void increment_x(const int& value = 1);
         void increment_y(const int& value = 1);
 
         void rotate(const bool&, const Point*);
 
-        unsigned get_x() const;
-        unsigned get_y() const;
+        int get_x() const;
+        int get_y() const;
 
         ~Point();
 };
@@ -33,19 +33,32 @@ class Figure {
     protected:
         vector<Point *> points;
         Point* point_reference;
+        bool simple_rotation;
         unsigned color_code;
         // figure's graphical grid:
         RectangleShape grid[4][2];
     public:
         Figure(){};
-        Figure(const unsigned& code) : color_code(code) {}
+        Figure(const unsigned& code) : 
+            color_code(code) {}
 
         vector<Point *> get_points() const;
         Point* get_point_reference() const;
         unsigned get_color_code() const;
         RectangleShape** get_grid() const;
-
+        
         virtual void initialize(const unsigned&, const Vector2f&) = 0;
+        void rotate(const bool&);
+};
+
+class Figure_Simple_Rotation: public Figure {
+    protected:
+        bool already_rotated;
+    public:
+        Figure_Simple_Rotation(){};
+        Figure_Simple_Rotation(const unsigned& code): Figure(code) {};
+
+        bool get_next_rotation();
 };
 
 // Square figure definition:
@@ -59,9 +72,9 @@ class Figure_O: public Figure {
 };
 
 // Stick figure definition:
-class Figure_I: public Figure {
+class Figure_I: public Figure_Simple_Rotation {
     public:
-        Figure_I(const unsigned& x_dim, const Vector2f& cell_size):Figure(2) {
+        Figure_I(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(2) {
             initialize(x_dim, cell_size);
         };
         
@@ -99,9 +112,9 @@ class Figure_J: public Figure {
 };
 
 // Z figure definition:
-class Figure_Z: public Figure {
+class Figure_Z: public Figure_Simple_Rotation {
     public:
-        Figure_Z(const unsigned& x_dim, const Vector2f& cell_size):Figure(6) {
+        Figure_Z(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(6) {
             initialize(x_dim, cell_size);
         };
         
@@ -109,9 +122,9 @@ class Figure_Z: public Figure {
 };
 
 // S figure definition:
-class Figure_S: public Figure {
+class Figure_S: public Figure_Simple_Rotation {
     public:
-        Figure_S(const unsigned& x_dim, const Vector2f& cell_size):Figure(7) {
+        Figure_S(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(7) {
             initialize(x_dim, cell_size);
         };
         
