@@ -142,7 +142,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                     // update all the buttons and their positions:
                     to_main_menu.setCharacterSize(5 * button_size / 6);
                     to_main_menu.setOutlineThickness(button_size / 6);
-                    to_main_menu.setPosition((cell_size.x + 1) * 10 + 19.0f, 20 * button_size / 6 + 125.0f);
+                    to_main_menu.setPosition((cell_size.x + 1) * 10 + 19.0f, 4 * button_size + 125.0f);
                     break;
                 default:
                     break;

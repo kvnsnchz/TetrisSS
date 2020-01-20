@@ -100,6 +100,11 @@ void Board::add_figure() {
 void Board::set_cell_size(const Vector2f& new_cell_size) {
     cell_size.x = new_cell_size.x;
     cell_size.y = new_cell_size.y;
+
+    // Update next figures' cell size:
+    for (unsigned i = 0; i < 4; i++) {
+        // current_figure[i].
+    }
 };
 
 unsigned Board::get_x_dim() const {
@@ -130,7 +135,11 @@ void Board::set_next_figure(Figure* figure) {
 void Board::print_board(RenderWindow& window, const Font& font, const double& font_size) {
     for(unsigned i = 0; i < x_dimension; i++) {
         for(unsigned j = 2; j < y_dimension; j++) {
+            // Update cell size and position:
             grid[i][j].setSize(cell_size);
+            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - 2) * cell_size.y + j - 2 + 5.0f);
+
+            // Update cell color:
             switch(map[i][j]) {
                 case 0:
                     grid[i][j].setFillColor(Color(121, 163, 249, 180));
