@@ -7,19 +7,19 @@
 // from different methods (needs to be updated):
 RectangleShape** figure_to_draw;
 
-Board::Board(RenderWindow& window) {
-    initialize(window);
+Board::Board(RenderWindow& window, const Vector2f& initial_cell_size) {
+    initialize(window, initial_cell_size);
 };
 
 // Initialize game board 20x10,
 // two more y coordinates to create figures outside (on top of) the game board:
-void Board::initialize(RenderWindow& window){
+void Board::initialize(RenderWindow& window, const Vector2f& initial_cell_size){
     x_dimension = 10;
     y_dimension = 22;
 
-    // initialize cell size according the user's screen resolution:
-    cell_size.x = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 129.0f) / 20));
-    cell_size.y = min(min(40.0f, ((float) VideoMode::getDesktopMode().width / 2 - 194.0f) / 10), min(40.0f, ((float) VideoMode::getDesktopMode().height - 129.0f) / 20));
+    // initialize cell size:
+    cell_size.x = initial_cell_size.x;
+    cell_size.y = initial_cell_size.y;
 
     // initialize map and board:
     map = new unsigned *[x_dimension];
@@ -97,6 +97,16 @@ void Board::add_figure() {
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
 }
 
+void Board::set_cell_size(const Vector2f& new_cell_size) {
+    cell_size.x = new_cell_size.x;
+    cell_size.y = new_cell_size.y;
+
+    // Update next figures' cell size:
+    for (unsigned i = 0; i < 4; i++) {
+        // current_figure[i].
+    }
+};
+
 int Board::get_x_dim() const {
     return x_dimension;
 };
@@ -122,9 +132,14 @@ void Board::set_next_figure(Figure* figure) {
 };
 
 // print game board:
-void Board::print_board(RenderWindow& window) {
+void Board::print_board(RenderWindow& window, const Font& font, const double& font_size) {
     for(int i = 0; i < x_dimension; i++) {
         for(int j = 2; j < y_dimension; j++) {
+            // Update cell size and position:
+            grid[i][j].setSize(cell_size);
+            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - 2) * cell_size.y + j - 2 + 5.0f);
+
+            // Update cell color:
             switch(map[i][j]) {
                 case 0:
                     grid[i][j].setFillColor(Color(121, 163, 249, 180));
@@ -166,22 +181,13 @@ void Board::print_board(RenderWindow& window) {
     }   
 
     // update next figure:
-    Font font;
-    try {
-        if (!font.loadFromFile("amatic/Amatic-Bold.ttf")) 
-            throw 0;
-    } catch (int e) {
-        if (e == 0)
-            cout << "Sorry, font file not found!" << endl;
-    } 
-    
     Text next_figure_title;
     next_figure_title.setFont(font);
     next_figure_title.setString("Next Figure:");
     next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 25.0f);
-    next_figure_title.setCharacterSize(50);
-    next_figure_title.setFillColor(Color(242, 0, 0, 255));
+    next_figure_title.setCharacterSize(font_size);
     next_figure_title.setStyle(Text::Bold);
+    next_figure_title.setFillColor(Color(144, 12, 63, 255));
     window.draw(next_figure_title);
 
     // next figure itself (its grid):
@@ -195,9 +201,9 @@ void Board::print_board(RenderWindow& window) {
     score_title.setFont(font);
     score_title.setString("Score: \n" + to_string(score));
     score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 200.0f);
-    score_title.setCharacterSize(50);
-    score_title.setFillColor(Color(242, 0, 0, 255));
+    score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
+    score_title.setFillColor(Color(144, 12, 63, 255));
     window.draw(score_title);
 };
 
@@ -357,7 +363,7 @@ void Board::rotate(bool right){
 }
 
 // Check for the full lines and erase them if they are exist:
-void Board::erase_lines() {
+void Board::erase_lines(const unsigned& complexity) {
     // initialize the indices of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
     int begin = 22;
@@ -367,7 +373,7 @@ void Board::erase_lines() {
     for (unsigned i = 0; i < 4; i++) {
         if (begin > current_figure->get_points()[i]->get_y())
             begin = current_figure->get_points()[i]->get_y();
-        if (end < current_figure->get_points()[i]->get_y()) 
+        if (end < current_figure->get_points()[i]->get_y())
             end = current_figure->get_points()[i]->get_y();
     }
 
@@ -443,25 +449,25 @@ void Board::erase_lines() {
                     map[j][i] = 0;
     }
 
-    // change score value according to the number of erased lignes:
+    // change score value according to the number of erased lignes and also complexity:
     switch (full_lines + previous_full_lines) {
         // if no line has been erased - adding 4 points 
         // (like the figure descent reward),
         // which is equal to the figure size:
         case 0:
-            score += 4;
+            score += 4 + 2 * (complexity - 1);
             break;
         case 1:
-            score += 40;
+            score += 40 * complexity;
             break;
         case 2:
-            score += 100;
+            score += 100 * complexity;
             break;
         case 3:
-            score += 300;
+            score += 300 * complexity;
             break;
         case 4:
-            score += 1200;
+            score += 1200 * complexity;
             break;
         default:
             break;

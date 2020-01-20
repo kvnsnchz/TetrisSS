@@ -30,15 +30,17 @@ class Board {
 
         friend ostream& operator <<(ostream& stream, const Board& board);
     public:
-        Board(RenderWindow& window);
+        Board(RenderWindow& window, const Vector2f& initial_cell_size);
 
         // game board initialization:
-        void initialize(RenderWindow& window);
+        void initialize(RenderWindow& window, const Vector2f& initial_cell_size);
         // new figure creation function:
         Figure* create_figure();
         // adding figure on top of the board:
         void add_figure();
         
+        void set_cell_size(const Vector2f& new_cell_size);
+
         int get_x_dim() const;
         int get_y_dim() const;
 
@@ -49,7 +51,7 @@ class Board {
         void set_next_figure(Figure* figure);
 
         // draw game board:
-        void print_board(RenderWindow& window);
+        void print_board(RenderWindow& window, const Font& font, const double& font_size);
 
         overflow is_empty(const Point& point) const;
         void change_point(const Point& point, const int& new_value = 0, const bool& from_rotation = false);
@@ -59,7 +61,7 @@ class Board {
         void step_right();
         void rotate(bool right);
         // Check for the full lines and erase them if they are:
-        void erase_lines();
+        void erase_lines(const unsigned& complexity);
 
         // adding game over condition function:
         bool game_over();

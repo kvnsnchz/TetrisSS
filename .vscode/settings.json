@@ -7,6 +7,9 @@
         "ostream": "cpp",
         "new": "cpp",
         "algorithm": "cpp",
+<<<<<<< HEAD
+        "fstream": "cpp"
+=======
         "type_traits": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
@@ -67,5 +70,6 @@
         "typeindex": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp"
+>>>>>>> d0e1a2eea4a8d156168b6717ea38197c051183c4
     }
 }

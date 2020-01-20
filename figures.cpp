@@ -235,10 +235,10 @@ void Figure_Z::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
 // S figure initialization:
 void Figure_S::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
-    point_reference = new Point(x_dim / 2 - 1, 1);
-    points.push_back(new Point(x_dim / 2 - 1, 0));
-    points.push_back(new Point(x_dim / 2 - 2, 1));
+    point_reference = new Point(x_dim / 2 - 1, 0);
     points.push_back(new Point(x_dim / 2, 0));
+    points.push_back(new Point(x_dim / 2 - 2, 1));
+    points.push_back(new Point(x_dim / 2 - 1, 1));
     points.push_back(point_reference);
 
     // initialize the figure`s grid:
