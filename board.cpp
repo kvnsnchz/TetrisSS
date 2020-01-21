@@ -248,18 +248,16 @@ bool Board::step_down() {
             break;
         };
     };
-
-    unsigned factor = 1;
+;
     if(is_free) {
-        factor = 1;
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
             change_point(*current_figure->get_points()[i]);
             current_figure->get_points()[i]->increment_y();
         }
-    }
 
-    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
-        change_point(*current_figure->get_points()[i], current_figure->get_color_code() * factor);
+        for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+            change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+    }
         
     return is_free;
 };
@@ -292,10 +290,9 @@ bool Board::step_left(const bool& with_floor) {
             change_point(*current_figure->get_points()[i]);
             current_figure->get_points()[i]->increment_x(-1);
         }
-    }
-
-    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+        for (unsigned i = 0; i < current_figure->get_points().size(); i++)
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+    }
 
     return is_free;
     
@@ -332,10 +329,9 @@ bool Board::step_right(const bool& with_floor) {
             change_point(*current_figure->get_points()[i]);
             current_figure->get_points()[i]->increment_x();
         }
-    }
-
-    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+        for (unsigned i = 0; i < current_figure->get_points().size(); i++)
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+    }
 
     return is_free;
 };
@@ -378,7 +374,6 @@ bool Board::has_floor(const Point& point) const{
 }
 
 void Board::rotate(bool right){
-    
     if(dynamic_cast<Figure_Simple_Rotation*>(current_figure)){
        right = ((Figure_Simple_Rotation*)current_figure)->get_next_rotation();
     }

@@ -22,7 +22,6 @@ void Point::rotate(const bool& right, const Point* reference){
     if(reference == NULL){
         return;
     }
-
     int old_x;
 
     if(right){
@@ -80,6 +79,7 @@ bool Figure_Simple_Rotation::get_next_rotation(){
 // Square figure initialization:
 void Figure_O::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
     // fill the vector with the points of specific current figure`s coordinates:
+    point_reference = NULL;
     points.push_back(new Point(x_dim / 2 - 1, 0));
     points.push_back(new Point(x_dim / 2, 0));
     points.push_back(new Point(x_dim / 2 - 1, 1));

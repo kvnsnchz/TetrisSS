@@ -33,7 +33,6 @@ class Figure {
     protected:
         vector<Point *> points;
         Point* point_reference;
-        bool simple_rotation;
         unsigned color_code;
         // figure's graphical grid:
         RectangleShape grid[4][2];
@@ -48,7 +47,6 @@ class Figure {
         RectangleShape** get_grid() const;
         
         virtual void initialize(const unsigned&, const Vector2f&) = 0;
-        void rotate(const bool&);
 };
 
 class Figure_Simple_Rotation: public Figure {
@@ -56,7 +54,7 @@ class Figure_Simple_Rotation: public Figure {
         bool already_rotated;
     public:
         Figure_Simple_Rotation(){};
-        Figure_Simple_Rotation(const unsigned& code): Figure(code) {};
+        Figure_Simple_Rotation(const unsigned& code): Figure(code), already_rotated(false) {};
 
         bool get_next_rotation();
 };
