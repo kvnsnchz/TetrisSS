@@ -29,6 +29,11 @@ class Board {
         Figure* next_figure;
 
         friend ostream& operator <<(ostream& stream, const Board& board);
+
+        overflow is_empty(const Point& point) const;
+        void change_points_rotated(const overflow&);
+        bool has_floor(const Point& point) const;
+        void print();
     public:
         Board(RenderWindow& window, const Vector2f& initial_cell_size);
 
@@ -53,16 +58,14 @@ class Board {
         // draw game board:
         void print_board(RenderWindow& window, const Font& font, const double& font_size);
 
-        overflow is_empty(const Point& point) const;
         void change_point(const Point& point, const int& new_value = 0, const bool& from_rotation = false);
-        void change_points_rotated(const overflow&);
         bool step_down();
-        void step_left();
-        void step_right();
+        bool step_left(const bool& with_floor = false);
+        bool step_right(const bool& with_floor = false);
         void rotate(bool right);
         // Check for the full lines and erase them if they are:
         void erase_lines(const unsigned& complexity);
-
+        void insert_figure_current();
         // adding game over condition function:
         bool game_over();
 

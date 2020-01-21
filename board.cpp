@@ -249,7 +249,7 @@ bool Board::step_down() {
         };
     };
 
-    unsigned factor = 10;
+    unsigned factor = 1;
     if(is_free) {
         factor = 1;
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
@@ -264,9 +264,10 @@ bool Board::step_down() {
     return is_free;
 };
 
-void Board::step_left() {
+bool Board::step_left(const bool& with_floor) {
     bool is_free = true;
-    
+    unsigned floor = 0;
+
     for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
         if(current_figure->get_points()[i]->get_x() == 0){
             is_free = false;
@@ -277,7 +278,14 @@ void Board::step_left() {
             is_free = false;
             break;
         };
+
+        if(with_floor)
+            if(has_floor(Point(current_figure->get_points()[i]->get_x() - 1, current_figure->get_points()[i]->get_y())))
+                floor++;
     };
+
+    if(with_floor && floor == 0)
+        is_free = false;
 
     if(is_free) {
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
@@ -288,24 +296,37 @@ void Board::step_left() {
 
     for (unsigned i = 0; i < current_figure->get_points().size(); i++)
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+
+    return is_free;
     
 };
 
-void Board::step_right() {
+bool Board::step_right(const bool& with_floor) {
     bool is_free = true;
-    
+    unsigned floor = 0;
+
     for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
         if(current_figure->get_points()[i]->get_x() + 1 >= x_dimension){
             is_free = false;
+            cout << "Chao fue"<<endl;
             break;
         }
 
         if (is_empty(Point(current_figure->get_points()[i]->get_x() + 1, current_figure->get_points()[i]->get_y())) != NONE) {
             is_free = false;
+            cout << "Chao Emp" << endl;
             break;
         };
+
+        if(with_floor)
+            if(has_floor(Point(current_figure->get_points()[i]->get_x() + 1, current_figure->get_points()[i]->get_y())))
+                floor++;
+                
     };
     
+    if(with_floor && floor == 0)
+        is_free = false;
+
     if(is_free) {
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
             change_point(*current_figure->get_points()[i]);
@@ -315,6 +336,8 @@ void Board::step_right() {
 
     for (unsigned i = 0; i < current_figure->get_points().size(); i++)
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+
+    return is_free;
 };
 
 void Board::change_points_rotated(const overflow& overf){
@@ -346,6 +369,12 @@ void Board::change_points_rotated(const overflow& overf){
             change_point(*current_figure->get_points()[i], current_figure->get_color_code()); 
 
     return;
+}
+
+bool Board::has_floor(const Point& point) const{
+    if(is_empty(Point(point.get_x(), point.get_y() + 1)) == NONE)
+        return false;
+    return true;
 }
 
 void Board::rotate(bool right){
@@ -474,6 +503,10 @@ void Board::erase_lines(const unsigned& complexity) {
     }
 };
 
+void Board::insert_figure_current(){
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+        change_point(*current_figure->get_points()[i], current_figure->get_color_code() * 10);     
+}
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < x_dimension; j++)
@@ -485,6 +518,18 @@ bool Board::game_over() {
 
 Board::~Board() {};
 
+void Board::print(){
+    for (int i = 2; i < y_dimension; i++) {
+        cout << "| ";
+        for (int j = 0; j < x_dimension; j++) {
+            if(map[j][i] < 10)
+                cout << " " << map[j][i] << " "; 
+            else
+                cout << map[j][i] << " "; 
+        };
+        cout << " |\n";
+    };
+}
 ostream& operator <<(ostream& stream, const Board& board) {
     // display a game board starting from the 2nd x coordinate,
     // indices 0 and 1 are reserver for new figure creation zone:

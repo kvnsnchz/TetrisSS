@@ -22,6 +22,9 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
     to_main_menu.setFillColor(Color(144, 12, 63, 255));
     to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
     to_main_menu.setPosition((cell_size.x + 1) * 10 + 19.0f, 20 * button_size / 6 + 125.0f);
+    
+    state_figure _state_figure = DESCEND_FIGURE;
+    int count_change_figure = DEF_COU_CHA_FIG;
 
     while (window.isOpen()) {
         Event event;
@@ -99,25 +102,47 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                         // while we want to move a current figure to the right:
                         case Keyboard::D:
                         case Keyboard::Right:
-                            game_board->step_right();
+                            if(_state_figure == STOP_FIGURE){
+                                bool step_done = game_board->step_right(true);
+                                if(step_done)
+                                    count_change_figure++;
+                                else
+                                    count_change_figure = 0;
+                                break;
+                            }
+                            
+                            game_board->step_right(false);
                             break;
                         // while we want to move a current figure to the left:
                         case Keyboard::A:
                         case Keyboard::Q:
                         case Keyboard::Left:
-                            game_board->step_left();
+                            
+                            if(_state_figure == STOP_FIGURE){
+                                bool step_done = game_board->step_left(true);
+                                if(step_done)
+                                    count_change_figure++;
+                                else
+                                   count_change_figure = 0;
+                                break;
+                            }
+
+                            game_board->step_left(false);
                             break;
                         // while we want to fall faster:
                         case Keyboard::S:
                         case Keyboard::Down:
-                            game_board->step_down();
+                            if(_state_figure != STOP_FIGURE)
+                                game_board->step_down();
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
-                            game_board->rotate(false);
+                            if(_state_figure != STOP_FIGURE)
+                                game_board->rotate(false);
                             break;
                         case Keyboard::H:
-                            game_board->rotate(true);
+                            if(_state_figure != STOP_FIGURE)
+                                game_board->rotate(true);
                             break;
                         default:
                             break;
@@ -164,10 +189,20 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
         window.draw(to_main_menu);
         // display what we have just drawed:
         window.display();
-
+        
+        if(_state_figure == STOP_FIGURE)
+            count_change_figure--;
+        if(count_change_figure <= 0)
+            _state_figure = CHANGE_FIGURE;
+        if(_state_figure == DESCEND_FIGURE)
+            _state_figure = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
         // if we can't move down no more:
-        if (!game_board->step_down()) {
+        if (_state_figure == CHANGE_FIGURE) {
+
+            count_change_figure = DEF_COU_CHA_FIG;
+            _state_figure = DESCEND_FIGURE;
             // check for the full lines:
+            game_board->insert_figure_current();
             game_board->erase_lines(complexity);
                     
             // if we reached game over condition:
