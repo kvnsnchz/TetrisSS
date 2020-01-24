@@ -194,7 +194,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     Text next_figure_title;
     next_figure_title.setFont(font);
     next_figure_title.setString("Next Figure:");
-    next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 25.0f);
+    next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 15.0f);
     next_figure_title.setCharacterSize(font_size);
     next_figure_title.setStyle(Text::Bold);
     next_figure_title.setFillColor(Color(144, 12, 63, 255));
