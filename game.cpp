@@ -51,7 +51,8 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
     state_figure _state_figure = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
-    while (window.isOpen()) {
+    // We are using descend counter to manage the figures' fall rate:
+    for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -255,45 +256,47 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
         window.draw(background);
 
         // update view:
-        window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
         // draw pause button:
         window.draw(pause);
         
-        if(_state_figure == STOP_FIGURE)
-            count_change_figure--;
-        if(count_change_figure <= 0)
-            _state_figure = CHANGE_FIGURE;
-        if(_state_figure == DESCEND_FIGURE)
-            _state_figure = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-        // if we can't move down no more:
-        if (_state_figure == CHANGE_FIGURE) {
+        // set delay according to the complexity:
+        if (descend_counter >= 300 / complexity) {
+            if(_state_figure == STOP_FIGURE)
+                count_change_figure--;
+            if(count_change_figure <= 0)
+                _state_figure = CHANGE_FIGURE;
+            if(_state_figure == DESCEND_FIGURE)
+                _state_figure = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+            // if we can't move down no more:
+            if (_state_figure == CHANGE_FIGURE) {
 
-            count_change_figure = DEF_COU_CHA_FIG;
-            _state_figure = DESCEND_FIGURE;
-            // check for the full lines:
-            game_board->insert_figure_current();
-            game_board->erase_lines(complexity);
+                count_change_figure = DEF_COU_CHA_FIG;
+                _state_figure = DESCEND_FIGURE;
+                // check for the full lines:
+                game_board->insert_figure_current();
+                game_board->erase_lines(complexity);
 
-            // if we have reached game over condition:
-            if (game_board->game_over())
-                game_over_menu(window, background, game_board, font);
+                // if we have reached game over condition:
+                if (game_board->game_over())
+                    game_over_menu(window, background, game_board, font);
 
-            // putting next figure into a current figure:
-            game_board->set_current_figure(game_board->get_next_figure());
-            // adding new current figure on the board:
-            game_board->add_figure();
-            // creating the next figure:
-            game_board->set_next_figure(game_board->create_figure());
+                // putting next figure into a current figure:
+                game_board->set_current_figure(game_board->get_next_figure());
+                // adding new current figure on the board:
+                game_board->add_figure();
+                // creating the next figure:
+                game_board->set_next_figure(game_board->create_figure());
+            }
+
+            descend_counter = 0;
         }
 
         // display what we have just drawn:
         window.display();
-
-        // set delay according to the complexity:
-        usleep(300000 / complexity);
     }
 
     delete game_board;
@@ -547,7 +550,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
         window.draw(background);
 
         // update view:
-        window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
@@ -834,7 +837,7 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
         window.draw(background);
 
         // update view:
-        window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
@@ -1146,7 +1149,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
         window.draw(background);
         
         // Update view:
-        window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // Draw the buttons:
         window.draw(singleplayer);
@@ -1390,7 +1393,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
         window.draw(background);
 
         // Update view:
-        window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // Draw a menu:
         window.draw(complexity_title);
