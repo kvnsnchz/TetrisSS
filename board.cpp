@@ -305,13 +305,11 @@ bool Board::step_right(const bool& with_floor) {
     for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
         if(current_figure->get_points()[i]->get_x() + 1 >= x_dimension){
             is_free = false;
-            cout << "Chao fue"<<endl;
             break;
         }
 
         if (is_empty(Point(current_figure->get_points()[i]->get_x() + 1, current_figure->get_points()[i]->get_y())) != NONE) {
             is_free = false;
-            cout << "Chao Emp" << endl;
             break;
         };
 
