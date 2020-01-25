@@ -15,6 +15,8 @@ class Board {
         unsigned **map;
         // graphic game board:
         RectangleShape **grid;
+        // game board complexity:
+        unsigned complexity;
         // 2D size of each cell:
         Vector2f cell_size;
         // x (horizontal) board dimension:
@@ -35,15 +37,18 @@ class Board {
         bool has_floor(const Point& point) const;
         void print();
     public:
-        Board(RenderWindow& window, const Vector2f& initial_cell_size);
+        Board(RenderWindow& window, const unsigned& initial_complexity, const Vector2f& initial_cell_size);
 
         // game board initialization:
-        void initialize(RenderWindow& window, const Vector2f& initial_cell_size);
+        void initialize(RenderWindow& window, const unsigned& initial_complexity, const Vector2f& initial_cell_size);
         // new figure creation function:
         Figure* create_figure();
         // adding figure on top of the board:
         void add_figure();
         
+        unsigned get_complexity();
+        void set_complexity(const unsigned& new_complexity);
+
         void set_cell_size(const Vector2f& new_cell_size);
 
         int get_x_dim() const;

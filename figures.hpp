@@ -5,6 +5,9 @@
 using namespace sf;
 using namespace std;
 
+// figure grid size (for drawing next figures):
+# define FIGURE_GRID_WIDTH 4
+# define FIGURE_GRID_HEIGHT 2
 class Point {
     private:
         int x;
@@ -35,7 +38,7 @@ class Figure {
         Point* point_reference;
         unsigned color_code;
         // figure's graphical grid:
-        RectangleShape grid[4][2];
+        RectangleShape grid[FIGURE_GRID_WIDTH][FIGURE_GRID_HEIGHT];
     public:
         Figure(){};
         Figure(const unsigned& code) : 
@@ -45,6 +48,7 @@ class Figure {
         Point* get_point_reference() const;
         unsigned get_color_code() const;
         RectangleShape** get_grid() const;
+        void set_grid(const unsigned& x_dim, const Vector2f& new_cell_size);
         
         virtual void initialize(const unsigned&, const Vector2f&) = 0;
 };
