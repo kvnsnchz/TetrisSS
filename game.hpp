@@ -8,6 +8,7 @@ enum state_figure {
     STOP_FIGURE,
     CHANGE_FIGURE
 };
+
 // new button initialization function (for code reduction):
 Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline = true, const bool& center = true);
 
