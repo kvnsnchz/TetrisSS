@@ -258,6 +258,9 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
         // update view:
         // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
+        // check for the full lines:
+        game_board->erase_lines(complexity);
+
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
         // draw pause button:
@@ -277,8 +280,8 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                 count_change_figure = DEF_COU_CHA_FIG;
                 _state_figure = DESCEND_FIGURE;
                 // check for the full lines:
-                game_board->insert_figure_current();
-                game_board->erase_lines(complexity);
+                game_board->fix_current_figure();
+                // game_board->erase_lines(complexity);
 
                 // if we have reached game over condition:
                 if (game_board->game_over())
