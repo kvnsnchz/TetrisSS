@@ -258,9 +258,6 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
         // update view:
         // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
-        // check for the full lines:
-        game_board->erase_lines(complexity);
-
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
         // draw pause button:
@@ -281,7 +278,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                 _state_figure = DESCEND_FIGURE;
                 // check for the full lines:
                 game_board->fix_current_figure();
-                // game_board->erase_lines(complexity);
+                game_board->erase_lines(complexity);
 
                 // if we have reached game over condition:
                 if (game_board->game_over())
@@ -1475,11 +1472,13 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                 case Event::TextEntered:
                     if (event.text.unicode < 128 && event.text.unicode != 13 
                         && event.text.unicode != 8 && event.text.unicode != 9) {
-                        if (session_name_captured && session_name.length() <= 12)
+                        if (session_name_captured && session_name.length() <= 12) {
                             session_name += static_cast<char>(event.text.unicode);
-                        else if (max_number_of_players_captured)
-                            if (event.text.unicode >= 50 && event.text.unicode <= 52)
-                                max_number_of_players = event.text.unicode - 48;
+                            session_name_display.setString(session_name);
+                        } else if (max_number_of_players_captured && event.text.unicode >= 50 && event.text.unicode <= 52) {
+                            max_number_of_players = event.text.unicode - 48;
+                            max_number_of_players_display.setString(to_string(max_number_of_players));
+                        }
                     }
                     break;
                 case Event::MouseButtonPressed:
@@ -1607,11 +1606,13 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                             }
                             break;
                         case Keyboard::BackSpace:
-                            if (session_name_captured && session_name.length() > 0)
+                            if (session_name_captured && session_name.length() > 0) {
                                 session_name.erase(session_name.length() - 1);
-                            else if (max_number_of_players_captured)
-                                if (max_number_of_players != 0)
-                                    max_number_of_players = 0;
+                                session_name_display.setString(session_name);
+                            } else if (max_number_of_players_captured && max_number_of_players != 0) {
+                                max_number_of_players = 0;
+                                max_number_of_players_display.setString(to_string(max_number_of_players));
+                            }
                             break;
                         default:
                             break;
