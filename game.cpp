@@ -1237,10 +1237,10 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                     switch (event.key.code) {
                         case Mouse::Left:
                             // If appropriate mouse position was captured:
-                            // 1) Starting to play in the easy mode:
+                            // 1) Go to new session menu:
                             if (captured_button(window, new_session))
-                                game(window, background, font, 1);
-                            // 2) Starting to play in the normal mode:
+                                create_session(window, background, font);
+                            // 2) Find a server:
                             else if (captured_button(window, find_server))
                                 game(window, background, font, 2);
                             // 3) Go back:
@@ -1273,7 +1273,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute new_session button:
-                                        game(window, background, font, 1);
+                                        create_session(window, background, font);
 
                                     // unfocus new_session button:
                                     new_session.setFillColor(Color(144, 12, 63, 255));
@@ -1314,6 +1314,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                 default:
                                     break;
                             }
+                            break;
                         default:
                             break;
                     }
@@ -1371,6 +1372,336 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
         window.draw(back);
         window.display();
     }
+};
+
+void create_session(RenderWindow& window, Sprite& background, const Font& font) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // number of buttons:
+    const unsigned number_of_buttons = 8;
+    // button size:
+    double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
+        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+    
+    // Initialize the session name:
+    string session_name = "";
+    // Initialize the number of maximum players: 
+    unsigned max_number_of_players = 2;
+
+    // Session name capture boolean identificator:
+    bool session_name_captured = false; 
+    // Max players capture boolean identificator:
+    bool max_number_of_players_captured = false;
+
+    // Initialize create_session menu title:
+    Text create_session_title = create_button(font, "Session Settings", button_size,
+        Vector2f(window.getSize().x / 2 - 10.0f,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2), false);
+
+    // Initialize session_name_title button:
+    Text session_name_title = create_button(font, "Session Name:", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f));
+    
+    // Initialize session name field:
+    Text session_name_display = create_button(font, "", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false);
+    
+    // Initialize max_number_of_players_title button:
+    Text max_number_of_players_title = create_button(font, "Max Players:", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f));
+    
+    // Initialize max players field:
+    Text max_number_of_players_display = create_button(font, " ", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f), false);
+
+    // Initialize back button:
+    Text back = create_button(font, "Back", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f));
+   
+    // Initialize back button:
+    Text create = create_button(font, "Create", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f));
+
+    // We are using enter text counter to manage the display of the entered text:
+    for (unsigned enter_text_counter = 0; window.isOpen(); enter_text_counter++) {
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    session_name_title.setFillColor(Color(144, 12, 63, 255));
+                    session_name_title.setOutlineColor(Color(218, 247, 166, 255));
+                    max_number_of_players_title.setFillColor(Color(144, 12, 63, 255));
+                    max_number_of_players_title.setOutlineColor(Color(218, 247, 166, 255));
+                    back.setFillColor(Color(144, 12, 63, 255));
+                    back.setOutlineColor(Color(218, 247, 166, 255));
+                    create.setFillColor(Color(144, 12, 63, 255));
+                    create.setOutlineColor(Color(218, 247, 166, 255));
+
+                    // If appropriate mouse position was captured:
+                    if (captured_button(window, session_name_title)) {
+                        // focus session_name_title button:
+                        session_name_title.setFillColor(Color(255, 195, 0, 255));
+                        session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 1;
+                    } else if (captured_button(window, max_number_of_players_title)) {
+                        // focus max_number_of_players_title button:
+                        max_number_of_players_title.setFillColor(Color(255, 195, 0, 255));
+                        max_number_of_players_title.setOutlineColor(Color(8, 0, 93, 255)); 
+                        focused_button_counter = 2;
+                    } else if (captured_button(window, back)) {
+                        // focus back button:
+                        back.setFillColor(Color(255, 195, 0, 255));
+                        back.setOutlineColor(Color(8, 0, 93, 255));
+                    } else if (captured_button(window, create)) {
+                        // focus create button:
+                        create.setFillColor(Color(255, 195, 0, 255));
+                        create.setOutlineColor(Color(8, 0, 93, 255));
+                    }
+                    break;
+                // If we want to type a text:
+                case Event::TextEntered:
+                    if (event.text.unicode < 128 && event.text.unicode != 13 
+                        && event.text.unicode != 8 && event.text.unicode != 9) {
+                        if (session_name_captured && session_name.length() <= 12)
+                            session_name += static_cast<char>(event.text.unicode);
+                        else if (max_number_of_players_captured)
+                            if (event.text.unicode >= 50 && event.text.unicode <= 52)
+                                max_number_of_players = event.text.unicode - 48;
+                    }
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) Enter a new session name:
+                            if (captured_button(window, session_name_title)) {
+                                session_name_captured = true;
+                                
+                                max_number_of_players_display.setString(to_string(max_number_of_players));
+                                max_number_of_players_captured = false;
+
+                                focused_button_counter = 1;
+                            // 2) Enter a max players number:
+                            } else if (captured_button(window, max_number_of_players_title)) {
+                                session_name_display.setString(session_name);
+                                session_name_captured = false;
+
+                                max_number_of_players_captured = true;
+
+                                focused_button_counter = 2;
+                            // 3) Go back:
+                            } else if (captured_button(window, back))
+                                return;
+                            // 4) Create a new session:
+                            else if (captured_button(window, create))
+                                break;
+                            break;
+                        default:
+                            break;
+                    }
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // capture session name field:
+                                    session_name_captured = true;
+
+                                    // focus session_name_title button:
+                                    session_name_title.setFillColor(Color(255, 195, 0, 255));
+                                    session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute session_name_title button:
+                                        break;
+
+                                    // uncapture session name field:
+                                    session_name_display.setString(session_name);
+                                    session_name_captured = false;
+                                    // capture max players number field:
+                                    max_number_of_players_captured = true;
+
+                                    // unfocus session_name_title button:
+                                    session_name_title.setFillColor(Color(144, 12, 63, 255));
+                                    session_name_title.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus max_number_of_players_title button:
+                                    max_number_of_players_title.setFillColor(Color(255, 195, 0, 255));
+                                    max_number_of_players_title.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 2:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute max_number_of_players_title button:
+                                        game(window, background, font, 2);
+
+                                    // uncapture max players number field:
+                                    max_number_of_players_display.setString(to_string(max_number_of_players));
+                                    max_number_of_players_captured = false;
+
+                                    // unfocus max_number_of_players_title button:
+                                    max_number_of_players_title.setFillColor(Color(144, 12, 63, 255));
+                                    max_number_of_players_title.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus back button:
+                                    back.setFillColor(Color(255, 195, 0, 255));
+                                    back.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 3:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute back button:
+                                        return;
+
+                                    // unfocus back button:
+                                    back.setFillColor(Color(144, 12, 63, 255));
+                                    back.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus create button:
+                                    create.setFillColor(Color(255, 195, 0, 255));
+                                    create.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 4:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute create button:
+                                        break;
+
+                                    // capture session name field:
+                                    session_name_captured = true;
+
+                                    // unfocus create button:
+                                    create.setFillColor(Color(144, 12, 63, 255));
+                                    create.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus session_name_title button:
+                                    session_name_title.setFillColor(Color(255, 195, 0, 255));
+                                    session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter = 1;
+                                default:
+                                    break;
+                            }
+                            break;
+                        case Keyboard::BackSpace:
+                            if (session_name_captured && session_name.length() > 0)
+                                session_name.erase(session_name.length() - 1);
+                            else if (max_number_of_players_captured)
+                                if (max_number_of_players != 0)
+                                    max_number_of_players = 0;
+                            break;
+                        default:
+                            break;
+                    }
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if (window.getSize().y < 600)
+                        window.setSize(Vector2u (window.getSize().x, 600));
+
+                    // update button size:
+                    button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 18), 
+                        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update all the buttons and their positions:
+                    create_session_title.setCharacterSize(5 * button_size / 6);
+                    create_session_title.setPosition((window.getSize().x - create_session_title.getGlobalBounds().width) / 2 - 10.0f, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
+
+                    session_name_title.setCharacterSize(5 * button_size / 6);
+                    session_name_title.setOutlineThickness(button_size / 6);
+                    session_name_title.setPosition((window.getSize().x - session_name_title.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                    
+                    session_name_display.setCharacterSize(5 * button_size / 6);
+                    session_name_display.setPosition(3 * (window.getSize().x - session_name_display.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+
+                    max_number_of_players_title.setCharacterSize(5 * button_size / 6);
+                    max_number_of_players_title.setOutlineThickness(button_size / 6);
+                    max_number_of_players_title.setPosition((window.getSize().x - max_number_of_players_title.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
+                    
+                    max_number_of_players_display.setCharacterSize(5 * button_size / 6);
+                    max_number_of_players_display.setPosition(3 * (window.getSize().x - max_number_of_players_display.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2  + (button_size + 15.0f) * 2 + 5.0f);
+
+                    back.setCharacterSize(5 * button_size / 6);
+                    back.setOutlineThickness(button_size / 6);
+                    back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f);
+                    
+                    create.setCharacterSize(5 * button_size / 6);
+                    create.setOutlineThickness(button_size / 6);
+                    create.setPosition(3 * (window.getSize().x - create.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // Clear window:
+        window.clear();
+
+        // Draw background:
+        window.draw(background);
+
+        // Display a test after a delay:
+        if (enter_text_counter >= 1000) {
+            // Display entered session name:
+            if (session_name_captured) {
+                if (session_name_display.getString().getSize() == session_name.length())
+                    session_name_display.setString(session_name + "|");
+                else 
+                    session_name_display.setString(session_name);
+            // Display entered max players number:
+            } else if (max_number_of_players_captured) {
+                if (max_number_of_players_display.getString().getSize() == 1)
+                    max_number_of_players_display.setString(to_string(max_number_of_players) + "|");
+                else
+                    max_number_of_players_display.setString(to_string(max_number_of_players));
+            }
+            
+            enter_text_counter = 0;
+        }
+        
+        // Draw a menu:
+        window.draw(create_session_title);
+        window.draw(session_name_title);
+        window.draw(session_name_display);
+        window.draw(max_number_of_players_title);
+        window.draw(max_number_of_players_display);
+        window.draw(back);
+        window.draw(create);
+        window.display();
+    }  
 };
 
 void complexity_menu(RenderWindow& window, Sprite& background, const Font& font) {
