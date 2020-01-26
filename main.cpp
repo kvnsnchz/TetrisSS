@@ -7,9 +7,9 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
-    /*if(argc == 1){
+    if(argc == 1){
         Server server;
-        Thread thread([&]() {server.search_clients();});
+        Thread thread([&]() {server.listen_clients();});
         thread.launch();
     }
     else{
@@ -20,7 +20,7 @@ int main(int argc, char const *argv[]) {
             client.disconnect_server();
         });
         thread.launch();
-    }*/
+    }
     // get user's resolution:
     Vector2f resolution(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height);
 

@@ -14,10 +14,26 @@ using namespace datatype;
 class Server
 {
 private:
+    //IPv4 addresses of clients:
+    string server_name;
+    Uint32 max_clients;
+    Uint32 level;
     vector<IpAddress> clients_address;
 public:
-    Server() {};
+    Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {};
+    Server(string s_name, Uint32 max_cli, Uint32 lvl): 
+        server_name(s_name), max_clients(max_cli), level(lvl) 
+    {};
 
-    void search_clients();
+    void set_server_name(const string&);
+    void set_max_clients(const Uint32&);
+    void set_level(const Uint32&);
+
+    string get_server_name() const;
+    Uint32 get_max_clients() const;
+    Uint32 get_level() const;
+    
+    //Listen for new customer connections:
+    void listen_clients();
 };
 
