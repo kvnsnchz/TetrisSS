@@ -506,10 +506,12 @@ void Board::erase_lines(const unsigned& complexity) {
     }
 };
 
-void Board::insert_figure_current(){
+// Fix current figure's position on the board if we can't move further:
+void Board::fix_current_figure() {
     for (unsigned i = 0; i < current_figure->get_points().size(); i++)
         change_point(*current_figure->get_points()[i], current_figure->get_color_code() * 10);     
 }
+
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < x_dimension; j++)
