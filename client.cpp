@@ -1,6 +1,6 @@
 #include "client.hpp"
 
-vector<server_t> Client::get_servers() const {
+vector<server_data> Client::get_servers() const {
     return servers;
 }
 
@@ -47,11 +47,13 @@ void Client::search_servers(){
             //Check if the message is a response of server information:
             if(!_datatype.compare(SERVER_INFO_RESPONSE)){
                 //Adding server information to server list:
-                servers.emplace_back(server_t());
+                servers.emplace_back(server_data());
                 servers.back().address = sender;
                 //Get the buffer information:
+                packet_recv >> servers.back().name;
                 packet_recv >> servers.back().clients_quantity;
-                cout << "Server: address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
+                packet_recv >> servers.back().level;
+                cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
             }
         }
         elapsed_seconds = chrono::system_clock::now() - start;

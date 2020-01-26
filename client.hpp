@@ -14,9 +14,11 @@ using namespace std;
 using namespace datatype;
 using namespace ports_number;
 
-struct server_t {
+struct server_data {
     IpAddress address;
+    string name;
     Uint32 clients_quantity;
+    Uint32 level;
 }; 
 
 class Client
@@ -25,11 +27,11 @@ private:
     //IPv4 address of the game server:
     IpAddress server_address;
     //Vector of game servers available to connect:
-    vector<server_t> servers;
+    vector<server_data> servers;
 public:
     Client() {};
     
-    vector<server_t> get_servers() const;
+    vector<server_data> get_servers() const;
     //Search for available game servers:
     void search_servers();
     //Connect to a specific game server from the available list:
