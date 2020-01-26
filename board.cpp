@@ -394,9 +394,9 @@ void Board::rotate(bool right){
     change_points_rotated(NONE);
 }
 
-// Check for the full lines and erase them if they are exist:
+// Check for the full lines and erase them if they exist:
 void Board::erase_lines(const unsigned& complexity) {
-    // initialize the indices of the highest and lowest possible full lines
+    // initialize the indexes of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
     int begin = 22;
     int end = 2;

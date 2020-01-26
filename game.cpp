@@ -968,9 +968,9 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                             // 1) Start new single game:
                             if (captured_button(window, singleplayer))
                                 complexity_menu(window, background, font);
-                            // 2) Start choose complexity:
+                            // 2) Go to multiplayer menu:
                             else if (captured_button(window, multiplayer))
-                                break;
+                                multiplayer_menu(window, background, font);
                             // 3) Check highscores:
                             else if (captured_button(window, leaderboard))
                                 break;
@@ -1023,8 +1023,8 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                 case 2:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
-                                        // execute multiplayer button:
-                                        break;
+                                        // Go to multiplayer menu:
+                                        multiplayer_menu(window, background, font);
 
                                     // unfocus multiplayer button:
                                     multiplayer.setFillColor(Color(144, 12, 63, 255));
@@ -1165,6 +1165,214 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
     }    
 }
 
+void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font) { 
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // number of buttons:
+    const unsigned number_of_buttons = 4;
+    // button size:
+    double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
+        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+    
+    // Vector2u window_size;
+
+    // Initialize multiplayer menu title:
+    Text multiplayer_title = create_button(font, "Multiplayer", button_size,
+        Vector2f(window.getSize().x / 2 - 10.0f,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2), false);
+
+    // Initialize new_session button:
+    Text new_session = create_button(font, "New Session", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f));
+    
+    // Initialize find_server button:
+    Text find_server = create_button(font, "Find Server", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f));
+      
+    // Initialize back button:
+    Text back = create_button(font, "Back", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f));
+   
+    while (window.isOpen()) {
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    new_session.setFillColor(Color(144, 12, 63, 255));
+                    new_session.setOutlineColor(Color(218, 247, 166, 255));
+                    find_server.setFillColor(Color(144, 12, 63, 255));
+                    find_server.setOutlineColor(Color(218, 247, 166, 255));
+                    back.setFillColor(Color(144, 12, 63, 255));
+                    back.setOutlineColor(Color(218, 247, 166, 255));
+
+                    // If appropriate mouse position was captured:
+                    if (captured_button(window, new_session)) {
+                        // focus new_session button:
+                        new_session.setFillColor(Color(255, 195, 0, 255));
+                        new_session.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 1;
+                    } else if (captured_button(window, find_server)) {
+                        // focus find_server button:
+                        find_server.setFillColor(Color(255, 195, 0, 255));
+                        find_server.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 2;  
+                    } else if (captured_button(window, back)) {
+                        // focus back button:
+                        back.setFillColor(Color(255, 195, 0, 255));
+                        back.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 3;
+                    }
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) Starting to play in the easy mode:
+                            if (captured_button(window, new_session))
+                                game(window, background, font, 1);
+                            // 2) Starting to play in the normal mode:
+                            else if (captured_button(window, find_server))
+                                game(window, background, font, 2);
+                            // 3) Go back:
+                            else if (captured_button(window, back))
+                                return;
+                            break;
+                        default:
+                            break;
+                    }
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // focus new_session button:
+                                    new_session.setFillColor(Color(255, 195, 0, 255));
+                                    new_session.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute new_session button:
+                                        game(window, background, font, 1);
+
+                                    // unfocus new_session button:
+                                    new_session.setFillColor(Color(144, 12, 63, 255));
+                                    new_session.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus find_server button:
+                                    find_server.setFillColor(Color(255, 195, 0, 255));
+                                    find_server.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 2:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute find_server button:
+                                        game(window, background, font, 2);
+
+                                    // unfocus find_server button:
+                                    find_server.setFillColor(Color(144, 12, 63, 255));
+                                    find_server.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus back button:
+                                    back.setFillColor(Color(255, 195, 0, 255));
+                                    back.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 3:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute back button:
+                                        main_menu(window, background, font);
+
+                                    // unfocus back button:
+                                    back.setFillColor(Color(144, 12, 63, 255));
+                                    back.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus new_session button:
+                                    new_session.setFillColor(Color(255, 195, 0, 255));
+                                    new_session.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter = 1;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        default:
+                            break;
+                    }
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if (window.getSize().y < 600)
+                        window.setSize(Vector2u (window.getSize().x, 600));
+
+                    // update button size:
+                    button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 18), 
+                        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update all the buttons and their positions:
+                    multiplayer_title.setCharacterSize(5 * button_size / 6);
+                    multiplayer_title.setPosition((window.getSize().x - multiplayer_title.getGlobalBounds().width) / 2 - 10.0f, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
+
+                    new_session.setCharacterSize(5 * button_size / 6);
+                    new_session.setOutlineThickness(button_size / 6);
+                    new_session.setPosition((window.getSize().x - new_session.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                    
+                    find_server.setCharacterSize(5 * button_size / 6);
+                    find_server.setOutlineThickness(button_size / 6);
+                    find_server.setPosition((window.getSize().x - find_server.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
+                    
+                    back.setCharacterSize(5 * button_size / 6);
+                    back.setOutlineThickness(button_size / 6);
+                    back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // Clear window:
+        window.clear();
+
+        // Draw background:
+        window.draw(background);
+
+        // Update view:
+        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+        // Draw a menu:
+        window.draw(multiplayer_title);
+        window.draw(new_session);
+        window.draw(find_server);
+        window.draw(back);
+        window.display();
+    }
+};
+
 void complexity_menu(RenderWindow& window, Sprite& background, const Font& font) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
@@ -1178,7 +1386,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
 
     // Initialize complexity title:
     Text complexity_title = create_button(font, "Choose complexity", button_size,
-        Vector2f(window.getSize().x / 2,
+        Vector2f(window.getSize().x / 2 - 15.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2), false);
 
     // Initialize mechanics button:
@@ -1361,7 +1569,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
 
                     // update all the buttons and their positions:
                     complexity_title.setCharacterSize(5 * button_size / 6);
-                    complexity_title.setPosition((window.getSize().x - complexity_title.getGlobalBounds().width) / 2, 
+                    complexity_title.setPosition((window.getSize().x - complexity_title.getGlobalBounds().width) / 2 - 15.0f, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
 
                     mechanics.setCharacterSize(5 * button_size / 6);

@@ -23,4 +23,6 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
 
 void main_menu(RenderWindow& window, Sprite& background, const Font& font);
 
+void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font);
+
 void complexity_menu(RenderWindow& window, Sprite& background, const Font& font);
