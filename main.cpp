@@ -9,7 +9,7 @@ using namespace std;
 int main(int argc, char const *argv[]) {
     /*if(argc == 1){
         Server server;
-        Thread thread([&]() {server.search_clients();});
+        Thread thread([&]() {server.listen_clients();});
         thread.launch();
     }
     else{

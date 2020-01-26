@@ -14,10 +14,11 @@ using namespace datatype;
 class Server
 {
 private:
+    //IPv4 addresses of clients:
     vector<IpAddress> clients_address;
 public:
     Server() {};
-
-    void search_clients();
+    //Listen for new customer connections:
+    void listen_clients();
 };
 

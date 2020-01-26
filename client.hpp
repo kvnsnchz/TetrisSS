@@ -22,14 +22,19 @@ struct server_t {
 class Client
 {
 private:
+    //IPv4 address of the game server:
     IpAddress server_address;
+    //Vector of game servers available to connect:
     vector<server_t> servers;
 public:
     Client() {};
     
     vector<server_t> get_servers() const;
+    //Search for available game servers:
     void search_servers();
+    //Connect to a specific game server from the available list:
     bool connect_server(const unsigned pos = 0);
+    //Disconnect from the game server:
     bool disconnect_server();
 };
 
