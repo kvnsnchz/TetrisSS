@@ -10,7 +10,7 @@ enum state_figure {
 };
 
 // new button initialization function (for code reduction):
-Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline = true, const bool& center = true);
+Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline = true, const unsigned& center_coefficient = 2);
 
 // captured button identifier:
 bool captured_button(RenderWindow& window, Text& button);
@@ -25,6 +25,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font);
 
 void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font);
 
-void complexity_menu(RenderWindow& window, Sprite& background, const Font& font);
-
+// Set up and create a new session as a server:
 void create_session(RenderWindow& window, Sprite& background, const Font& font);
+
+// Manage just created session as a server:
+void session_menu(RenderWindow& window, Sprite& background, const Font& font,
+    const string& session_name, const unsigned& max_number_of_players, const unsigned& complexity);
+
+void complexity_menu(RenderWindow& window, Sprite& background, const Font& font);

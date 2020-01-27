@@ -1,7 +1,9 @@
 #include "game.hpp"
+#include "server.hpp"
+#include "client.hpp"
 
 // new button initialization function (for code reduction):
-Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline, const bool& center) {
+Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline, const unsigned& center_coefficient) {
     // Initialize new button:
     Text new_button;
     new_button.setFont(font);
@@ -13,8 +15,8 @@ Text create_button(const Font& font, const char* title, const double& button_siz
         new_button.setOutlineThickness(button_size / 6);
         new_button.setOutlineColor(Color(218, 247, 166, 255));
     }
-    if (center)
-        position.x -= new_button.getGlobalBounds().width / 2;
+    if (center_coefficient != 0)
+        position.x -= new_button.getGlobalBounds().width / center_coefficient;
     new_button.setPosition(position);
 
     return new_button;
@@ -46,7 +48,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
 
     // Initialize pause button:
     Text pause = create_button(font, "Pause", button_size,
-        Vector2f((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, false);
+        Vector2f((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
 
     state_figure _state_figure = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
@@ -121,7 +123,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                     if (event.key.code == Keyboard::Return)
                                         break;
 
-                                    // focus main menu button:
+                                    // focus pause button:
                                     pause.setFillColor(Color(255, 195, 0, 255));
                                     pause.setOutlineColor(Color(8, 0, 93, 255));
                                     focused_button_counter++;
@@ -146,7 +148,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                         pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                                     }
 
-                                    // unfocus main menu button:
+                                    // unfocus pause button:
                                     pause.setFillColor(Color(144, 12, 63, 255));
                                     pause.setOutlineColor(Color(218, 247, 166, 255));
                                     focused_button_counter = 0;
@@ -191,7 +193,6 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                         case Keyboard::A:
                         case Keyboard::Q:
                         case Keyboard::Left:
-                            
                             if(_state_figure == STOP_FIGURE){
                                 bool step_done = game_board->step_left(true);
                                 if(step_done)
@@ -254,9 +255,6 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
 
         // draw background:
         window.draw(background);
-
-        // update view:
-        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
@@ -417,6 +415,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                         default:
                             break;
                     }
+                    break;
                 case Event::KeyPressed:
                     switch (event.key.code) {
                         // if we want to focus (Tab) or push (Enter) some button using keyboard:
@@ -498,6 +497,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                         default:
                             break;
                     }
+                    break;
                 // if we have changed window's size:
                 case Event::Resized:
                     // set minimal window size:
@@ -548,9 +548,6 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
 
         // draw background:
         window.draw(background);
-
-        // update view:
-        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
@@ -780,6 +777,7 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                         default:
                             break;
                     }
+                    break;
                 // if we have changed window's size:
                 case Event::Resized:
                     // set minimal window size:
@@ -835,9 +833,6 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
 
         // draw background:
         window.draw(background);
-
-        // update view:
-        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // draw a board:
         game_board->print_board(window, font, 5 * button_size / 6);
@@ -984,6 +979,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                         default:
                             break;
                     }
+                    break;
                 case Event::KeyPressed:
                     switch (event.key.code) {
                         // if we want to focus (Tab) or push (Enter) some button using keyboard:
@@ -1093,6 +1089,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                         default:
                             break;
                     }
+                    break;
                 // if we have changed window's size:
                 case Event::Resized:
                     // set minimal window size:
@@ -1147,9 +1144,6 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
         
         // Draw a background:
         window.draw(background);
-        
-        // Update view:
-        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // Draw the buttons:
         window.draw(singleplayer);
@@ -1247,6 +1241,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                         default:
                             break;
                     }
+                    break;
                 case Event::KeyPressed:
                     switch (event.key.code) {
                         // if we want to focus (Tab) or push (Enter) some button using keyboard:
@@ -1315,6 +1310,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                         default:
                             break;
                     }
+                    break;
                 // if we have changed window's size:
                 case Event::Resized:
                     // set minimal window size:
@@ -1359,9 +1355,6 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
         // Draw background:
         window.draw(background);
 
-        // Update view:
-        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
-
         // Draw a menu:
         window.draw(multiplayer_title);
         window.draw(new_session);
@@ -1384,13 +1377,15 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
     string session_name = "";
     // Initialize the number of maximum players: 
     unsigned max_number_of_players = 2;
+    // Initialize the game complexity:
+    unsigned complexity = 0;
 
     // Session name capture boolean identificator:
     bool session_name_captured = false; 
     // Max players capture boolean identificator:
     bool max_number_of_players_captured = false;
 
-    // Initialize create_session menu title:
+    // Initialize create session menu title:
     Text create_session_title = create_button(font, "Session Settings", button_size,
         Vector2f(window.getSize().x / 2 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2), false);
@@ -1398,32 +1393,52 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
     // Initialize session_name_title button:
     Text session_name_title = create_button(font, "Session Name:", button_size,
         Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), true, 4);
     
     // Initialize session name field:
     Text session_name_display = create_button(font, "", button_size,
         Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false);
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 4);
     
     // Initialize max_number_of_players_title button:
     Text max_number_of_players_title = create_button(font, "Max Players:", button_size,
         Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f), true, 4);
     
     // Initialize max players field:
     Text max_number_of_players_display = create_button(font, " ", button_size,
         Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f), false);
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f), false, 4);
 
+    // Initialize complexity title:
+    Text complexity_title = create_button(font, "Choose complexity", button_size,
+        Vector2f(window.getSize().x / 2 - 15.0f,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f), false);
+
+    // Initialize mechanics button:
+    Text mechanics = create_button(font, "Mechanics", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 5.0f));
+    
+    // Initialize STIC button:
+    Text STIC = create_button(font, "STIC", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 5.0f));
+    
+    // Initialize applied mathematics button:
+    Text applied_mathematics = create_button(font, "Applied Mathematics", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 5.0f));
+    
     // Initialize back button:
     Text back = create_button(font, "Back", button_size,
         Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f));
    
-    // Initialize back button:
+    // Initialize create button:
     Text create = create_button(font, "Create", button_size,
         Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f));
 
     // We are using enter text counter to manage the display of the entered text:
     for (unsigned enter_text_counter = 0; window.isOpen(); enter_text_counter++) {
@@ -1442,6 +1457,18 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                     session_name_title.setOutlineColor(Color(218, 247, 166, 255));
                     max_number_of_players_title.setFillColor(Color(144, 12, 63, 255));
                     max_number_of_players_title.setOutlineColor(Color(218, 247, 166, 255));
+                    if (complexity != 1) {
+                        mechanics.setFillColor(Color(144, 12, 63, 255));
+                        mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                    }
+                    if (complexity != 2) {
+                        STIC.setFillColor(Color(144, 12, 63, 255));
+                        STIC.setOutlineColor(Color(218, 247, 166, 255));
+                    }
+                    if (complexity != 3) {
+                        applied_mathematics.setFillColor(Color(144, 12, 63, 255));
+                        applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                    }
                     back.setFillColor(Color(144, 12, 63, 255));
                     back.setOutlineColor(Color(218, 247, 166, 255));
                     create.setFillColor(Color(144, 12, 63, 255));
@@ -1466,6 +1493,18 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                         // focus create button:
                         create.setFillColor(Color(255, 195, 0, 255));
                         create.setOutlineColor(Color(8, 0, 93, 255));
+                    } else if (captured_button(window, mechanics)) {
+                        // focus mechanics button:
+                        mechanics.setFillColor(Color(255, 195, 0, 255));
+                        mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                    } else if (captured_button(window, STIC)) {
+                        // focus STIC button:
+                        STIC.setFillColor(Color(255, 195, 0, 255));
+                        STIC.setOutlineColor(Color(8, 0, 93, 255));
+                    } else if (captured_button(window, applied_mathematics)) {
+                        // focus applied mathematics button:
+                        applied_mathematics.setFillColor(Color(255, 195, 0, 255));
+                        applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));   
                     }
                     break;
                 // If we want to type a text:
@@ -1473,11 +1512,34 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                     if (event.text.unicode < 128 && event.text.unicode != 13 
                         && event.text.unicode != 8 && event.text.unicode != 9) {
                         if (session_name_captured && session_name.length() <= 12) {
+                            // Add a new symbol at the end of a session name's string
+                            // (maximal length of which - 12 characters):
                             session_name += static_cast<char>(event.text.unicode);
                             session_name_display.setString(session_name);
+
+                            // Resize session name:
+                            session_name_title.setCharacterSize(5 * button_size / 6);
+                            session_name_title.setOutlineThickness(button_size / 6);
+                            session_name_title.setPosition((window.getSize().x - session_name_title.getGlobalBounds().width) / 4, 
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                                
+                            session_name_display.setCharacterSize(5 * button_size / 6);
+                            session_name_display.setPosition(3 * (window.getSize().x - session_name_display.getGlobalBounds().width) / 4, 
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
                         } else if (max_number_of_players_captured && event.text.unicode >= 50 && event.text.unicode <= 52) {
+                            // Set a new value of max players number (between 2 and 4):
                             max_number_of_players = event.text.unicode - 48;
                             max_number_of_players_display.setString(to_string(max_number_of_players));
+                        
+                            // Resize max players number:
+                            max_number_of_players_title.setCharacterSize(5 * button_size / 6);
+                            max_number_of_players_title.setOutlineThickness(button_size / 6);
+                            max_number_of_players_title.setPosition((window.getSize().x - max_number_of_players_title.getGlobalBounds().width) / 4, 
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
+                                
+                            max_number_of_players_display.setCharacterSize(5 * button_size / 6);
+                            max_number_of_players_display.setPosition(3 * (window.getSize().x - max_number_of_players_display.getGlobalBounds().width) / 4, 
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2  + (button_size + 15.0f) * 2 + 5.0f);
                         }
                     }
                     break;
@@ -1501,16 +1563,37 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                 max_number_of_players_captured = true;
 
                                 focused_button_counter = 2;
-                            // 3) Go back:
+                            // 3) Choose an easy mode:
+                            } else if (captured_button(window, mechanics)) {
+                                // focus mechanics button:
+                                mechanics.setFillColor(Color(255, 195, 0, 255));
+                                mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                                complexity = 1;
+                            // 4) Choose a normal mode:
+                            } else if (captured_button(window, STIC)) {
+                                // focus STIC button:
+                                STIC.setFillColor(Color(255, 195, 0, 255));
+                                STIC.setOutlineColor(Color(8, 0, 93, 255));
+                                complexity = 2;
+                            // 5) Choose a hard mode:
+                            } else if (captured_button(window, applied_mathematics)) {
+                                // focus applied mathematics button:
+                                applied_mathematics.setFillColor(Color(255, 195, 0, 255));
+                                applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));
+                                complexity = 3;
+                            // 6) Go back:
                             } else if (captured_button(window, back))
                                 return;
-                            // 4) Create a new session:
-                            else if (captured_button(window, create))
-                                break;
+                            // 7) Create a new session (if all required information is entered):
+                            else if (captured_button(window, create) && session_name != ""
+                                && complexity != 0 && max_number_of_players != 0) { 
+                                session_menu(window, background, font, session_name, max_number_of_players, complexity);
+                            }
                             break;
                         default:
                             break;
                     }
+                    break;
                 case Event::KeyPressed:
                     switch (event.key.code) {
                         // if we want to focus (Tab) or push (Enter) some button using keyboard:
@@ -1554,11 +1637,6 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     focused_button_counter++;
                                     break;
                                 case 2:
-                                    // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
-                                        // execute max_number_of_players_title button:
-                                        game(window, background, font, 2);
-
                                     // uncapture max players number field:
                                     max_number_of_players_display.setString(to_string(max_number_of_players));
                                     max_number_of_players_captured = false;
@@ -1566,12 +1644,87 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     // unfocus max_number_of_players_title button:
                                     max_number_of_players_title.setFillColor(Color(144, 12, 63, 255));
                                     max_number_of_players_title.setOutlineColor(Color(218, 247, 166, 255));
-                                    // focus back button:
-                                    back.setFillColor(Color(255, 195, 0, 255));
-                                    back.setOutlineColor(Color(8, 0, 93, 255));
+                                    // focus mechanics button:
+                                    mechanics.setFillColor(Color(255, 195, 0, 255));
+                                    mechanics.setOutlineColor(Color(8, 0, 93, 255));
                                     focused_button_counter++;
                                     break;
                                 case 3:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        // set complexity:
+                                        complexity = 1;
+
+                                        // unfocus STIC button:
+                                        STIC.setFillColor(Color(144, 12, 63, 255));
+                                        STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                        // unfocus applied mathematics button:
+                                        applied_mathematics.setFillColor(Color(144, 12, 63, 255));
+                                        applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                    } else {
+                                        if (complexity != 1) {
+                                            // unfocus mechanics button:
+                                            mechanics.setFillColor(Color(144, 12, 63, 255));
+                                            mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                        }
+                                        
+                                        // focus STIC button:
+                                        STIC.setFillColor(Color(255, 195, 0, 255));
+                                        STIC.setOutlineColor(Color(8, 0, 93, 255));
+                                        focused_button_counter++;
+                                    }
+                                    break;
+                                case 4:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        // set complexity:
+                                        complexity = 2;
+
+                                        // unfocus mechanics button:
+                                        mechanics.setFillColor(Color(144, 12, 63, 255));
+                                        mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                        // unfocus applied mathematics button:
+                                        applied_mathematics.setFillColor(Color(144, 12, 63, 255));
+                                        applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                    } else {
+                                        if (complexity != 2) {
+                                            // unfocus STIC button:
+                                            STIC.setFillColor(Color(144, 12, 63, 255));
+                                            STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                        }
+
+                                        // focus applied mathematics button:
+                                        applied_mathematics.setFillColor(Color(255, 195, 0, 255));
+                                        applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));
+                                        focused_button_counter++;
+                                    }
+                                    break;
+                                case 5:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        // set complexity:
+                                        complexity = 3;
+
+                                        // unfocus mechanics button:
+                                        mechanics.setFillColor(Color(144, 12, 63, 255));
+                                        mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                        // unfocus STIC button:
+                                        STIC.setFillColor(Color(144, 12, 63, 255));
+                                        STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                    } else {
+                                        if (complexity != 3) {
+                                            // unfocus applied mathematics button:
+                                            applied_mathematics.setFillColor(Color(144, 12, 63, 255));
+                                            applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                        }
+
+                                        // focus back button:
+                                        back.setFillColor(Color(255, 195, 0, 255));
+                                        back.setOutlineColor(Color(8, 0, 93, 255));
+                                        focused_button_counter++;
+                                    }
+                                    break;
+                                case 6:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute back button:
@@ -1585,38 +1738,66 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     create.setOutlineColor(Color(8, 0, 93, 255));
                                     focused_button_counter++;
                                     break;
-                                case 4:
+                                case 7:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return && session_name != ""
+                                        && complexity != 0 && max_number_of_players != 0)
                                         // execute create button:
-                                        break;
+                                        session_menu(window, background, font, session_name, max_number_of_players, complexity);
+                                    else {
+                                        // capture session name field:
+                                        session_name_captured = true;
 
-                                    // capture session name field:
-                                    session_name_captured = true;
-
-                                    // unfocus create button:
-                                    create.setFillColor(Color(144, 12, 63, 255));
-                                    create.setOutlineColor(Color(218, 247, 166, 255));
-                                    // focus session_name_title button:
-                                    session_name_title.setFillColor(Color(255, 195, 0, 255));
-                                    session_name_title.setOutlineColor(Color(8, 0, 93, 255));
-                                    focused_button_counter = 1;
+                                        // unfocus create button:
+                                        create.setFillColor(Color(144, 12, 63, 255));
+                                        create.setOutlineColor(Color(218, 247, 166, 255));
+                                        // focus session_name_title button:
+                                        session_name_title.setFillColor(Color(255, 195, 0, 255));
+                                        session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                                        focused_button_counter = 1;
+                                    }
+                                    break;
                                 default:
                                     break;
                             }
                             break;
+                        // If we have pushed Backspace:
                         case Keyboard::BackSpace:
                             if (session_name_captured && session_name.length() > 0) {
+                                // Erase the last symbol from the session name string:
                                 session_name.erase(session_name.length() - 1);
                                 session_name_display.setString(session_name);
+
+                                // Resize session name:
+                                session_name_title.setCharacterSize(5 * button_size / 6);
+                                session_name_title.setOutlineThickness(button_size / 6);
+                                session_name_title.setPosition((window.getSize().x - session_name_title.getGlobalBounds().width) / 4, 
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                                
+                                session_name_display.setCharacterSize(5 * button_size / 6);
+                                session_name_display.setPosition(3 * (window.getSize().x - session_name_display.getGlobalBounds().width) / 4, 
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
                             } else if (max_number_of_players_captured && max_number_of_players != 0) {
+                                // Reset max players number to 0:
                                 max_number_of_players = 0;
                                 max_number_of_players_display.setString(to_string(max_number_of_players));
+
+                                // Resize max players number:
+                                max_number_of_players_title.setCharacterSize(5 * button_size / 6);
+                                max_number_of_players_title.setOutlineThickness(button_size / 6);
+                                max_number_of_players_title.setPosition((window.getSize().x - max_number_of_players_title.getGlobalBounds().width) / 4, 
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
+                                
+                                max_number_of_players_display.setCharacterSize(5 * button_size / 6);
+                                max_number_of_players_display.setPosition(3 * (window.getSize().x - max_number_of_players_display.getGlobalBounds().width) / 4, 
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2  + (button_size + 15.0f) * 2 + 5.0f);
+
                             }
                             break;
                         default:
                             break;
                     }
+                    break;
                 // if we have changed window's size:
                 case Event::Resized:
                     // set minimal window size:
@@ -1653,15 +1834,34 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                     max_number_of_players_display.setPosition(3 * (window.getSize().x - max_number_of_players_display.getGlobalBounds().width) / 4, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2  + (button_size + 15.0f) * 2 + 5.0f);
 
+                    complexity_title.setCharacterSize(5 * button_size / 6);
+                    complexity_title.setPosition((window.getSize().x - complexity_title.getGlobalBounds().width) / 2 - 10.0f, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f);
+
+                    mechanics.setCharacterSize(5 * button_size / 6);
+                    mechanics.setOutlineThickness(button_size / 6);
+                    mechanics.setPosition((window.getSize().x - mechanics.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 5.0f);
+                    
+                    STIC.setCharacterSize(5 * button_size / 6);
+                    STIC.setOutlineThickness(button_size / 6);
+                    STIC.setPosition((window.getSize().x - STIC.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 5.0f);
+                    
+                    applied_mathematics.setCharacterSize(5 * button_size / 6);
+                    applied_mathematics.setOutlineThickness(button_size / 6);
+                    applied_mathematics.setPosition((window.getSize().x - applied_mathematics.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 6.0f);
+
                     back.setCharacterSize(5 * button_size / 6);
                     back.setOutlineThickness(button_size / 6);
                     back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
                     
                     create.setCharacterSize(5 * button_size / 6);
                     create.setOutlineThickness(button_size / 6);
                     create.setPosition(3 * (window.getSize().x - create.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
                     break;
                 default:
                     break;
@@ -1675,7 +1875,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
         window.draw(background);
 
         // Display a test after a delay:
-        if (enter_text_counter >= 1000) {
+        if (enter_text_counter >= 500) {
             // Display entered session name:
             if (session_name_captured) {
                 if (session_name_display.getString().getSize() == session_name.length())
@@ -1699,11 +1899,65 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
         window.draw(session_name_display);
         window.draw(max_number_of_players_title);
         window.draw(max_number_of_players_display);
+        window.draw(complexity_title);
+        window.draw(mechanics);
+        window.draw(STIC);
+        window.draw(applied_mathematics);
         window.draw(back);
         window.draw(create);
         window.display();
     }  
 };
+
+// Manage just created session as a server:
+void session_menu(RenderWindow& window, Sprite& background, const Font& font,
+    const string& session_name, const unsigned& max_number_of_players, const unsigned& complexity) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // number of buttons:
+    const unsigned number_of_buttons = 5;
+    // button size:
+    double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
+        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+    
+    // Create a new server's session:
+    Server* current_session = new Server(session_name, max_number_of_players, complexity);
+
+    // Initialize session title:
+    string session_title_string = "Session " + session_name;
+    Text session_title = create_button(font, session_title_string.data(), button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + 10.0f));
+
+    // Initialize disconnect button:
+    Text disconnect = create_button(font, "Disconnect", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+   
+    // Initialize ready button:
+    Text ready = create_button(font, "Ready", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+
+    while(window.isOpen()) {
+
+        // Look for the clients:
+        // current_session->listen_clients();
+
+        // Clear window:
+        window.clear();
+
+        // Draw background:
+        window.draw(background);
+
+        // Draw a menu:
+        window.draw(session_title);
+        window.draw(disconnect);
+        window.draw(ready);
+        window.display();
+    }
+};
+
 
 void complexity_menu(RenderWindow& window, Sprite& background, const Font& font) {
     // counter of the currently chosen button:
@@ -1934,9 +2188,6 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
 
         // Draw background:
         window.draw(background);
-
-        // Update view:
-        // window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
         // Draw a menu:
         window.draw(complexity_title);

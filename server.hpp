@@ -14,10 +14,11 @@ using namespace datatype;
 class Server
 {
 private:
-    //IPv4 addresses of clients:
     string server_name;
     Uint32 max_clients;
     Uint32 level;
+
+    // IPv4 addresses of clients:
     vector<IpAddress> clients_address;
 public:
     Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {};
@@ -33,7 +34,7 @@ public:
     Uint32 get_max_clients() const;
     Uint32 get_level() const;
     
-    //Listen for new customer connections:
+    // Listen for some new client connections:
     void listen_clients();
 };
 
