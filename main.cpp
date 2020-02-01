@@ -5,26 +5,26 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
-    if(argc == 1){
-         Server server("Kevin", 4, 2);
-         server.connect_udp_socket();
-         Thread thread([&]() {server.listen_clients();});
-         thread.launch();
-     }
-     else{
-         Client client;
-         Thread thread([&]() {
-             client.connect_udp_socket();
-             client.search_servers();
-             request_status status;
-             client.connect_server(0, status);
-             cout << status << endl;
-             //client.ready();
-            // client.disconnect_server();
-            client.disconnect_udp_socket();
-         });
-         thread.launch();
-     }
+    // if(argc == 1){
+    //      Server server("Kevin", 4, 2);
+    //      server.connect_udp_socket();
+    //      Thread thread([&]() {server.listen_clients();});
+    //      thread.launch();
+    //  }
+    //  else{
+    //      Client client;
+    //      Thread thread([&]() {
+    //          client.connect_udp_socket();
+    //          client.search_servers();
+    //          request_status status;
+    //          client.connect_server(0, status);
+    //          cout << status << endl;
+    //          //client.ready();
+    //         // client.disconnect_server();
+    //         client.disconnect_udp_socket();
+    //      });
+    //      thread.launch();
+    //  }
     // get user's resolution:
     Vector2f resolution(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height);
 

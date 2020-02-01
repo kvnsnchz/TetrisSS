@@ -1910,7 +1910,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
 };
 
 // Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, const bool& is_server) {
+void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, Client* current_client) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1923,8 +1923,8 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
     bool is_ready = false;
 
     Thread* search_thread;
-
-    if (is_server) {
+    
+    if (current_client == nullptr) {
         // Look for the clients:
         search_thread = new Thread([&] () { current_session->listen_clients(); });
 
@@ -2004,7 +2004,7 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                             // If appropriate mouse position was captured:
                             // 1) Go back:
                             if (captured_button(window, disconnect)) {
-                                if (is_server)
+                                if (current_client == nullptr)
                                     search_thread->terminate();
                                 return;
                             // 2) Get ready or not:
@@ -2044,7 +2044,7 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        if (is_server)
+                                        if (current_client == nullptr)
                                             // execute disconnect button:
                                             search_thread->terminate();
                                         return;
@@ -2319,8 +2319,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 search_thread.terminate();
                                 return;
                             // current_client->get_servers().size() + 2) Get connect or not:
-                            } else if (captured_button(window, connect) && chosen_server != -1) { 
-                                search_thread.terminate();
+                            } else if (captured_button(window, connect) && chosen_server != -1) {
                                 current_client->connect_server(chosen_server, status);
                             };
                             break;
@@ -2377,7 +2376,6 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
                                     // execute connect button:
-                                    search_thread.terminate();
                                     current_client->connect_server(chosen_server, status);
                                 } else {
                                     // unfocus connect button:
@@ -2497,6 +2495,9 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                     break;
             }
         }
+
+        if (status == SUCCESS)
+            session_menu(window, background, font, nullptr, current_client);
 
         // Clear window:
         window.clear();
