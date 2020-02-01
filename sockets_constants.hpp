@@ -39,6 +39,7 @@ struct server_data {
     string name;
     Uint32 clients_quantity;
     Uint32 level;
+    Uint32 max_clients;
     vector<client_data> clients;
 };
 

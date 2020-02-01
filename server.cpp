@@ -16,6 +16,10 @@ string Server::get_server_name() const{
     return server_name;
 }
 
+vector<client_data> Server::get_clients() const{
+    return clients;
+}
+
 Uint32 Server::get_max_clients() const{
     return max_clients;
 }
@@ -24,20 +28,23 @@ Uint32 Server::get_level() const{
     return level;
 }
 
-//Listen for new customer connections:
-void Server::listen_clients() {
-    //UDP socket
-    UdpSocket socket;
-    socket.setBlocking(false);
-    
-    
-    //Port connection: 
-    if (socket.bind(SERVER_PORT) != Socket::Done)
-    {   
+//Connect to udp socket
+void Server::connect_udp_socket(){
+    if (socket.bind(SERVER_PORT) != sf::Socket::Done)
+    {
         cout << "Server: Connection error" << endl;
         return;
     }
+}
+//Disconnect to udp socket
+void Server::disconnect_udp_socket(){
+    socket.unbind();
+}
 
+//Listen for new customer connections:
+void Server::listen_clients() {
+    socket.setBlocking(false);
+    
     Packet packet_recv;;
     IpAddress sender;
     unsigned short port;
@@ -63,7 +70,7 @@ void Server::listen_clients() {
                     packet_send << server_name;
                     packet_send << (Uint32)clients.size();
                     packet_send << level;
-                                       
+                    packet_send << max_clients;                    
                     //Send server information to client 
                     if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                         cout << "Server: Send error" << endl;
@@ -88,6 +95,8 @@ void Server::listen_clients() {
                     packet_send << server_name;
                     packet_send << (Uint32)clients.size();
                     packet_send << level;
+                    packet_send << max_clients;
+
                     for(unsigned i = 0; i < clients.size(); i ++){
                         packet_send << clients[i].address.toString();
                         packet_send << clients[i].status;
