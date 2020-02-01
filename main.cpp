@@ -7,7 +7,7 @@
 using namespace std;
 
 int main(int argc, char const *argv[]) {
-    /*if(argc == 1){
+  /*  if(argc == 1){
          Server server("Kevin", 4, 2);
          Thread thread([&]() {server.listen_clients();});
          thread.launch();
@@ -16,7 +16,9 @@ int main(int argc, char const *argv[]) {
          Client client;
          Thread thread([&]() {
              client.search_servers();
-             client.connect_server(0);
+             request_status status;
+             client.connect_server(0, status);
+             cout << status << endl;
              client.ready();
             // client.disconnect_server();
          });

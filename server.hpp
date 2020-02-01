@@ -1,4 +1,3 @@
-#include <SFML/Network.hpp>
 #include <iostream>
 #include <thread>
 #include <boost/algorithm/string.hpp>
@@ -6,8 +5,6 @@
 
 #define MAX_CLIENTS 4
 
-using namespace sf;
-using namespace std;
 using namespace ports_number;
 
 class Server
@@ -18,15 +15,15 @@ private:
     Uint32 level;
 
     // IPv4 addresses of clients:
-    vector<IpAddress> clients_address;
+    vector<client_data> clients;
 public:
     Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
-        clients_address.emplace_back(IpAddress::getLocalAddress());
+        clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
     };
     Server(string s_name, Uint32 max_cli, Uint32 lvl): 
         server_name(s_name), max_clients(max_cli), level(lvl) 
     {
-        clients_address.emplace_back(IpAddress::getLocalAddress());
+        clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
     };
 
     void set_server_name(const string&);
