@@ -19,6 +19,7 @@ struct server_data {
     string name;
     Uint32 clients_quantity;
     Uint32 level;
+    vector<IpAddress> clients_address;
 }; 
 
 class Client

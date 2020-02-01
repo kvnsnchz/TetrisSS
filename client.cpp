@@ -47,12 +47,20 @@ void Client::search_servers(){
             //Check if the message is a response of server information:
             if(!_datatype.compare(SERVER_INFO_RESPONSE)){
                 //Adding server information to server list:
-                servers.emplace_back(server_data());
-                servers.back().address = sender;
+                server_data _server_data = server_data();
+                _server_data.address = sender;
+                packet_recv >> _server_data.name;
+                packet_recv >> _server_data.clients_quantity;
+                packet_recv >> _server_data.level;
+                for(unsigned i = 0; i < _server_data.clients_quantity; i++){
+                    string client_address;
+                    packet_recv >> client_address;
+                    _server_data.clients_address.emplace_back(client_address);
+                }
+
+                servers.emplace_back(_server_data);
                 //Get the buffer information:
-                packet_recv >> servers.back().name;
-                packet_recv >> servers.back().clients_quantity;
-                packet_recv >> servers.back().level;
+                
                 cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
             }
         }

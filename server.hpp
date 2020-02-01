@@ -21,10 +21,14 @@ private:
     // IPv4 addresses of clients:
     vector<IpAddress> clients_address;
 public:
-    Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {};
+    Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
+        clients_address.emplace_back(IpAddress::getLocalAddress());
+    };
     Server(string s_name, Uint32 max_cli, Uint32 lvl): 
         server_name(s_name), max_clients(max_cli), level(lvl) 
-    {};
+    {
+        clients_address.emplace_back(IpAddress::getLocalAddress());
+    };
 
     void set_server_name(const string&);
     void set_max_clients(const Uint32&);

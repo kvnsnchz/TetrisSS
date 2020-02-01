@@ -59,7 +59,10 @@ void Server::listen_clients() {
                     packet_send << server_name;
                     packet_send << (Uint32)clients_address.size();
                     packet_send << level;
-
+                    for(unsigned i = 0; i < clients_address.size(); i++){
+                        packet_send << clients_address[i].toString();
+                    }
+                    
                     //Send server information to client 
                     if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                         cout << "Server: Send error" << endl;
