@@ -40,7 +40,7 @@ public:
     vector<client_data> get_clients() const;
     Uint32 get_max_clients() const;
     Uint32 get_level() const;
-
+    
     //Connect to Socket UDP
     void connect_udp_socket();
     //Disconnect to Socket UDP

@@ -26,6 +26,8 @@ public:
     ~Client() {
         disconnect_udp_socket();
     }
+
+    server_data get_server_data() const;
     vector<server_data> get_servers() const;
     //Connect to Socket UDP
     void connect_udp_socket();
