@@ -3,24 +3,26 @@
 vector<server_data> Client::get_servers() const {
     return servers;
 }
-
-//Search for available game servers:
-void Client::search_servers(){
-    //UDP socket
-    UdpSocket socket;
-    
-    //Port connection: 
+//Connect to udp socket
+void Client::connect_udp_socket(){
     if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
     {
         cout << "Client: Connection error" << endl;
         return;
     }
-
+}
+//Disconnect to udp socket
+void Client::disconnect_udp_socket(){
+    socket.unbind();
+}
+//Search for available game servers:
+void Client::search_servers(){
     //Filling send buffer:
     Packet packet_send;
     //Server information request:
     packet_send << SERVER_INFO_REQUEST;
-    
+    socket.setBlocking(true);
+
     //Sending broadcast message for search available servers: 
     if (socket.send(packet_send, IpAddress::Broadcast, SERVER_PORT) != sf::Socket::Done)
     {
@@ -53,6 +55,7 @@ void Client::search_servers(){
                 packet_recv >> _server_data.name;
                 packet_recv >> _server_data.clients_quantity;
                 packet_recv >> _server_data.level;
+                packet_recv >> _server_data.max_clients;
 
                 servers.emplace_back(_server_data);
                 
@@ -68,21 +71,13 @@ void Client::search_servers(){
 //Connect to a specific game server from the available list:
 void Client::connect_server(const unsigned pos, request_status& status){
     //Checking that the selected server is in the list:
+    socket.setBlocking(true);
 
     if(pos > servers.size()){
         status = ERROR;
         return;
     }
-    //UDP socket
-    UdpSocket socket;
 
-    //Port connection: 
-    if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
-    {
-        status = ERROR;
-        cout << "Client: Connection error" << endl;
-        return;
-    }
     status = NOT_READY;
     //Filling send buffer:
     Packet packet_send;
@@ -131,6 +126,8 @@ void Client::connect_server(const unsigned pos, request_status& status){
                     packet_recv >> _server_data.name;
                     packet_recv >> _server_data.clients_quantity;
                     packet_recv >> _server_data.level;
+                    packet_recv >> _server_data.max_clients;
+                
                     for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
                         string client_address;
                         bool client_status;
@@ -154,16 +151,7 @@ void Client::connect_server(const unsigned pos, request_status& status){
 
 //Disconnect from the game server:
 bool Client::disconnect_server(){
-    //UDP socket
-    UdpSocket socket;
-
-    //Port connection: 
-    if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
-    {
-        cout << "Client: Connection error" << endl;
-        return false;
-    }
-    
+    socket.setBlocking(true);
     //Filling send buffer:
     Packet packet_send;
     //Server connection request:
@@ -182,17 +170,8 @@ bool Client::disconnect_server(){
 }
 
 void Client::listen_sever(){
-     //UDP socket
-    UdpSocket socket;
     socket.setBlocking(false);
     
-    //Port connection: 
-    if (socket.bind(SERVER_PORT) != Socket::Done)
-    {
-        cout << "Client: Connection error" << endl;
-        return;
-    }
-
     Packet packet_recv;;
     IpAddress sender;
     unsigned short port;
@@ -229,15 +208,7 @@ void Client::listen_sever(){
 }
 
 bool Client::ready(){
-    //UDP socket
-    UdpSocket socket;
-
-    //Port connection: 
-    if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
-    {
-        cout << "Client: Connection error" << endl;
-        return false;
-    }
+    socket.setBlocking(true);
     
     //Filling send buffer:
     Packet packet_send;

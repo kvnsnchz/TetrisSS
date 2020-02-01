@@ -16,6 +16,7 @@ private:
 
     // IPv4 addresses of clients:
     vector<client_data> clients;
+    UdpSocket socket;
 public:
     Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
         clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
@@ -29,11 +30,16 @@ public:
     void set_server_name(const string&);
     void set_max_clients(const Uint32&);
     void set_level(const Uint32&);
-
+    
     string get_server_name() const;
+    vector<client_data> get_clients() const;
     Uint32 get_max_clients() const;
     Uint32 get_level() const;
-    
+
+    //Connect to Socket UDP
+    void connect_udp_socket();
+    //Disconnect to Socket UDP
+    void disconnect_udp_socket();
     // Listen for some new client connections:
     void listen_clients();
 };
