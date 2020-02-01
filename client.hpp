@@ -20,8 +20,12 @@ private:
     vector<server_data> servers;
     UdpSocket socket;
 public:
-    Client() {};
-    
+    Client() {
+        connect_udp_socket();
+    };
+    ~Client() {
+        disconnect_udp_socket();
+    }
     vector<server_data> get_servers() const;
     //Connect to Socket UDP
     void connect_udp_socket();

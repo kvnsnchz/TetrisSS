@@ -20,11 +20,16 @@ private:
 public:
     Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
         clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
+        connect_udp_socket();
     };
     Server(string s_name, Uint32 max_cli, Uint32 lvl): 
         server_name(s_name), max_clients(max_cli), level(lvl) 
     {
         clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
+        connect_udp_socket();
+    };
+    ~Server(){
+        disconnect_udp_socket();
     };
 
     void set_server_name(const string&);
