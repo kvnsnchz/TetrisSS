@@ -1908,7 +1908,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
 };
 
 // Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session) {
+void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, const bool& is_server) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1920,10 +1920,14 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
     // player's readiness indicator:
     bool is_ready = false;
 
-    // Look for the clients:
-    Thread search_thread([&] () { current_session->listen_clients(); });
+    Thread* search_thread;
 
-    search_thread.launch();
+    if (is_server) {
+        // Look for the clients:
+        search_thread = new Thread([&] () { current_session->listen_clients(); });
+
+        search_thread->launch();
+    } 
 
     // Initialize session title:
     string session_title_string = "Session " + current_session->get_server_name();
@@ -1936,10 +1940,24 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
         Vector2f(window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f), false, 4);
 
-    // Initialize player's title:
+    // Initialize status title:
     Text status_title = create_button(font, "Status", button_size,
         Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f), false, 4);
+
+    // Initialize player list:
+    vector<Text> player;
+    // for (unsigned i = 0; i < current_client->get_servers().size(); i++) {
+    //     server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
+    //         Vector2f(window.getSize().x / 6,
+    //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+    //     server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
+    //         Vector2f(3 * window.getSize().x / 6,
+    //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+    //     server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity + 1) + "/4", button_size,
+    //         Vector2f(5 * window.getSize().x / 6,
+    //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+    // }
 
     // Initialize disconnect button:
     Text disconnect = create_button(font, "Disconnect", button_size,
@@ -1987,7 +2005,8 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                             // If appropriate mouse position was captured:
                             // 1) Go back:
                             if (captured_button(window, disconnect)) {
-                                search_thread.terminate();
+                                if (is_server)
+                                    search_thread->terminate();
                                 return;
                             // 2) Get ready or not:
                             } else if (captured_button(window, ready)) { 
@@ -2026,8 +2045,9 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        // execute disconnect button:
-                                        search_thread.terminate();
+                                        if (is_server)
+                                            // execute disconnect button:
+                                            search_thread->terminate();
                                         return;
                                     }
 
@@ -2370,6 +2390,8 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                         server_info[i + 2].setOutlineColor(Color(218, 247, 166, 255));
                                     }
                                     
+                                    cout << "Hello" << endl;
+                                    cout << current_client->get_servers().size() - 1 << endl;
                                     // if it is not a last server:
                                     if ((unsigned) i < current_client->get_servers().size() - 1) {
                                         // focus next server button:

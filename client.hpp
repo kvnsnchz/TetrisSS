@@ -8,18 +8,11 @@
 
 #define MAX_SEARCH_TIME 10
 #define MAX_CONNECTION_TIME 2
+#define MAX_RESPONSE_TIME 1
 
 using namespace sf;
 using namespace std;
-using namespace datatype;
 using namespace ports_number;
-
-struct server_data {
-    IpAddress address;
-    string name;
-    Uint32 clients_quantity;
-    Uint32 level;
-}; 
 
 class Client
 {
@@ -38,5 +31,9 @@ public:
     bool connect_server(const unsigned pos = 0);
     //Disconnect from the game server:
     bool disconnect_server();
+    //Listen the server
+    void listen_sever();
+    //Ready to play
+    bool ready();
 };
 

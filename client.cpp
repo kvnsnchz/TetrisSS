@@ -40,19 +40,28 @@ void Client::search_servers(){
         //Check if there is a message:
         if (socket.receive(packet_recv, sender, port) == Socket::Done)
         {
-            string _datatype;
-
+            datatype _datatype;
+            Uint32 datatype_value;
             //Get the buffer information:
-            packet_recv >> _datatype;
+            packet_recv >> datatype_value;
+            _datatype = (datatype) datatype_value;
             //Check if the message is a response of server information:
-            if(!_datatype.compare(SERVER_INFO_RESPONSE)){
+            if(_datatype == SERVER_INFO_RESPONSE){
                 //Adding server information to server list:
-                servers.emplace_back(server_data());
-                servers.back().address = sender;
+                server_data _server_data = server_data();
+                _server_data.address = sender;
+                packet_recv >> _server_data.name;
+                packet_recv >> _server_data.clients_quantity;
+                packet_recv >> _server_data.level;
+                for(unsigned i = 0; i < _server_data.clients_quantity; i++){
+                    string client_address;
+                    packet_recv >> client_address;
+                    _server_data.clients_address.emplace_back(client_address);
+                }
+
+                servers.emplace_back(_server_data);
                 //Get the buffer information:
-                packet_recv >> servers.back().name;
-                packet_recv >> servers.back().clients_quantity;
-                packet_recv >> servers.back().level;
+                
                 cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
             }
         }
@@ -105,19 +114,20 @@ bool Client::connect_server(const unsigned pos){
             //Checking that the address of the sender 
             //is the same as that of the selected server
             if(sender == servers[pos].address){
-                string _datatype;
+                datatype _datatype;
+                Uint32 datatype_value;
                 //Get the buffer information:
-                packet_recv >> _datatype;
+                packet_recv >> datatype_value;
+                _datatype = (datatype) datatype_value;
                 
+                switch ((unsigned)_datatype)
+                {
                 //Check if the message is a server connection response error:
-                if(!_datatype.compare(SERVER_CONN_RESPONSE_ERROR)){
-                    //Removing server of the server list:
+                case SERVER_CONN_RESPONSE_ERROR:
                     servers.erase(servers.begin() + pos);
                     return false;
-                }
                 //Check if the message is a server connection response success:
-                if(!_datatype.compare(SERVER_CONN_RESPONSE_SUCCESS)){
-                    //Setting server address: 
+                case SERVER_CONN_RESPONSE_SUCCESS:
                     server_address = servers[pos].address;
                     cout << "Connected to the Server " << server_address << endl;
                     return true;
@@ -157,5 +167,103 @@ bool Client::disconnect_server(){
 
     server_address = IpAddress::None;
     cout << "Disconnected to the Server " << server_address << endl;
+    return true;
+}
+
+void Client::listen_sever(){
+     //UDP socket
+    UdpSocket socket;
+    socket.setBlocking(false);
+    
+    //Port connection: 
+    if (socket.bind(SERVER_PORT) != Socket::Done)
+    {
+        cout << "Client: Connection error" << endl;
+        return;
+    }
+
+    Packet packet_recv;;
+    IpAddress sender;
+    unsigned short port;
+
+    while(true){
+        //Check if there is a message:
+        if (socket.receive(packet_recv, sender, port) == Socket::Done)
+        {
+            Packet packet_send;
+            datatype _datatype;
+            Uint32 datatype_value;
+            //Get the buffer information:
+            packet_recv >> datatype_value;
+            _datatype = (datatype) datatype_value;
+            
+            switch ((unsigned)_datatype)
+            {
+            //Check if the message is a request for information:
+            case CLIENT_UPDATE_INFO:
+                unsigned pos_client;
+                packet_recv >> pos_client;
+                break;
+            
+            }
+           
+            std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
+        }
+    }
+}
+
+bool Client::ready(){
+    //UDP socket
+    UdpSocket socket;
+
+    //Port connection: 
+    if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
+    {
+        cout << "Client: Connection error" << endl;
+        return false;
+    }
+    
+    //Filling send buffer:
+    Packet packet_send;
+    //Client ready:
+    packet_send << CLIENT_READY;
+    
+    //Sending ready client message: 
+    if (socket.send(packet_send, server_address, SERVER_PORT) != sf::Socket::Done)
+    {
+        cout << "Client: Send error" << endl;
+        return false;
+    }
+
+    chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
+    chrono::duration<double> elapsed_seconds;
+    //Setting non blocking socket:
+    socket.setBlocking(false);
+
+    do{
+        Packet packet_recv;
+        IpAddress sender;
+        unsigned short port;
+        //Check if there is a message:
+        if (socket.receive(packet_recv, sender, port) == Socket::Done)
+        {
+            //Checking that the address of the sender 
+            //is the same as that of the selected server
+            if(sender == server_address){
+                datatype _datatype;
+                Uint32 datatype_value;
+                //Get the buffer information:
+                packet_recv >> datatype_value;
+                _datatype = (datatype) datatype_value;
+                if(_datatype == CLIENT_READY_SUCCESS){
+                    cout << "Ready " << endl;
+                    return true;
+                }
+            }
+        }
+        elapsed_seconds = chrono::system_clock::now() - start;
+        //Waiting for server response for MAX_RESPONSE_TIME
+    } while(elapsed_seconds.count() <= MAX_RESPONSE_TIME);
+
     return true;
 }

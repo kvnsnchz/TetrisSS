@@ -30,9 +30,10 @@ void Server::listen_clients() {
     UdpSocket socket;
     socket.setBlocking(false);
     
+    
     //Port connection: 
     if (socket.bind(SERVER_PORT) != Socket::Done)
-    {
+    {   
         cout << "Server: Connection error" << endl;
         return;
     }
@@ -41,35 +42,40 @@ void Server::listen_clients() {
     IpAddress sender;
     unsigned short port;
 
-    //Check if there is a message:
-    while(1)
-    {if (socket.receive(packet_recv, sender, port) == Socket::Done)
-    {
-        string _datatype;
-        Packet packet_send;
+    while(true){
+        //Check if there is a message:
+        if (socket.receive(packet_recv, sender, port) == Socket::Done)
+        {
+            Packet packet_send;
+            datatype _datatype;
+            Uint32 datatype_value;
+            //Get the buffer information:
+            packet_recv >> datatype_value;
+            _datatype = (datatype) datatype_value;
+            
+            switch ((unsigned)_datatype)
+            {
+            //Check if the message is a request for information:
+            case SERVER_INFO_REQUEST:
+                if(clients_address.size() <= max_clients){
+                    //Filling send buffer:
+                    packet_send << SERVER_INFO_RESPONSE;
+                    packet_send << server_name;
+                    packet_send << (Uint32)clients_address.size();
+                    packet_send << level;
+                    for(unsigned i = 0; i < clients_address.size(); i++){
+                        packet_send << clients_address[i].toString();
+                    }
+                    
+                    //Send server information to client 
+                    if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
+                        cout << "Server: Send error" << endl;
 
-        //Get the buffer information:
-        packet_recv >> _datatype;
-        
-        //Check if the message is a request for information:
-        if(!_datatype.compare(SERVER_INFO_REQUEST)){
-            if(clients_address.size() <= max_clients){
-                //Filling send buffer:
-                packet_send << SERVER_INFO_RESPONSE;
-                packet_send << server_name;
-                packet_send << (Uint32)clients_address.size();
-                packet_send << level;
-
-                //Send server information to client 
-                if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
-                    cout << "Server: Send error" << endl;
-
-                cout << "Client " << _datatype << endl;
-            }
-        }
-        else{
+                    cout << "Client " << _datatype << endl;
+                }
+                break;
             //Check if the message is a request of connection:
-            if(!_datatype.compare(SERVER_CONN_REQUEST)){
+            case SERVER_CONN_REQUEST:
                 //Check if I can receive more clients:
                 if(clients_address.size() == max_clients){
                     //Buffer filling with error message:
@@ -87,19 +93,30 @@ void Server::listen_clients() {
                     cout << "Server: Send error" << endl;
                 
                 cout << "New client " << sender << endl;
-            }
-            else{
-                //Check if the message is a request of disconnection:
-                if(!_datatype.compare(SERVER_DISCONNECTION)){
-                    vector<IpAddress>::iterator it = find(clients_address.begin(), clients_address.end(), sender);
-                    if(it != clients_address.end()){
-                        //Removing the client of the client list:
-                        clients_address.erase(it);
-                        cout << "Delete client " << sender << endl;
-                    }
+                break;
+            //Check if the message is a request of disconnection:
+            case SERVER_DISCONNECTION:
+            {
+                vector<IpAddress>::iterator it = find(clients_address.begin(), clients_address.end(), sender);
+                if(it != clients_address.end()){
+                    //Removing the client of the client list:
+                    clients_address.erase(it);
+                    cout << "Delete client " << sender << endl;
                 }
+                break;
             }
+            //Check if the message is as ready client message:
+            case CLIENT_READY:
+                //Buffer filling with success message
+                packet_send << CLIENT_READY_SUCCESS;
+                if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
+                    cout << "Server: Send error" << endl;
+                
+                cout << "Client " << sender << " ready" << endl;
+                break;
+            }
+           
+            std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
         }
-        std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
-    }}
+    }
 }
