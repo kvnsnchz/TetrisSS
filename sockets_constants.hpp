@@ -16,7 +16,7 @@ namespace datatype {
 
 namespace ports_number {
     const unsigned short SERVER_PORT = 2004;
-    const unsigned short CLIENT_PORT = 2005;
+    const unsigned short CLIENT_PORT = 2006;
 }
 
 #endif

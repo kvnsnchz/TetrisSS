@@ -1,8 +1,6 @@
 #include <vector>
 #include <SFML/System/Thread.hpp>
 #include "game.hpp"
-#include "server.hpp"
-#include "client.hpp"
 
 using namespace std;
 
