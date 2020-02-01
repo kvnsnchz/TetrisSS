@@ -19,17 +19,26 @@ enum datatype {
     CLIENT_UPDATE_INFO,
 };
 
+enum request_status {
+    NOT_READY,
+    SUCCESS,
+    ERROR,
+};
+
+struct client_data {
+    IpAddress address;
+    bool status;
+    bool operator == (client_data autre_client){
+       return address == autre_client.address;
+    };
+};
+
 struct server_data {
     IpAddress address;
     string name;
     Uint32 clients_quantity;
     Uint32 level;
-    vector<IpAddress> clients_address;
-}; 
-
-struct client_data {
-    IpAddress address;
-    bool status;
+    vector<client_data> clients;
 };
 
 namespace ports_number {

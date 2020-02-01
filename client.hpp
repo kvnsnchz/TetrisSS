@@ -1,4 +1,3 @@
-#include <SFML/Network.hpp>
 #include <iostream>
 #include <thread>
 #include <cstring>
@@ -10,15 +9,13 @@
 #define MAX_CONNECTION_TIME 2
 #define MAX_RESPONSE_TIME 1
 
-using namespace sf;
-using namespace std;
 using namespace ports_number;
 
 class Client
 {
 private:
     //IPv4 address of the game server:
-    IpAddress server_address;
+    server_data _server_data;
     //Vector of game servers available to connect:
     vector<server_data> servers;
 public:
@@ -28,7 +25,7 @@ public:
     //Search for available game servers:
     void search_servers();
     //Connect to a specific game server from the available list:
-    bool connect_server(const unsigned pos = 0);
+    void connect_server(const unsigned pos, request_status& status);
     //Disconnect from the game server:
     bool disconnect_server();
     //Listen the server

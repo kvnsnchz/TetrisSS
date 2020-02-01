@@ -48,19 +48,13 @@ void Client::search_servers(){
             //Check if the message is a response of server information:
             if(_datatype == SERVER_INFO_RESPONSE){
                 //Adding server information to server list:
-                server_data _server_data = server_data();
+                server_data _server_data;
                 _server_data.address = sender;
                 packet_recv >> _server_data.name;
                 packet_recv >> _server_data.clients_quantity;
                 packet_recv >> _server_data.level;
-                for(unsigned i = 0; i < _server_data.clients_quantity; i++){
-                    string client_address;
-                    packet_recv >> client_address;
-                    _server_data.clients_address.emplace_back(client_address);
-                }
 
                 servers.emplace_back(_server_data);
-                //Get the buffer information:
                 
                 cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
             }
@@ -72,21 +66,24 @@ void Client::search_servers(){
 }
 
 //Connect to a specific game server from the available list:
-bool Client::connect_server(const unsigned pos){
+void Client::connect_server(const unsigned pos, request_status& status){
     //Checking that the selected server is in the list:
-    if(pos > servers.size())
-        return false;
-    
+
+    if(pos > servers.size()){
+        status = ERROR;
+        return;
+    }
     //UDP socket
     UdpSocket socket;
 
     //Port connection: 
     if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
     {
+        status = ERROR;
         cout << "Client: Connection error" << endl;
-        return false;
+        return;
     }
-    
+    status = NOT_READY;
     //Filling send buffer:
     Packet packet_send;
     //Server connection request:
@@ -95,8 +92,9 @@ bool Client::connect_server(const unsigned pos){
     //Sending server connection request: 
     if (socket.send(packet_send, servers[pos].address, SERVER_PORT) != sf::Socket::Done)
     {
+        status = ERROR;
         cout << "Client: Send error" << endl;
-        return false;
+        return;
     }
 
     chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
@@ -125,12 +123,24 @@ bool Client::connect_server(const unsigned pos){
                 //Check if the message is a server connection response error:
                 case SERVER_CONN_RESPONSE_ERROR:
                     servers.erase(servers.begin() + pos);
-                    return false;
+                    status = ERROR;
+                    return;
                 //Check if the message is a server connection response success:
                 case SERVER_CONN_RESPONSE_SUCCESS:
-                    server_address = servers[pos].address;
-                    cout << "Connected to the Server " << server_address << endl;
-                    return true;
+                    _server_data.address = servers[pos].address;
+                    packet_recv >> _server_data.name;
+                    packet_recv >> _server_data.clients_quantity;
+                    packet_recv >> _server_data.level;
+                    for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
+                        string client_address;
+                        bool client_status;
+                        packet_recv >> client_address;
+                        packet_recv >> client_status;
+                        _server_data.clients.emplace_back(client_data{client_address, client_status});
+                    }
+                    status = SUCCESS;
+                    cout << "Connected to the Server " << _server_data.address << endl;
+                    return;
                 }
             }
         }
@@ -138,7 +148,8 @@ bool Client::connect_server(const unsigned pos){
         //Waiting for server response for MAX_CONNECTION_TIME
     } while(elapsed_seconds.count() <= MAX_CONNECTION_TIME);
 
-    return false;
+    status = ERROR;
+    return;
 }
 
 //Disconnect from the game server:
@@ -159,14 +170,14 @@ bool Client::disconnect_server(){
     packet_send << SERVER_DISCONNECTION;
     
     //Sending server connection request: 
-    if (socket.send(packet_send, server_address, SERVER_PORT) != sf::Socket::Done)
+    if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
         return false;
     }
 
-    server_address = IpAddress::None;
-    cout << "Disconnected to the Server " << server_address << endl;
+    _server_data.address = IpAddress::None;
+    cout << "Disconnected to the Server " << _server_data.address << endl;
     return true;
 }
 
@@ -202,7 +213,12 @@ void Client::listen_sever(){
             //Check if the message is a request for information:
             case CLIENT_UPDATE_INFO:
                 unsigned pos_client;
+                string client_address;
+                bool client_status;
                 packet_recv >> pos_client;
+                packet_recv >> client_address;
+                packet_recv >> client_status;
+                
                 break;
             
             }
@@ -229,7 +245,7 @@ bool Client::ready(){
     packet_send << CLIENT_READY;
     
     //Sending ready client message: 
-    if (socket.send(packet_send, server_address, SERVER_PORT) != sf::Socket::Done)
+    if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
         return false;
@@ -249,7 +265,7 @@ bool Client::ready(){
         {
             //Checking that the address of the sender 
             //is the same as that of the selected server
-            if(sender == server_address){
+            if(sender == _server_data.address){
                 datatype _datatype;
                 Uint32 datatype_value;
                 //Get the buffer information:

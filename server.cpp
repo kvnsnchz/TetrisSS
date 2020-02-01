@@ -57,16 +57,13 @@ void Server::listen_clients() {
             {
             //Check if the message is a request for information:
             case SERVER_INFO_REQUEST:
-                if(clients_address.size() <= max_clients){
+                if(clients.size() <= max_clients){
                     //Filling send buffer:
                     packet_send << SERVER_INFO_RESPONSE;
                     packet_send << server_name;
-                    packet_send << (Uint32)clients_address.size();
+                    packet_send << (Uint32)clients.size();
                     packet_send << level;
-                    for(unsigned i = 0; i < clients_address.size(); i++){
-                        packet_send << clients_address[i].toString();
-                    }
-                    
+                                       
                     //Send server information to client 
                     if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                         cout << "Server: Send error" << endl;
@@ -77,16 +74,24 @@ void Server::listen_clients() {
             //Check if the message is a request of connection:
             case SERVER_CONN_REQUEST:
                 //Check if I can receive more clients:
-                if(clients_address.size() == max_clients){
+                if(clients.size() == max_clients){
                     //Buffer filling with error message:
                     packet_send << SERVER_CONN_RESPONSE_ERROR;
                 }
                 else{
                     //Adding the new client to the client list:
-                    if(find(clients_address.begin(), clients_address.end(), sender) == clients_address.end())
-                        clients_address.emplace_back(sender);
+                    client_data _client_data{sender, false};
+                    if(find(clients.begin(), clients.end(), _client_data) == clients.end())
+                        clients.emplace_back(_client_data);
                     //Buffer filling with success message
                     packet_send << SERVER_CONN_RESPONSE_SUCCESS;
+                    packet_send << server_name;
+                    packet_send << (Uint32)clients.size();
+                    packet_send << level;
+                    for(unsigned i = 0; i < clients.size(); i ++){
+                        packet_send << clients[i].address.toString();
+                        packet_send << clients[i].status;
+                    }
                 }
                 //Send information to client
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
@@ -97,10 +102,10 @@ void Server::listen_clients() {
             //Check if the message is a request of disconnection:
             case SERVER_DISCONNECTION:
             {
-                vector<IpAddress>::iterator it = find(clients_address.begin(), clients_address.end(), sender);
-                if(it != clients_address.end()){
+                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                if(it != clients.end()){
                     //Removing the client of the client list:
-                    clients_address.erase(it);
+                    clients.erase(it);
                     cout << "Delete client " << sender << endl;
                 }
                 break;
@@ -108,6 +113,14 @@ void Server::listen_clients() {
             //Check if the message is as ready client message:
             case CLIENT_READY:
                 //Buffer filling with success message
+                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                if(it == clients.end())
+                    break;
+                (*it).status = true;
+                /*packet_send << CLIENT_UPDATE_INFO;
+                packet_
+
+                packet_send.clear();*/
                 packet_send << CLIENT_READY_SUCCESS;
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                     cout << "Server: Send error" << endl;
