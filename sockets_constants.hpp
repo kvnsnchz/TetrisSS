@@ -20,6 +20,7 @@ enum datatype {
 };
 
 enum request_status {
+    UNASSIGNED,
     NOT_READY,
     SUCCESS,
     ERROR,

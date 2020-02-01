@@ -31,7 +31,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
 void create_session(RenderWindow& window, Sprite& background, const Font& font);
 
 // Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session);
+void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session = nullptr, const bool& is_server = true);
 
 // Find servers function:
 void find_servers(RenderWindow& window, Sprite& background, const Font& font);
