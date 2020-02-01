@@ -9,7 +9,6 @@
 using namespace sf;
 using namespace std;
 using namespace ports_number;
-using namespace datatype;
 
 class Server
 {
