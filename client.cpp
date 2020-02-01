@@ -1,5 +1,9 @@
 #include "client.hpp"
 
+server_data Client::get_server_data() const {
+    return _server_data;
+}
+
 vector<server_data> Client::get_servers() const {
     return servers;
 }
