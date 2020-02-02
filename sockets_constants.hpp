@@ -16,7 +16,9 @@ enum datatype {
     SERVER_DISCONNECTION,
     CLIENT_READY,
     CLIENT_READY_SUCCESS,
-    CLIENT_UPDATE_INFO,
+    NEW_CLIENT_INFO,
+    UPDATE_CLIENT_INFO,
+    DELETE_CLIENT_INFO,
 };
 
 enum request_status {
@@ -45,6 +47,7 @@ struct server_data {
 namespace ports_number {
     const unsigned short SERVER_PORT = 2004;
     const unsigned short CLIENT_PORT = 2006;
+    const unsigned short CLIENT_TCP_PORT = 3006;
 }
 
 #endif

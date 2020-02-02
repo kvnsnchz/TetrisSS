@@ -107,6 +107,7 @@ void Server::listen_clients() {
                     cout << "Server: Send error" << endl;
                 
                 cout << "New client " << sender << endl;
+                
                 break;
             //Check if the message is a request of disconnection:
             case SERVER_DISCONNECTION:
@@ -126,10 +127,17 @@ void Server::listen_clients() {
                 if(it == clients.end())
                     break;
                 (*it).status = true;
-                /*packet_send << CLIENT_UPDATE_INFO;
-                packet_
+                packet_send << UPDATE_CLIENT_INFO;
+                packet_send << (Uint32)(it - clients.begin());
+                packet_send << (*it).address.toString();
+                packet_send << (*it).status;
 
-                packet_send.clear();*/
+                for(unsigned i = 0; i < clients.size(); i++){
+                    if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                        cout << "Server: Send error" << endl;
+                }
+
+                packet_send.clear();
                 packet_send << CLIENT_READY_SUCCESS;
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                     cout << "Server: Send error" << endl;
