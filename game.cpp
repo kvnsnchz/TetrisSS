@@ -1586,7 +1586,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                             else if (captured_button(window, create) && session_name != ""
                                 && complexity != 0 && max_number_of_players != 0) { 
                                 Server* current_session = new Server(session_name, max_number_of_players, complexity);
-                                session_menu(window, background, font, current_session);
+                                session_menu(window, background, font, current_session, nullptr);
                             }
                             break;
                         default:
@@ -1743,7 +1743,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         && complexity != 0 && max_number_of_players != 0) {
                                         // execute create button:
                                         Server* current_session = new Server(session_name, max_number_of_players, complexity);
-                                        session_menu(window, background, font, current_session);
+                                        session_menu(window, background, font, current_session, nullptr);
                                     } else {
                                         // capture session name field:
                                         session_name_captured = true;
@@ -1914,26 +1914,39 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
-    const unsigned number_of_buttons = 3 + current_session->get_max_clients();
+    const unsigned number_of_buttons = 7;
     // button size:
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
 
-    // player's readiness indicator:
-    bool is_ready = false;
-
-    Thread* search_thread;
-    
+    // Initialize client-server communication:
+    Thread* listen_thread;    
     if (current_client == nullptr) {
         // Look for the clients:
-        search_thread = new Thread([&] () { current_session->listen_clients(); });
+        listen_thread = new Thread([&] () { current_session->listen_clients(); });
 
-        search_thread->launch();
-    } 
+        listen_thread->launch();
+    }
 
+    // Create a list of clients and initialize server name:
+    vector<client_data> *player_list;
+    string server_name = "";
+    if (current_client == nullptr) {
+        player_list = new vector<client_data>(current_session->get_clients());
+        server_name = current_session->get_server_name();
+    } else if (current_session == nullptr) {
+        player_list = new vector<client_data>(current_client->get_server_data().clients);
+        server_name = current_client->get_server_data().name;
+    }
+    
+    // Initialize the index of current player:
+    unsigned current_player_index = 0;
+    for (unsigned i = 0; i < player_list->size(); i++)
+        if (player_list->at(i).address == IpAddress::getLocalAddress())
+            current_player_index = i;
+    
     // Initialize session title:
-    string session_title_string = "Session " + current_session->get_server_name();
-    Text session_title = create_button(font, session_title_string.data(), button_size,
+    Text session_title = create_button(font, "Session " + server_name, button_size,
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + 5.0f), false);
 
@@ -1948,13 +1961,13 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f), false, 4);
 
     // Initialize player list:
-    vector<Text> player_list;
-    for (unsigned i = 0; i < current_session->get_max_clients(); i++) {
-        player_list.emplace_back(create_button(font, "Player " + i + 1, button_size,
-            Vector2f(window.getSize().x / 6,
+    vector<Text> player_list_titles;
+    for (unsigned i = 0; i < player_list->size(); i++) {
+        player_list_titles.emplace_back(create_button(font, string ("Player " + to_string(i + 1)), button_size,
+            Vector2f(window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
-        player_list.emplace_back(create_button(font, "Not Ready", button_size,
-            Vector2f(3 * window.getSize().x / 6,
+        player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+            Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
     }
 
@@ -1969,6 +1982,34 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
 
     while(window.isOpen()) {
+        if (current_client == nullptr) {
+            // Look for the clients:
+            listen_thread = new Thread([&] () { current_session->listen_clients(); });
+
+            listen_thread->launch();
+
+            // Update a list of players:
+            player_list = new vector<client_data>(current_session->get_clients());
+        } else if (current_session == nullptr) {
+            // Listen to server:
+            // listen_thread = new Thread([&] () { current_client->listen_sever(); });
+
+            // listen_thread->launch();
+
+            // Update a list of players:
+            player_list = new vector<client_data>(current_client->get_server_data().clients);
+        }
+
+        // player_list_titles.clear();
+        // for (unsigned i = 0; i < player_list->size(); i++) {
+        //     player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
+        //         Vector2f(window.getSize().x / 4,
+        //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+        //     player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+        //         Vector2f(3 * window.getSize().x / 4,
+        //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+        // }
+
         Event event;
 
         while (window.pollEvent(event)) {
@@ -2005,16 +2046,16 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                             // 1) Go back:
                             if (captured_button(window, disconnect)) {
                                 if (current_client == nullptr)
-                                    search_thread->terminate();
+                                    listen_thread->terminate();
                                 return;
                             // 2) Get ready or not:
                             } else if (captured_button(window, ready)) { 
-                                if (is_ready) {
+                                if (player_list->at(current_player_index).status) {
                                     ready.setString("Ready");
-                                    is_ready = false;
+                                    player_list->at(current_player_index).status = false;
                                 } else {
                                     ready.setString("Not Ready");
-                                    is_ready = true;
+                                    player_list->at(current_player_index).status = true;
                                 }
                             }
                             break;
@@ -2046,7 +2087,7 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                     if (event.key.code == Keyboard::Return) {
                                         if (current_client == nullptr)
                                             // execute disconnect button:
-                                            search_thread->terminate();
+                                            listen_thread->terminate();
                                         return;
                                     }
 
@@ -2062,12 +2103,12 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // execute ready button:
-                                        if (is_ready) {
+                                        if (player_list->at(current_player_index).status) {
                                             ready.setString("Ready");
-                                            is_ready = false;
+                                            player_list->at(current_player_index).status = false;
                                         } else {
                                             ready.setString("Not Ready");
-                                            is_ready = true;
+                                            player_list->at(current_player_index).status = true;
                                         }
                                     }
                                         
@@ -2139,6 +2180,8 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
         window.draw(session_title);
         window.draw(player_title);
         window.draw(status_title);
+        for (unsigned i = 0; i < player_list_titles.size(); i++)
+            window.draw(player_list_titles[i]);
         window.draw(disconnect);
         window.draw(ready);
         window.display();
@@ -2496,8 +2539,10 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
             }
         }
 
-        if (status == SUCCESS)
+        if (status == SUCCESS) {
+            cout << current_client->get_server_data().clients.size() << endl;
             session_menu(window, background, font, nullptr, current_client);
+        }
 
         // Clear window:
         window.clear();
