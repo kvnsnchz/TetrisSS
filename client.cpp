@@ -193,19 +193,27 @@ void Client::listen_sever(){
             
             switch ((unsigned)_datatype)
             {
-            //Check if the message is a request for information:
-            case CLIENT_UPDATE_INFO:
+            //Check if the message is of new client info:
+            case NEW_CLIENT_INFO:
+            break;
+            //Check if the message is of update client info:
+            case UPDATE_CLIENT_INFO:
+            {    
                 unsigned pos_client;
                 string client_address;
                 bool client_status;
                 packet_recv >> pos_client;
                 packet_recv >> client_address;
                 packet_recv >> client_status;
-                
+                _server_data.clients[pos_client].address = client_address;
+                _server_data.clients[pos_client].status = client_status;
+                cout << "Client update " << _server_data.clients[pos_client].address << _server_data.clients[pos_client].status << endl;
                 break;
-            
             }
-           
+            //Check if the message is of delete client info:
+            case DELETE_CLIENT_INFO:
+            break;
+            }
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
         }
     }

@@ -17,8 +17,6 @@ private:
     // IPv4 addresses of clients:
     vector<client_data> clients;
     UdpSocket socket;
-    vector<TcpSocket> tcp_sockets;
-
 public:
     Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
         clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
