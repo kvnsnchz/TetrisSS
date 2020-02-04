@@ -1423,8 +1423,8 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 5.0f));
     
-    // Initialize applied mathematics button:
-    Text applied_mathematics = create_button(font, "Applied Mathematics", button_size,
+    // Initialize applied Maths button:
+    Text applied_maths = create_button(font, "Applied Maths", button_size,
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 5.0f));
     
@@ -1464,8 +1464,8 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                         STIC.setOutlineColor(Color(218, 247, 166, 255));
                     }
                     if (complexity != 3) {
-                        applied_mathematics.setFillColor(Color(144, 12, 63, 255));
-                        applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                        applied_maths.setFillColor(Color(144, 12, 63, 255));
+                        applied_maths.setOutlineColor(Color(218, 247, 166, 255));
                     }
                     back.setFillColor(Color(144, 12, 63, 255));
                     back.setOutlineColor(Color(218, 247, 166, 255));
@@ -1499,10 +1499,10 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                         // focus STIC button:
                         STIC.setFillColor(Color(255, 195, 0, 255));
                         STIC.setOutlineColor(Color(8, 0, 93, 255));
-                    } else if (captured_button(window, applied_mathematics)) {
-                        // focus applied mathematics button:
-                        applied_mathematics.setFillColor(Color(255, 195, 0, 255));
-                        applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));   
+                    } else if (captured_button(window, applied_maths)) {
+                        // focus applied Maths button:
+                        applied_maths.setFillColor(Color(255, 195, 0, 255));
+                        applied_maths.setOutlineColor(Color(8, 0, 93, 255));   
                     }
                     break;
                 // If we want to type a text:
@@ -1574,10 +1574,10 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                 STIC.setOutlineColor(Color(8, 0, 93, 255));
                                 complexity = 2;
                             // 5) Choose a hard mode:
-                            } else if (captured_button(window, applied_mathematics)) {
-                                // focus applied mathematics button:
-                                applied_mathematics.setFillColor(Color(255, 195, 0, 255));
-                                applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));
+                            } else if (captured_button(window, applied_maths)) {
+                                // focus applied Maths button:
+                                applied_maths.setFillColor(Color(255, 195, 0, 255));
+                                applied_maths.setOutlineColor(Color(8, 0, 93, 255));
                                 complexity = 3;
                             // 6) Go back:
                             } else if (captured_button(window, back))
@@ -1657,9 +1657,9 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         // unfocus STIC button:
                                         STIC.setFillColor(Color(144, 12, 63, 255));
                                         STIC.setOutlineColor(Color(218, 247, 166, 255));
-                                        // unfocus applied mathematics button:
-                                        applied_mathematics.setFillColor(Color(144, 12, 63, 255));
-                                        applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                        // unfocus applied Maths button:
+                                        applied_maths.setFillColor(Color(144, 12, 63, 255));
+                                        applied_maths.setOutlineColor(Color(218, 247, 166, 255));
                                     } else {
                                         if (complexity != 1) {
                                             // unfocus mechanics button:
@@ -1682,9 +1682,9 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         // unfocus mechanics button:
                                         mechanics.setFillColor(Color(144, 12, 63, 255));
                                         mechanics.setOutlineColor(Color(218, 247, 166, 255));
-                                        // unfocus applied mathematics button:
-                                        applied_mathematics.setFillColor(Color(144, 12, 63, 255));
-                                        applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                        // unfocus applied Maths button:
+                                        applied_maths.setFillColor(Color(144, 12, 63, 255));
+                                        applied_maths.setOutlineColor(Color(218, 247, 166, 255));
                                     } else {
                                         if (complexity != 2) {
                                             // unfocus STIC button:
@@ -1692,9 +1692,9 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                             STIC.setOutlineColor(Color(218, 247, 166, 255));
                                         }
 
-                                        // focus applied mathematics button:
-                                        applied_mathematics.setFillColor(Color(255, 195, 0, 255));
-                                        applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));
+                                        // focus applied Maths button:
+                                        applied_maths.setFillColor(Color(255, 195, 0, 255));
+                                        applied_maths.setOutlineColor(Color(8, 0, 93, 255));
                                         focused_button_counter++;
                                     }
                                     break;
@@ -1712,9 +1712,9 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         STIC.setOutlineColor(Color(218, 247, 166, 255));
                                     } else {
                                         if (complexity != 3) {
-                                            // unfocus applied mathematics button:
-                                            applied_mathematics.setFillColor(Color(144, 12, 63, 255));
-                                            applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                            // unfocus applied Maths button:
+                                            applied_maths.setFillColor(Color(144, 12, 63, 255));
+                                            applied_maths.setOutlineColor(Color(218, 247, 166, 255));
                                         }
 
                                         // focus back button:
@@ -1848,9 +1848,9 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                     STIC.setPosition((window.getSize().x - STIC.getGlobalBounds().width) / 2, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 5.0f);
                     
-                    applied_mathematics.setCharacterSize(5 * button_size / 6);
-                    applied_mathematics.setOutlineThickness(button_size / 6);
-                    applied_mathematics.setPosition((window.getSize().x - applied_mathematics.getGlobalBounds().width) / 2, 
+                    applied_maths.setCharacterSize(5 * button_size / 6);
+                    applied_maths.setOutlineThickness(button_size / 6);
+                    applied_maths.setPosition((window.getSize().x - applied_maths.getGlobalBounds().width) / 2, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 6.0f);
 
                     back.setCharacterSize(5 * button_size / 6);
@@ -1902,7 +1902,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
         window.draw(complexity_title);
         window.draw(mechanics);
         window.draw(STIC);
-        window.draw(applied_mathematics);
+        window.draw(applied_maths);
         window.draw(back);
         window.draw(create);
         window.display();
@@ -1977,28 +1977,28 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
    
     // Initialize ready button:
-    Text ready = create_button(font, "Not Ready", button_size,
+    Text ready = create_button(font, "Ready", button_size,
         Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
 
     while(window.isOpen()) {
-        if (current_client == nullptr) {
-            // Look for the clients:
-            listen_thread = new Thread([&] () { current_session->listen_clients(); });
+        // if (current_client == nullptr) {
+        //     // Look for the clients:
+        //     listen_thread = new Thread([&] () { current_session->listen_clients(); });
 
-            listen_thread->launch();
+        //     listen_thread->launch();
 
-            // Update a list of players:
-            player_list = new vector<client_data>(current_session->get_clients());
-        } else if (current_session == nullptr) {
-            // Listen to server:
-            // listen_thread = new Thread([&] () { current_client->listen_sever(); });
+        //     // Update a list of players:
+        //     player_list = new vector<client_data>(current_session->get_clients());
+        // } else if (current_session == nullptr) {
+        //     // Listen to server:
+        //     // listen_thread = new Thread([&] () { current_client->listen_sever(); });
 
-            // listen_thread->launch();
+        //     // listen_thread->launch();
 
-            // Update a list of players:
-            player_list = new vector<client_data>(current_client->get_server_data().clients);
-        }
+        //     // Update a list of players:
+        //     player_list = new vector<client_data>(current_client->get_server_data().clients);
+        // }
 
         // player_list_titles.clear();
         // for (unsigned i = 0; i < player_list->size(); i++) {
@@ -2045,17 +2045,22 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                             // If appropriate mouse position was captured:
                             // 1) Go back:
                             if (captured_button(window, disconnect)) {
-                                if (current_client == nullptr)
+                                if (current_client == nullptr) {
                                     listen_thread->terminate();
-                                return;
+                                    return;
+                                } else {
+                                    find_servers(window, background, font);
+                                }
                             // 2) Get ready or not:
                             } else if (captured_button(window, ready)) { 
                                 if (player_list->at(current_player_index).status) {
                                     ready.setString("Ready");
                                     player_list->at(current_player_index).status = false;
+                                    player_list_titles[2 * current_player_index + 1].setString("Not Ready");
                                 } else {
                                     ready.setString("Not Ready");
                                     player_list->at(current_player_index).status = true;
+                                    player_list_titles[2 * current_player_index + 1].setString("Ready");
                                 }
                             }
                             break;
@@ -2085,19 +2090,21 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        if (current_client == nullptr)
-                                            // execute disconnect button:
+                                        if (current_client == nullptr) {
                                             listen_thread->terminate();
-                                        return;
+                                            return;
+                                        } else {
+                                            find_servers(window, background, font);
+                                        }
+                                    } else {
+                                        // unfocus disconnect button:
+                                        disconnect.setFillColor(Color(144, 12, 63, 255));
+                                        disconnect.setOutlineColor(Color(218, 247, 166, 255));
+                                        // focus ready button:
+                                        ready.setFillColor(Color(255, 195, 0, 255));
+                                        ready.setOutlineColor(Color(8, 0, 93, 255));
+                                        focused_button_counter++;
                                     }
-
-                                    // unfocus disconnect button:
-                                    disconnect.setFillColor(Color(144, 12, 63, 255));
-                                    disconnect.setOutlineColor(Color(218, 247, 166, 255));
-                                    // focus ready button:
-                                    ready.setFillColor(Color(255, 195, 0, 255));
-                                    ready.setOutlineColor(Color(8, 0, 93, 255));
-                                    focused_button_counter++;
                                     break;
                                 case 2:
                                     // if we have pressed Enter:
@@ -2106,19 +2113,21 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                         if (player_list->at(current_player_index).status) {
                                             ready.setString("Ready");
                                             player_list->at(current_player_index).status = false;
+                                            player_list_titles[2 * current_player_index + 1].setString("Not Ready");
                                         } else {
                                             ready.setString("Not Ready");
                                             player_list->at(current_player_index).status = true;
+                                            player_list_titles[2 * current_player_index + 1].setString("Ready");
                                         }
+                                    } else {
+                                        // unfocus ready button:
+                                        ready.setFillColor(Color(144, 12, 63, 255));
+                                        ready.setOutlineColor(Color(218, 247, 166, 255));
+                                        // focus disconnect button:
+                                        disconnect.setFillColor(Color(255, 195, 0, 255));
+                                        disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                                        focused_button_counter = 1;
                                     }
-                                        
-                                    // unfocus ready button:
-                                    ready.setFillColor(Color(144, 12, 63, 255));
-                                    ready.setOutlineColor(Color(218, 247, 166, 255));
-                                    // focus disconnect button:
-                                    disconnect.setFillColor(Color(255, 195, 0, 255));
-                                    disconnect.setOutlineColor(Color(8, 0, 93, 255));
-                                    focused_button_counter = 1;
                                     break;
                                 default:
                                     break;
@@ -2154,6 +2163,15 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                     status_title.setCharacterSize(5 * button_size / 6);
                     status_title.setPosition(3 * (window.getSize().x - status_title.getGlobalBounds().width) / 4,
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f);
+
+                    for (unsigned i = 0; i < player_list_titles.size() / 2; i++) {
+                        player_list_titles[2 * i].setCharacterSize(5 * button_size / 6);
+                        player_list_titles[2 * i].setPosition((window.getSize().x - player_list_titles[2 * i].getGlobalBounds().width) / 4,
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f);
+                        player_list_titles[2 * i + 1].setCharacterSize(5 * button_size / 6);
+                        player_list_titles[2 * i + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * i + 1].getGlobalBounds().width) / 4,
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f);
+                    }
 
                     disconnect.setCharacterSize(5 * button_size / 6);
                     disconnect.setOutlineThickness(button_size / 6);
@@ -2196,15 +2214,15 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
     map<unsigned, string> complexities;
     complexities[0] = "Mechanics";
     complexities[1] = "STIC";
-    complexities[2] = "Applied Mathematics";
+    complexities[2] = "Applied Maths";
 
     // Create a client:
     Client* current_client = new Client();
 
     // Looking for servers:
-    Thread search_thread([&] () { current_client->search_servers(); });
+    Thread* search_thread = new Thread([&] () { current_client->search_servers(); });
 
-    search_thread.launch();
+    search_thread->launch();
 
     // set the wait image:
     Texture texture;
@@ -2268,28 +2286,21 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
     }
 
     // Initialize back button:
-    Text back = create_button(font, "back", button_size,
-        Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+    Text back = create_button(font, "Back", button_size,
+        Vector2f(window.getSize().x / 6 - 10.0f,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
+   
+    // Initialize refresh button:
+    Text refresh = create_button(font, "Refresh", button_size,
+        Vector2f(3 * window.getSize().x / 6 - 10.0f,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
    
     // Initialize connect button:
     Text connect = create_button(font, "Connect", button_size,
-        Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+        Vector2f(5 * window.getSize().x / 6 - 10.0f,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
 
     while(window.isOpen()) {
-        if (server_info.size() / 3 < current_client->get_servers().size()) {
-            server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
-                Vector2f(window.getSize().x / 6,
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-            server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
-                Vector2f(3 * window.getSize().x / 6,
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-            server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
-                Vector2f(5 * window.getSize().x / 6,
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-        }
-
         // number_of_buttons = 3 + current_client->get_servers().size();
 
         Event event;
@@ -2313,6 +2324,8 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                     }
                     back.setFillColor(Color(144, 12, 63, 255));
                     back.setOutlineColor(Color(218, 247, 166, 255));
+                    refresh.setFillColor(Color(144, 12, 63, 255));
+                    refresh.setOutlineColor(Color(218, 247, 166, 255));
                     connect.setFillColor(Color(144, 12, 63, 255));
                     connect.setOutlineColor(Color(218, 247, 166, 255));
 
@@ -2337,11 +2350,16 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                         back.setFillColor(Color(255, 195, 0, 255));
                         back.setOutlineColor(Color(8, 0, 93, 255));
                         focused_button_counter = current_client->get_servers().size() + 1;
+                    } else if (captured_button(window, refresh)) {
+                        // focus refresh button:
+                        refresh.setFillColor(Color(255, 195, 0, 255));
+                        refresh.setOutlineColor(Color(8, 0, 93, 255)); 
+                        focused_button_counter = current_client->get_servers().size() + 2;
                     } else if (captured_button(window, connect)) {
                         // focus connect button:
                         connect.setFillColor(Color(255, 195, 0, 255));
                         connect.setOutlineColor(Color(8, 0, 93, 255)); 
-                        focused_button_counter = current_client->get_servers().size() + 2;
+                        focused_button_counter = current_client->get_servers().size() + 3;
                     } 
                     break;
                 case Event::MouseButtonPressed:
@@ -2359,9 +2377,33 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                             }
                             // current_client->get_servers().size() + 1) Go back:
                             if (captured_button(window, back)) {
-                                search_thread.terminate();
+                                cout << focused_button_counter  << endl;
+                                search_thread->terminate();
+                                current_client->disconnect_udp_socket();
                                 return;
-                            // current_client->get_servers().size() + 2) Get connect or not:
+                            // current_client->get_servers().size() + 2) Refresh list of servers:
+                            } else if (captured_button(window, refresh)) {
+                                cout << focused_button_counter << endl;
+                                cout << server_info.size() / 3 << endl;
+                                cout << current_client->get_servers().size() << endl;
+                                search_thread->terminate();
+
+                                search_thread = new Thread([&] () { current_client->search_servers(); });
+
+                                search_thread->launch();
+
+                                for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
+                                    server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
+                                        Vector2f(window.getSize().x / 6,
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
+                                        Vector2f(3 * window.getSize().x / 6,
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
+                                        Vector2f(5 * window.getSize().x / 6,
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                                }
+                            // current_client->get_servers().size() + 3) Get connect or not:
                             } else if (captured_button(window, connect) && chosen_server != -1) {
                                 current_client->connect_server(chosen_server, status);
                             };
@@ -2402,20 +2444,56 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                             } else if (focused_button_counter == current_client->get_servers().size() + 1) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
+                                    cout << focused_button_counter  << endl;
                                     // execute back button:
-                                    search_thread.terminate();
+                                    search_thread->terminate();
+                                    current_client->disconnect_udp_socket();
                                     return;
                                 }
 
                                 // unfocus back button:
                                 back.setFillColor(Color(144, 12, 63, 255));
                                 back.setOutlineColor(Color(218, 247, 166, 255));
-                                // focus connect button:
-                                connect.setFillColor(Color(255, 195, 0, 255));
-                                connect.setOutlineColor(Color(8, 0, 93, 255));
+                                // focus refresh button:
+                                refresh.setFillColor(Color(255, 195, 0, 255));
+                                refresh.setOutlineColor(Color(8, 0, 93, 255));
                                 focused_button_counter++;
                                 break;
                             } else if (focused_button_counter == current_client->get_servers().size() + 2) {
+                                // if we have pressed Enter:
+                                if (event.key.code == Keyboard::Return) {
+                                    cout << focused_button_counter  << endl;
+                                    // execute refresh button:
+                                    search_thread->terminate();
+
+                                    search_thread = new Thread([&] () { current_client->search_servers(); });
+
+                                    search_thread->launch();
+
+                                    for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
+                                        server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
+                                            Vector2f(window.getSize().x / 6,
+                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                                        server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
+                                            Vector2f(3 * window.getSize().x / 6,
+                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                                        server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
+                                            Vector2f(5 * window.getSize().x / 6,
+                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                                    }
+
+                                    break;
+                                } else {
+                                    // unfocus refresh button:
+                                    refresh.setFillColor(Color(144, 12, 63, 255));
+                                    refresh.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus connect button:
+                                    connect.setFillColor(Color(255, 195, 0, 255));
+                                    connect.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                }
+                            } else if (focused_button_counter == current_client->get_servers().size() + 3) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
                                     // execute connect button:
@@ -2515,24 +2593,29 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                     number_of_players_title.setPosition((5 * (window.getSize().x) - number_of_players_title.getGlobalBounds().width) / 6,
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
 
-                    for (unsigned i = 0; i < server_info.size(); i += 3) {
+                    for (unsigned i = 0; i < server_info.size() / 3; i++) {
                         for (unsigned j = 0; j < 3; j++) {
-                            server_info[i + j].setCharacterSize(5 * button_size / 6);
-                            server_info[i + j].setOutlineThickness(button_size / 6);
-                            server_info[i + j].setPosition(((j + 1) * 2 - 1) * (window.getSize().x - server_info[i +j].getGlobalBounds().width) / 6,
+                            server_info[3 * i + j].setCharacterSize(5 * button_size / 6);
+                            server_info[3 * i + j].setOutlineThickness(button_size / 6);
+                            server_info[3 * i + j].setPosition(((j + 1) * 2 - 1) * (window.getSize().x - server_info[i + j].getGlobalBounds().width) / 6,
                                 (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f);        
                         }
                     }
 
                     back.setCharacterSize(5 * button_size / 6);
                     back.setOutlineThickness(button_size / 6);
-                    back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 4,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 6 - 10.0f,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f);
+
+                    refresh.setCharacterSize(5 * button_size / 6);
+                    refresh.setOutlineThickness(button_size / 6);
+                    refresh.setPosition(3 * (window.getSize().x - refresh.getGlobalBounds().width) / 6 - 10.0f,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f);
 
                     connect.setCharacterSize(5 * button_size / 6);
                     connect.setOutlineThickness(button_size / 6);
-                    connect.setPosition(3 * (window.getSize().x - connect.getGlobalBounds().width) / 4,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    connect.setPosition(5 * (window.getSize().x - connect.getGlobalBounds().width) / 6 - 10.0f,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f);
                     break;
                 default:
                     break;
@@ -2558,6 +2641,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
         for (unsigned i = 0; i < server_info.size(); i++)
             window.draw(server_info[i]);
         window.draw(back);
+        window.draw(refresh);
         window.draw(connect);
         if (status == NOT_READY)
             window.draw(wait);
@@ -2591,8 +2675,8 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f));
     
-    // Initialize applied mathematics button:
-    Text applied_mathematics = create_button(font, "Applied Mathematics", button_size,
+    // Initialize applied Maths button:
+    Text applied_maths = create_button(font, "Applied Maths", button_size,
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f));
     
@@ -2617,8 +2701,8 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                     mechanics.setOutlineColor(Color(218, 247, 166, 255));
                     STIC.setFillColor(Color(144, 12, 63, 255));
                     STIC.setOutlineColor(Color(218, 247, 166, 255));
-                    applied_mathematics.setFillColor(Color(144, 12, 63, 255));
-                    applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                    applied_maths.setFillColor(Color(144, 12, 63, 255));
+                    applied_maths.setOutlineColor(Color(218, 247, 166, 255));
                     back.setFillColor(Color(144, 12, 63, 255));
                     back.setOutlineColor(Color(218, 247, 166, 255));
 
@@ -2633,10 +2717,10 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                         STIC.setFillColor(Color(255, 195, 0, 255));
                         STIC.setOutlineColor(Color(8, 0, 93, 255));
                         focused_button_counter = 2;
-                    } else if (captured_button(window, applied_mathematics)) {
-                        // focus applied mathematics button:
-                        applied_mathematics.setFillColor(Color(255, 195, 0, 255));
-                        applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));
+                    } else if (captured_button(window, applied_maths)) {
+                        // focus applied Maths button:
+                        applied_maths.setFillColor(Color(255, 195, 0, 255));
+                        applied_maths.setOutlineColor(Color(8, 0, 93, 255));
                         focused_button_counter = 3;             
                     } else if (captured_button(window, back)) {
                         // focus back button:
@@ -2656,7 +2740,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                             else if (captured_button(window, STIC))
                                 game(window, background, font, 2);
                             // 3) Starting to play in the hard mode:
-                            else if (captured_button(window, applied_mathematics))
+                            else if (captured_button(window, applied_maths))
                                 game(window, background, font, 3);
                             // 4) Go back:
                             else if (captured_button(window, back))
@@ -2707,20 +2791,20 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                     // unfocus STIC button:
                                     STIC.setFillColor(Color(144, 12, 63, 255));
                                     STIC.setOutlineColor(Color(218, 247, 166, 255));
-                                    // focus applied mathematics button:
-                                    applied_mathematics.setFillColor(Color(255, 195, 0, 255));
-                                    applied_mathematics.setOutlineColor(Color(8, 0, 93, 255));
+                                    // focus applied Maths button:
+                                    applied_maths.setFillColor(Color(255, 195, 0, 255));
+                                    applied_maths.setOutlineColor(Color(8, 0, 93, 255));
                                     focused_button_counter++;
                                     break;
                                 case 3:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
-                                        // execute applied mathematics button:
+                                        // execute applied Maths button:
                                         game(window, background, font, 3);
 
-                                    // unfocus applied mathematics button:
-                                    applied_mathematics.setFillColor(Color(144, 12, 63, 255));
-                                    applied_mathematics.setOutlineColor(Color(218, 247, 166, 255));
+                                    // unfocus applied Maths button:
+                                    applied_maths.setFillColor(Color(144, 12, 63, 255));
+                                    applied_maths.setOutlineColor(Color(218, 247, 166, 255));
                                     // focus back button:
                                     back.setFillColor(Color(255, 195, 0, 255));
                                     back.setOutlineColor(Color(8, 0, 93, 255));
@@ -2774,9 +2858,9 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                     STIC.setPosition((window.getSize().x - STIC.getGlobalBounds().width) / 2, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
                     
-                    applied_mathematics.setCharacterSize(5 * button_size / 6);
-                    applied_mathematics.setOutlineThickness(button_size / 6);
-                    applied_mathematics.setPosition((window.getSize().x - applied_mathematics.getGlobalBounds().width) / 2, 
+                    applied_maths.setCharacterSize(5 * button_size / 6);
+                    applied_maths.setOutlineThickness(button_size / 6);
+                    applied_maths.setPosition((window.getSize().x - applied_maths.getGlobalBounds().width) / 2, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f);
                     
                     back.setCharacterSize(5 * button_size / 6);
@@ -2799,7 +2883,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
         window.draw(complexity_title);
         window.draw(mechanics);
         window.draw(STIC);
-        window.draw(applied_mathematics);
+        window.draw(applied_maths);
         window.draw(back);
         window.display();
     }
