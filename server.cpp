@@ -41,6 +41,24 @@ void Server::disconnect_udp_socket(){
     socket.unbind();
 }
 
+void Server::disconnect(){
+    socket.setBlocking(true);
+    //Filling send buffer:
+    Packet packet_send;
+    //Server disconnection request:
+    packet_send << CLIENT_DISCONNECTION;
+    
+    //Sending server disconnection: 
+    for(unsigned i = 0; i < clients.size(); i ++){
+        if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+        {
+            cout << "Client: Send error" << endl;
+            return;
+        }
+    }
+    clients.clear();
+}
+
 //Listen for new customer connections:
 void Server::listen_clients(bool& changes) {
     changes = false;
@@ -126,7 +144,7 @@ void Server::listen_clients(bool& changes) {
                 
                 break;
             //Check if the message is a request of disconnection:
-            case SERVER_DISCONNECTION:
+            case CLIENT_DISCONNECTION:
             {
                 vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
                 if(it != clients.end()){

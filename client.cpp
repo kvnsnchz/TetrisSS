@@ -165,10 +165,10 @@ void Client::disconnect_server(request_status& status){
     socket.setBlocking(true);
     //Filling send buffer:
     Packet packet_send;
-    //Server connection request:
-    packet_send << SERVER_DISCONNECTION;
+    //client disconnection request:
+    packet_send << CLIENT_DISCONNECTION;
     
-    //Sending server connection request: 
+    //Sending client disconnection: 
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
@@ -179,10 +179,10 @@ void Client::disconnect_server(request_status& status){
     _server_data.address = IpAddress::None;
     cout << "Disconnected to the Server " << _server_data.address << endl;
     status = SUCCESS;
-    return;
 }
 
-void Client::listen_sever(){
+void Client::listen_sever(bool server_disconnected){
+    server_disconnected = false;
     socket.setBlocking(false);
     
     Packet packet_recv;;
@@ -233,6 +233,10 @@ void Client::listen_sever(){
                 packet_recv >> pos_client;
                 _server_data.clients.erase(_server_data.clients.begin() + pos_client);
             break;
+            case SERVER_DISCONNECTION:
+                _server_data.address = IpAddress::None;
+                server_disconnected = true;
+                return;
             }
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
         }

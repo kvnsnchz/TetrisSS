@@ -47,5 +47,7 @@ public:
     void disconnect_udp_socket();
     // Listen for some new client connections:
     void listen_clients(bool& changes);
+    //Disconnected server
+    void disconnect();
 };
 

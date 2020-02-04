@@ -40,7 +40,7 @@ public:
     //Disconnect from the game server:
     void disconnect_server(request_status& status);
     //Listen the server
-    void listen_sever();
+    void listen_sever(bool server_disconnected);
     //Ready to play
     void ready(request_status& status);
 };
