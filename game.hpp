@@ -1,5 +1,7 @@
 #include <unistd.h>
 #include "board.hpp"
+#include "server.hpp"
+#include "client.hpp"
 
 #define DEF_COU_CHA_FIG 2 
 
@@ -10,7 +12,7 @@ enum state_figure {
 };
 
 // new button initialization function (for code reduction):
-Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline = true, const unsigned& center_coefficient = 2);
+Text create_button(const Font& font, const string title, const double& button_size, Vector2f position, const bool& outline = true, const unsigned& center_coefficient = 2);
 
 // captured button identifier:
 bool captured_button(RenderWindow& window, Text& button);
@@ -29,7 +31,9 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
 void create_session(RenderWindow& window, Sprite& background, const Font& font);
 
 // Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font,
-    const string& session_name, const unsigned& max_number_of_players, const unsigned& complexity);
+void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, Client* current_client);
+
+// Find servers function:
+void find_servers(RenderWindow& window, Sprite& background, const Font& font);
 
 void complexity_menu(RenderWindow& window, Sprite& background, const Font& font);

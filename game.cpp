@@ -1,9 +1,7 @@
 #include "game.hpp"
-#include "server.hpp"
-#include "client.hpp"
 
 // new button initialization function (for code reduction):
-Text create_button(const Font& font, const char* title, const double& button_size, Vector2f position, const bool& outline, const unsigned& center_coefficient) {
+Text create_button(const Font& font, const string title, const double& button_size, Vector2f position, const bool& outline, const unsigned& center_coefficient) {
     // Initialize new button:
     Text new_button;
     new_button.setFont(font);
@@ -54,7 +52,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
     int count_change_figure = DEF_COU_CHA_FIG;
 
     // We are using descend counter to manage the figures' fall rate:
-    for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
+    for (int descend_counter = 0; window.isOpen(); descend_counter++) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -261,8 +259,10 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
         // draw pause button:
         window.draw(pause);
         
+        // (float) descend_counter / (500000 * window.getSize().x * window.getSize().y) >= 0.0000003f / complexity;
         // set delay according to the complexity:
-        if (descend_counter >= 300 / complexity) {
+        if ((float) descend_counter >= 300.0f / complexity) {
+             
             if(_state_figure == STOP_FIGURE)
                 count_change_figure--;
             if(count_change_figure <= 0)
@@ -1141,7 +1141,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
 
         // Clear window:
         window.clear();
-        
+    
         // Draw a background:
         window.draw(background);
 
@@ -1164,8 +1164,6 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
     // button size:
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
-    
-    // Vector2u window_size;
 
     // Initialize multiplayer menu title:
     Text multiplayer_title = create_button(font, "Multiplayer", button_size,
@@ -1233,7 +1231,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                 create_session(window, background, font);
                             // 2) Find a server:
                             else if (captured_button(window, find_server))
-                                game(window, background, font, 2);
+                                find_servers(window, background, font);
                             // 3) Go back:
                             else if (captured_button(window, back))
                                 return;
@@ -1279,7 +1277,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute find_server button:
-                                        game(window, background, font, 2);
+                                        find_servers(window, background, font);
 
                                     // unfocus find_server button:
                                     find_server.setFillColor(Color(144, 12, 63, 255));
@@ -1587,7 +1585,8 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                             // 7) Create a new session (if all required information is entered):
                             else if (captured_button(window, create) && session_name != ""
                                 && complexity != 0 && max_number_of_players != 0) { 
-                                session_menu(window, background, font, session_name, max_number_of_players, complexity);
+                                Server* current_session = new Server(session_name, max_number_of_players, complexity);
+                                session_menu(window, background, font, current_session, nullptr);
                             }
                             break;
                         default:
@@ -1741,10 +1740,11 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                 case 7:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return && session_name != ""
-                                        && complexity != 0 && max_number_of_players != 0)
+                                        && complexity != 0 && max_number_of_players != 0) {
                                         // execute create button:
-                                        session_menu(window, background, font, session_name, max_number_of_players, complexity);
-                                    else {
+                                        Server* current_session = new Server(session_name, max_number_of_players, complexity);
+                                        session_menu(window, background, font, current_session, nullptr);
+                                    } else {
                                         // capture session name field:
                                         session_name_captured = true;
 
@@ -1892,7 +1892,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
             
             enter_text_counter = 0;
         }
-        
+
         // Draw a menu:
         window.draw(create_session_title);
         window.draw(session_name_title);
@@ -1910,24 +1910,66 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
 };
 
 // Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font,
-    const string& session_name, const unsigned& max_number_of_players, const unsigned& complexity) {
+void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, Client* current_client) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
-    const unsigned number_of_buttons = 5;
+    const unsigned number_of_buttons = 7;
     // button size:
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
-    
-    // Create a new server's session:
-    Server* current_session = new Server(session_name, max_number_of_players, complexity);
 
+    // Initialize client-server communication:
+    Thread* listen_thread;    
+    if (current_client == nullptr) {
+        // Look for the clients:
+        listen_thread = new Thread([&] () { current_session->listen_clients(); });
+
+        listen_thread->launch();
+    }
+
+    // Create a list of clients and initialize server name:
+    vector<client_data> *player_list;
+    string server_name = "";
+    if (current_client == nullptr) {
+        player_list = new vector<client_data>(current_session->get_clients());
+        server_name = current_session->get_server_name();
+    } else if (current_session == nullptr) {
+        player_list = new vector<client_data>(current_client->get_server_data().clients);
+        server_name = current_client->get_server_data().name;
+    }
+    
+    // Initialize the index of current player:
+    unsigned current_player_index = 0;
+    for (unsigned i = 0; i < player_list->size(); i++)
+        if (player_list->at(i).address == IpAddress::getLocalAddress())
+            current_player_index = i;
+    
     // Initialize session title:
-    string session_title_string = "Session " + session_name;
-    Text session_title = create_button(font, session_title_string.data(), button_size,
+    Text session_title = create_button(font, "Session " + server_name, button_size,
         Vector2f(window.getSize().x / 2,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + 10.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + 5.0f), false);
+
+    // Initialize player's title:
+    Text player_title = create_button(font, "Player", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f), false, 4);
+
+    // Initialize status title:
+    Text status_title = create_button(font, "Status", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f), false, 4);
+
+    // Initialize player list:
+    vector<Text> player_list_titles;
+    for (unsigned i = 0; i < player_list->size(); i++) {
+        player_list_titles.emplace_back(create_button(font, string ("Player " + to_string(i + 1)), button_size,
+            Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+        player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+            Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+    }
 
     // Initialize disconnect button:
     Text disconnect = create_button(font, "Disconnect", button_size,
@@ -1935,14 +1977,198 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
    
     // Initialize ready button:
-    Text ready = create_button(font, "Ready", button_size,
+    Text ready = create_button(font, "Not Ready", button_size,
         Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
 
     while(window.isOpen()) {
+        if (current_client == nullptr) {
+            // Look for the clients:
+            listen_thread = new Thread([&] () { current_session->listen_clients(); });
 
-        // Look for the clients:
-        // current_session->listen_clients();
+            listen_thread->launch();
+
+            // Update a list of players:
+            player_list = new vector<client_data>(current_session->get_clients());
+        } else if (current_session == nullptr) {
+            // Listen to server:
+            // listen_thread = new Thread([&] () { current_client->listen_sever(); });
+
+            // listen_thread->launch();
+
+            // Update a list of players:
+            player_list = new vector<client_data>(current_client->get_server_data().clients);
+        }
+
+        // player_list_titles.clear();
+        // for (unsigned i = 0; i < player_list->size(); i++) {
+        //     player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
+        //         Vector2f(window.getSize().x / 4,
+        //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+        //     player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+        //         Vector2f(3 * window.getSize().x / 4,
+        //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+        // }
+
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    disconnect.setFillColor(Color(144, 12, 63, 255));
+                    disconnect.setOutlineColor(Color(218, 247, 166, 255));
+                    ready.setFillColor(Color(144, 12, 63, 255));
+                    ready.setOutlineColor(Color(218, 247, 166, 255));
+
+                    // If appropriate mouse position was captured:
+                    if (captured_button(window, disconnect)) {
+                        // focus disconnect button:
+                        disconnect.setFillColor(Color(255, 195, 0, 255));
+                        disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = 1;
+                    } else if (captured_button(window, ready)) {
+                        // focus ready button:
+                        ready.setFillColor(Color(255, 195, 0, 255));
+                        ready.setOutlineColor(Color(8, 0, 93, 255)); 
+                        focused_button_counter = 2;
+                    } 
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) Go back:
+                            if (captured_button(window, disconnect)) {
+                                if (current_client == nullptr)
+                                    listen_thread->terminate();
+                                return;
+                            // 2) Get ready or not:
+                            } else if (captured_button(window, ready)) { 
+                                if (player_list->at(current_player_index).status) {
+                                    ready.setString("Ready");
+                                    player_list->at(current_player_index).status = false;
+                                } else {
+                                    ready.setString("Not Ready");
+                                    player_list->at(current_player_index).status = true;
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // focus disconnect button:
+                                    disconnect.setFillColor(Color(255, 195, 0, 255));
+                                    disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        if (current_client == nullptr)
+                                            // execute disconnect button:
+                                            listen_thread->terminate();
+                                        return;
+                                    }
+
+                                    // unfocus disconnect button:
+                                    disconnect.setFillColor(Color(144, 12, 63, 255));
+                                    disconnect.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus ready button:
+                                    ready.setFillColor(Color(255, 195, 0, 255));
+                                    ready.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter++;
+                                    break;
+                                case 2:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        // execute ready button:
+                                        if (player_list->at(current_player_index).status) {
+                                            ready.setString("Ready");
+                                            player_list->at(current_player_index).status = false;
+                                        } else {
+                                            ready.setString("Not Ready");
+                                            player_list->at(current_player_index).status = true;
+                                        }
+                                    }
+                                        
+                                    // unfocus ready button:
+                                    ready.setFillColor(Color(144, 12, 63, 255));
+                                    ready.setOutlineColor(Color(218, 247, 166, 255));
+                                    // focus disconnect button:
+                                    disconnect.setFillColor(Color(255, 195, 0, 255));
+                                    disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                                    focused_button_counter = 1;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        
+                        default:
+                            break;
+                    }
+                    break;
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if (window.getSize().y < 600)
+                        window.setSize(Vector2u (window.getSize().x, 600));
+
+                    // update button size:
+                    button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 18), 
+                        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update all the buttons and their positions:
+                    session_title.setCharacterSize(5 * button_size / 6);
+                    session_title.setPosition((window.getSize().x - session_title.getGlobalBounds().width) / 2, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
+
+                    player_title.setCharacterSize(5 * button_size / 6);
+                    player_title.setPosition((window.getSize().x - player_title.getGlobalBounds().width) / 4,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f);
+
+                    status_title.setCharacterSize(5 * button_size / 6);
+                    status_title.setPosition(3 * (window.getSize().x - status_title.getGlobalBounds().width) / 4,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 15.0f + 20.0f);
+
+                    disconnect.setCharacterSize(5 * button_size / 6);
+                    disconnect.setOutlineThickness(button_size / 6);
+                    disconnect.setPosition((window.getSize().x - disconnect.getGlobalBounds().width) / 4,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    
+                    ready.setCharacterSize(5 * button_size / 6);
+                    ready.setOutlineThickness(button_size / 6);
+                    ready.setPosition(3 * (window.getSize().x - disconnect.getGlobalBounds().width) / 4,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    break;
+                default:
+                    break;
+            }
+        }
 
         // Clear window:
         window.clear();
@@ -1952,12 +2178,392 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font,
 
         // Draw a menu:
         window.draw(session_title);
+        window.draw(player_title);
+        window.draw(status_title);
+        for (unsigned i = 0; i < player_list_titles.size(); i++)
+            window.draw(player_list_titles[i]);
         window.draw(disconnect);
         window.draw(ready);
         window.display();
     }
 };
 
+// Find servers function:
+void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+
+    map<unsigned, string> complexities;
+    complexities[0] = "Mechanics";
+    complexities[1] = "STIC";
+    complexities[2] = "Applied Mathematics";
+
+    // Create a client:
+    Client* current_client = new Client();
+
+    // Looking for servers:
+    Thread search_thread([&] () { current_client->search_servers(); });
+
+    search_thread.launch();
+
+    // set the wait image:
+    Texture texture;
+    try {
+        if (!texture.loadFromFile("background/wait.jpg")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, wait image not found!" << endl;
+    }
+
+    // create a wait sprite itself:
+    Sprite wait;
+    wait.setTexture(texture);
+    wait.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.5);
+    wait.setColor(Color(255, 255, 255, 100));    
+
+    // Number of buttons:
+    unsigned number_of_buttons = 8;
+    // Button size:
+    double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
+        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+    
+    // Currently chosen server:
+    int chosen_server = -1;
+
+    // Request status:
+    request_status status = UNASSIGNED;
+
+    // Initialize server list title:
+    Text server_list_title = create_button(font, "Server List", button_size,
+        Vector2f(window.getSize().x / 2,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + 5.0f), false);
+
+    // Initialize server_name's title:
+    Text server_name_title = create_button(font, "Server Name", button_size,
+        Vector2f(window.getSize().x / 6,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 6);
+
+    // Initialize complexity title:
+    Text complexity_title = create_button(font, "Complexity", button_size,
+        Vector2f(3 * window.getSize().x / 6,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 6);
+
+    // Initialize number of players title:
+    Text number_of_players_title = create_button(font, "Players", button_size,
+        Vector2f(5 * window.getSize().x / 6,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 6);
+
+    vector<Text> server_info;
+    for (unsigned i = 0; i < current_client->get_servers().size(); i++) {
+        server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
+            Vector2f(window.getSize().x / 6,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+        server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
+            Vector2f(3 * window.getSize().x / 6,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+        server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/4", button_size,
+            Vector2f(5 * window.getSize().x / 6,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+    }
+
+    // Initialize back button:
+    Text back = create_button(font, "back", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+   
+    // Initialize connect button:
+    Text connect = create_button(font, "Connect", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+
+    while(window.isOpen()) {
+        if (server_info.size() / 3 < current_client->get_servers().size()) {
+            server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
+                Vector2f(window.getSize().x / 6,
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+            server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
+                Vector2f(3 * window.getSize().x / 6,
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+            server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
+                Vector2f(5 * window.getSize().x / 6,
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+        }
+
+        // number_of_buttons = 3 + current_client->get_servers().size();
+
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    for (int i = 0; (unsigned) i < server_info.size(); i += 3) {
+                        for (unsigned j = 0; j < 3; j++) {
+                            if (chosen_server != i / 3) {
+                                server_info[i + j].setFillColor(Color(144, 12, 63, 255));
+                                server_info[i + j].setOutlineColor(Color(218, 247, 166, 255));
+                            }
+                        }
+                    }
+                    back.setFillColor(Color(144, 12, 63, 255));
+                    back.setOutlineColor(Color(218, 247, 166, 255));
+                    connect.setFillColor(Color(144, 12, 63, 255));
+                    connect.setOutlineColor(Color(218, 247, 166, 255));
+
+                    // If appropriate mouse position was captured:
+                    for (unsigned i = 0; i < server_info.size(); i += 3) {
+                        if (captured_button(window, server_info[i]) 
+                            || captured_button(window, server_info[i + 1])
+                            || captured_button(window, server_info[i + 2])) {
+                            // focus proper server buttons:
+                            server_info[i].setFillColor(Color(255, 195, 0, 255));
+                            server_info[i].setOutlineColor(Color(8, 0, 93, 255));
+                            server_info[i + 1].setFillColor(Color(255, 195, 0, 255));
+                            server_info[i + 1].setOutlineColor(Color(8, 0, 93, 255));
+                            server_info[i + 2].setFillColor(Color(255, 195, 0, 255));
+                            server_info[i + 2].setOutlineColor(Color(8, 0, 93, 255));
+                            focused_button_counter = i / 3 + 1;
+                            break;
+                        }
+                    }
+                    if (captured_button(window, back)) {
+                        // focus back button:
+                        back.setFillColor(Color(255, 195, 0, 255));
+                        back.setOutlineColor(Color(8, 0, 93, 255));
+                        focused_button_counter = current_client->get_servers().size() + 1;
+                    } else if (captured_button(window, connect)) {
+                        // focus connect button:
+                        connect.setFillColor(Color(255, 195, 0, 255));
+                        connect.setOutlineColor(Color(8, 0, 93, 255)); 
+                        focused_button_counter = current_client->get_servers().size() + 2;
+                    } 
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            for (unsigned i = 0; i < server_info.size(); i += 3) {
+                                if (captured_button(window, server_info[i]) 
+                                    || captured_button(window, server_info[i + 1])
+                                    || captured_button(window, server_info[i + 2])) {
+                                    // i + 1) Choose a proper server:
+                                    chosen_server = i / 3;
+                                    break;
+                                }
+                            }
+                            // current_client->get_servers().size() + 1) Go back:
+                            if (captured_button(window, back)) {
+                                search_thread.terminate();
+                                return;
+                            // current_client->get_servers().size() + 2) Get connect or not:
+                            } else if (captured_button(window, connect) && chosen_server != -1) {
+                                current_client->connect_server(chosen_server, status);
+                            };
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            if (focused_button_counter == 0 && current_client->get_servers().size() && 
+                                event.key.code != Keyboard::Return) {
+                                // in this case, Enter won't do nothing:
+                                // focus proper server buttons:
+                                server_info[0].setFillColor(Color(255, 195, 0, 255));
+                                server_info[0].setOutlineColor(Color(8, 0, 93, 255));
+                                server_info[1].setFillColor(Color(255, 195, 0, 255));
+                                server_info[1].setOutlineColor(Color(8, 0, 93, 255));
+                                server_info[2].setFillColor(Color(255, 195, 0, 255));
+                                server_info[2].setOutlineColor(Color(8, 0, 93, 255));
+                                focused_button_counter++;
+                                break;
+                            } else if (focused_button_counter == 0 && current_client->get_servers().size() == 0) {
+                                // in this case, Enter won't do nothing:
+                                if (event.key.code == Keyboard::Return)
+                                    break;
+
+                                // focus back button:
+                                back.setFillColor(Color(255, 195, 0, 255));
+                                back.setOutlineColor(Color(8, 0, 93, 255));
+                                focused_button_counter++;
+                                break;
+                            } else if (focused_button_counter == current_client->get_servers().size() + 1) {
+                                // if we have pressed Enter:
+                                if (event.key.code == Keyboard::Return) {
+                                    // execute back button:
+                                    search_thread.terminate();
+                                    return;
+                                }
+
+                                // unfocus back button:
+                                back.setFillColor(Color(144, 12, 63, 255));
+                                back.setOutlineColor(Color(218, 247, 166, 255));
+                                // focus connect button:
+                                connect.setFillColor(Color(255, 195, 0, 255));
+                                connect.setOutlineColor(Color(8, 0, 93, 255));
+                                focused_button_counter++;
+                                break;
+                            } else if (focused_button_counter == current_client->get_servers().size() + 2) {
+                                // if we have pressed Enter:
+                                if (event.key.code == Keyboard::Return) {
+                                    // execute connect button:
+                                    current_client->connect_server(chosen_server, status);
+                                } else {
+                                    // unfocus connect button:
+                                    connect.setFillColor(Color(144, 12, 63, 255));
+                                    connect.setOutlineColor(Color(218, 247, 166, 255));
+                                    
+                                    // if we have some servers:
+                                    if (current_client->get_servers().size() != 0) {
+                                        // focus proper server buttons:
+                                        server_info[0].setFillColor(Color(255, 195, 0, 255));
+                                        server_info[0].setOutlineColor(Color(8, 0, 93, 255));
+                                        server_info[1].setFillColor(Color(255, 195, 0, 255));
+                                        server_info[1].setOutlineColor(Color(8, 0, 93, 255));
+                                        server_info[2].setFillColor(Color(255, 195, 0, 255));
+                                        server_info[2].setOutlineColor(Color(8, 0, 93, 255));
+                                    } else {
+                                        // focus back button:
+                                        back.setFillColor(Color(255, 195, 0, 255));
+                                        back.setOutlineColor(Color(8, 0, 93, 255));
+                                    }
+                                    focused_button_counter = 1;
+                                }
+                                break;
+                            }
+                            for (int i = 0; (unsigned) i < server_info.size(); i += 3) {
+                                if (focused_button_counter == (unsigned) i + 1) {
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        // choose a server:
+                                        chosen_server = i / 3;
+                                        break;
+                                    }
+
+                                    if (chosen_server != i / 3) {
+                                        // unfocus current server button:
+                                        server_info[i].setFillColor(Color(144, 12, 63, 255));
+                                        server_info[i].setOutlineColor(Color(218, 247, 166, 255));
+                                        server_info[i + 1].setFillColor(Color(144, 12, 63, 255));
+                                        server_info[i + 1].setOutlineColor(Color(218, 247, 166, 255));
+                                        server_info[i + 2].setFillColor(Color(144, 12, 63, 255));
+                                        server_info[i + 2].setOutlineColor(Color(218, 247, 166, 255));
+                                    }
+                                    
+                                    // if it is not a last server:
+                                    if ((unsigned) i < current_client->get_servers().size() - 1) {
+                                        // focus next server button:
+                                        server_info[i + 3].setFillColor(Color(255, 195, 0, 255));
+                                        server_info[i + 3].setOutlineColor(Color(8, 0, 93, 255));
+                                        server_info[i + 4].setFillColor(Color(255, 195, 0, 255));
+                                        server_info[i + 4].setOutlineColor(Color(8, 0, 93, 255));
+                                        server_info[i + 5].setFillColor(Color(255, 195, 0, 255));
+                                        server_info[i + 5].setOutlineColor(Color(8, 0, 93, 255));
+                                    } else {
+                                        // focus back button:
+                                        back.setFillColor(Color(255, 195, 0, 255));
+                                        back.setOutlineColor(Color(8, 0, 93, 255));
+                                    }
+                                    focused_button_counter++;
+                                    break;
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if (window.getSize().y < 600)
+                        window.setSize(Vector2u (window.getSize().x, 600));
+
+                    // update button size:
+                    button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 18), 
+                        (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
+
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update all the buttons and their positions:
+                    server_list_title.setCharacterSize(5 * button_size / 6);
+                    server_list_title.setPosition((window.getSize().x - server_list_title.getGlobalBounds().width) / 2 - 10.0f, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
+
+                    server_name_title.setCharacterSize(5 * button_size / 6);
+                    server_name_title.setPosition((window.getSize().x - server_name_title.getGlobalBounds().width) / 6,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+
+                    complexity_title.setCharacterSize(5 * button_size / 6);
+                    complexity_title.setPosition((3 * (window.getSize().x) - complexity_title.getGlobalBounds().width) / 6,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+
+                    number_of_players_title.setCharacterSize(5 * button_size / 6);
+                    number_of_players_title.setPosition((5 * (window.getSize().x) - number_of_players_title.getGlobalBounds().width) / 6,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+
+                    for (unsigned i = 0; i < server_info.size(); i += 3) {
+                        for (unsigned j = 0; j < 3; j++) {
+                            server_info[i + j].setCharacterSize(5 * button_size / 6);
+                            server_info[i + j].setOutlineThickness(button_size / 6);
+                            server_info[i + j].setPosition(((j + 1) * 2 - 1) * (window.getSize().x - server_info[i +j].getGlobalBounds().width) / 6,
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f);        
+                        }
+                    }
+
+                    back.setCharacterSize(5 * button_size / 6);
+                    back.setOutlineThickness(button_size / 6);
+                    back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 4,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+
+                    connect.setCharacterSize(5 * button_size / 6);
+                    connect.setOutlineThickness(button_size / 6);
+                    connect.setPosition(3 * (window.getSize().x - connect.getGlobalBounds().width) / 4,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (status == SUCCESS) {
+            cout << current_client->get_server_data().clients.size() << endl;
+            session_menu(window, background, font, nullptr, current_client);
+        }
+
+        // Clear window:
+        window.clear();
+
+        // Draw background:
+        window.draw(background);
+
+        // Draw a menu:
+        window.draw(server_list_title);
+        window.draw(server_name_title);
+        window.draw(complexity_title);
+        window.draw(number_of_players_title);
+        for (unsigned i = 0; i < server_info.size(); i++)
+            window.draw(server_info[i]);
+        window.draw(back);
+        window.draw(connect);
+        if (status == NOT_READY)
+            window.draw(wait);
+        window.display();
+    }
+};
 
 void complexity_menu(RenderWindow& window, Sprite& background, const Font& font) {
     // counter of the currently chosen button:
