@@ -154,7 +154,7 @@ void Client::connect_server(const unsigned pos, request_status& status){
 }
 
 //Disconnect from the game server:
-bool Client::disconnect_server(){
+void Client::disconnect_server(request_status& status){
     socket.setBlocking(true);
     //Filling send buffer:
     Packet packet_send;
@@ -165,12 +165,14 @@ bool Client::disconnect_server(){
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
-        return false;
+        status = ERROR;
+        return;
     }
 
     _server_data.address = IpAddress::None;
     cout << "Disconnected to the Server " << _server_data.address << endl;
-    return true;
+    status = SUCCESS;
+    return;
 }
 
 void Client::listen_sever(){
@@ -195,6 +197,14 @@ void Client::listen_sever(){
             {
             //Check if the message is of new client info:
             case NEW_CLIENT_INFO:
+                _server_data.clients.clear();
+                for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
+                    string client_address;
+                    bool client_status;
+                    packet_recv >> client_address;
+                    packet_recv >> client_status;
+                    _server_data.clients.emplace_back(client_data{client_address, client_status});
+                }
             break;
             //Check if the message is of update client info:
             case UPDATE_CLIENT_INFO:
@@ -219,7 +229,7 @@ void Client::listen_sever(){
     }
 }
 
-bool Client::ready(){
+void Client::ready(request_status& status){
     socket.setBlocking(true);
     
     //Filling send buffer:
@@ -231,14 +241,15 @@ bool Client::ready(){
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
-        return false;
+        status = ERROR;
+        return;
     }
 
     chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
     chrono::duration<double> elapsed_seconds;
     //Setting non blocking socket:
     socket.setBlocking(false);
-
+    status = NOT_READY;
     do{
         Packet packet_recv;
         IpAddress sender;
@@ -256,7 +267,8 @@ bool Client::ready(){
                 _datatype = (datatype) datatype_value;
                 if(_datatype == CLIENT_READY_SUCCESS){
                     cout << "Ready " << endl;
-                    return true;
+                    status = SUCCESS;
+                    return;
                 }
             }
         }
@@ -264,5 +276,5 @@ bool Client::ready(){
         //Waiting for server response for MAX_RESPONSE_TIME
     } while(elapsed_seconds.count() <= MAX_RESPONSE_TIME);
 
-    return true;
+    status = ERROR;
 }

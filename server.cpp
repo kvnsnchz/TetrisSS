@@ -42,7 +42,8 @@ void Server::disconnect_udp_socket(){
 }
 
 //Listen for new customer connections:
-void Server::listen_clients() {
+void Server::listen_clients(bool& changes) {
+    changes = false;
     socket.setBlocking(false);
     
     Packet packet_recv;;
@@ -53,7 +54,7 @@ void Server::listen_clients() {
         //Check if there is a message:
         if (socket.receive(packet_recv, sender, port) == Socket::Done)
         {
-            Packet packet_send;
+            Packet packet_send, gen_packet_send;
             datatype _datatype;
             Uint32 datatype_value;
             //Get the buffer information:
@@ -97,15 +98,29 @@ void Server::listen_clients() {
                     packet_send << level;
                     packet_send << max_clients;
 
+                    gen_packet_send << NEW_CLIENT_INFO;
+                   
                     for(unsigned i = 0; i < clients.size(); i ++){
                         packet_send << clients[i].address.toString();
                         packet_send << clients[i].status;
+
+                        gen_packet_send << clients[i].address.toString();
+                        gen_packet_send << clients[i].status;
                     }
+                    
                 }
                 //Send information to client
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                     cout << "Server: Send error" << endl;
                 
+                if(gen_packet_send.getDataSize() > 0){
+                    for(unsigned i = 0; i < clients.size(); i ++){
+                        if (socket.send(gen_packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                            cout << "Server: Send error" << endl;
+                    }
+                }
+
+                changes = true;
                 cout << "New client " << sender << endl;
                 
                 break;
@@ -117,6 +132,7 @@ void Server::listen_clients() {
                     //Removing the client of the client list:
                     clients.erase(it);
                     cout << "Delete client " << sender << endl;
+                    changes = true;
                 }
                 break;
             }
@@ -142,6 +158,7 @@ void Server::listen_clients() {
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                     cout << "Server: Send error" << endl;
                 
+                changes = true;
                 cout << "Client " << sender << " ready" << endl;
                 break;
             }
@@ -149,5 +166,4 @@ void Server::listen_clients() {
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
         }
     }
-    cout << "Hola" << endl;
 }
