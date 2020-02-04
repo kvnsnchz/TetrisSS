@@ -1919,11 +1919,12 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
 
+    bool changes = false;
     // Initialize client-server communication:
     Thread* listen_thread;    
     if (current_client == nullptr) {
         // Look for the clients:
-        listen_thread = new Thread([&] () { current_session->listen_clients(); });
+        listen_thread = new Thread([&] () { current_session->listen_clients(changes); });
 
         listen_thread->launch();
     }

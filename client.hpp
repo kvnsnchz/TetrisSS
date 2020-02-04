@@ -38,10 +38,10 @@ public:
     //Connect to a specific game server from the available list:
     void connect_server(const unsigned pos, request_status& status);
     //Disconnect from the game server:
-    bool disconnect_server();
+    void disconnect_server(request_status& status);
     //Listen the server
     void listen_sever();
     //Ready to play
-    bool ready();
+    void ready(request_status& status);
 };
 

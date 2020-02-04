@@ -31,8 +31,8 @@ enum request_status {
 struct client_data {
     IpAddress address;
     bool status;
-    bool operator == (client_data autre_client){
-       return address == autre_client.address;
+    bool operator == (client_data other_client){
+       return address == other_client.address;
     };
 };
 
@@ -43,6 +43,9 @@ struct server_data {
     Uint32 level;
     Uint32 max_clients;
     vector<client_data> clients;
+    bool operator == (server_data other_server){
+        return address == other_server.address;
+    };
 };
 
 namespace ports_number {

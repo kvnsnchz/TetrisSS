@@ -54,16 +54,23 @@ void Client::search_servers(){
             //Check if the message is a response of server information:
             if(_datatype == SERVER_INFO_RESPONSE){
                 //Adding server information to server list:
-                server_data _server_data;
-                _server_data.address = sender;
-                packet_recv >> _server_data.name;
-                packet_recv >> _server_data.clients_quantity;
-                packet_recv >> _server_data.level;
-                packet_recv >> _server_data.max_clients;
+                vector<server_data>::iterator it = find(servers.begin(), servers.end(), server_data{
+                    sender, "", 0, 0, 0, vector<client_data>()
+                });
 
-                servers.emplace_back(_server_data);
+                if(it == servers.end()){
+                    server_data _server_data;
+                    _server_data.address = sender;
+                    packet_recv >> _server_data.name;
+                    packet_recv >> _server_data.clients_quantity;
+                    packet_recv >> _server_data.level;
+                    packet_recv >> _server_data.max_clients;
+
+                    servers.emplace_back(_server_data);
+                    
+                    cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
                 
-                cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
+                }
             }
         }
         elapsed_seconds = chrono::system_clock::now() - start;
@@ -154,7 +161,7 @@ void Client::connect_server(const unsigned pos, request_status& status){
 }
 
 //Disconnect from the game server:
-bool Client::disconnect_server(){
+void Client::disconnect_server(request_status& status){
     socket.setBlocking(true);
     //Filling send buffer:
     Packet packet_send;
@@ -165,12 +172,14 @@ bool Client::disconnect_server(){
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
-        return false;
+        status = ERROR;
+        return;
     }
 
     _server_data.address = IpAddress::None;
     cout << "Disconnected to the Server " << _server_data.address << endl;
-    return true;
+    status = SUCCESS;
+    return;
 }
 
 void Client::listen_sever(){
@@ -195,6 +204,14 @@ void Client::listen_sever(){
             {
             //Check if the message is of new client info:
             case NEW_CLIENT_INFO:
+                _server_data.clients.clear();
+                for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
+                    string client_address;
+                    bool client_status;
+                    packet_recv >> client_address;
+                    packet_recv >> client_status;
+                    _server_data.clients.emplace_back(client_data{client_address, client_status});
+                }
             break;
             //Check if the message is of update client info:
             case UPDATE_CLIENT_INFO:
@@ -212,6 +229,9 @@ void Client::listen_sever(){
             }
             //Check if the message is of delete client info:
             case DELETE_CLIENT_INFO:
+                unsigned pos_client;
+                packet_recv >> pos_client;
+                _server_data.clients.erase(_server_data.clients.begin() + pos_client);
             break;
             }
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
@@ -219,7 +239,7 @@ void Client::listen_sever(){
     }
 }
 
-bool Client::ready(){
+void Client::ready(request_status& status){
     socket.setBlocking(true);
     
     //Filling send buffer:
@@ -231,14 +251,15 @@ bool Client::ready(){
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
-        return false;
+        status = ERROR;
+        return;
     }
 
     chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
     chrono::duration<double> elapsed_seconds;
     //Setting non blocking socket:
     socket.setBlocking(false);
-
+    status = NOT_READY;
     do{
         Packet packet_recv;
         IpAddress sender;
@@ -255,8 +276,17 @@ bool Client::ready(){
                 packet_recv >> datatype_value;
                 _datatype = (datatype) datatype_value;
                 if(_datatype == CLIENT_READY_SUCCESS){
+                    vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
+                    if(it == _server_data.clients.end()){
+                        status = ERROR;
+                        break;
+                    }
+                        
+                    (*it).status = true;
+                
                     cout << "Ready " << endl;
-                    return true;
+                    status = SUCCESS;
+                    return;
                 }
             }
         }
@@ -264,5 +294,5 @@ bool Client::ready(){
         //Waiting for server response for MAX_RESPONSE_TIME
     } while(elapsed_seconds.count() <= MAX_RESPONSE_TIME);
 
-    return true;
+    status = ERROR;
 }
