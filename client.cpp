@@ -54,16 +54,23 @@ void Client::search_servers(){
             //Check if the message is a response of server information:
             if(_datatype == SERVER_INFO_RESPONSE){
                 //Adding server information to server list:
-                server_data _server_data;
-                _server_data.address = sender;
-                packet_recv >> _server_data.name;
-                packet_recv >> _server_data.clients_quantity;
-                packet_recv >> _server_data.level;
-                packet_recv >> _server_data.max_clients;
+                vector<server_data>::iterator it = find(servers.begin(), servers.end(), server_data{
+                    sender, "", 0, 0, 0, vector<client_data>()
+                });
 
-                servers.emplace_back(_server_data);
+                if(it == servers.end()){
+                    server_data _server_data;
+                    _server_data.address = sender;
+                    packet_recv >> _server_data.name;
+                    packet_recv >> _server_data.clients_quantity;
+                    packet_recv >> _server_data.level;
+                    packet_recv >> _server_data.max_clients;
+
+                    servers.emplace_back(_server_data);
+                    
+                    cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
                 
-                cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
+                }
             }
         }
         elapsed_seconds = chrono::system_clock::now() - start;
