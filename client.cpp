@@ -181,8 +181,8 @@ void Client::disconnect_server(request_status& status){
     status = SUCCESS;
 }
 
-void Client::listen_sever(bool server_disconnected){
-    server_disconnected = false;
+void Client::listen_sever(request_status& status){
+    status = NOT_CHANGES;
     socket.setBlocking(false);
     
     Packet packet_recv;;
@@ -202,6 +202,19 @@ void Client::listen_sever(bool server_disconnected){
             
             switch ((unsigned)_datatype)
             {
+            case CLIENT_READY_SUCCESS:
+                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
+                if(it == _server_data.clients.end()){
+                    status = READY_ERROR;
+                    break;
+                }
+                    
+                (*it).status = true;
+            
+                cout << "Ready " << endl;
+                status = READY_SUCCESS;
+                return;
+            break;
             //Check if the message is of new client info:
             case NEW_CLIENT_INFO:
                 _server_data.clients.clear();
@@ -212,6 +225,7 @@ void Client::listen_sever(bool server_disconnected){
                     packet_recv >> client_status;
                     _server_data.clients.emplace_back(client_data{client_address, client_status});
                 }
+                status = CHANGES;
             break;
             //Check if the message is of update client info:
             case UPDATE_CLIENT_INFO:
@@ -225,6 +239,7 @@ void Client::listen_sever(bool server_disconnected){
                 _server_data.clients[pos_client].address = client_address;
                 _server_data.clients[pos_client].status = client_status;
                 cout << "Client update " << _server_data.clients[pos_client].address << _server_data.clients[pos_client].status << endl;
+                status = CHANGES;
                 break;
             }
             //Check if the message is of delete client info:
@@ -232,10 +247,11 @@ void Client::listen_sever(bool server_disconnected){
                 unsigned pos_client;
                 packet_recv >> pos_client;
                 _server_data.clients.erase(_server_data.clients.begin() + pos_client);
+                status = CHANGES;
             break;
             case SERVER_DISCONNECTION:
                 _server_data.address = IpAddress::None;
-                server_disconnected = true;
+                status = SERVER_DISCONNECTED;
                 return;
             }
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
@@ -243,7 +259,7 @@ void Client::listen_sever(bool server_disconnected){
     }
 }
 
-void Client::ready(request_status& status){
+void Client::ready(){
     socket.setBlocking(true);
     
     //Filling send buffer:
@@ -255,48 +271,6 @@ void Client::ready(request_status& status){
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
-        status = ERROR;
-        return;
     }
 
-    chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
-    chrono::duration<double> elapsed_seconds;
-    //Setting non blocking socket:
-    socket.setBlocking(false);
-    status = NOT_READY;
-    do{
-        Packet packet_recv;
-        IpAddress sender;
-        unsigned short port;
-        //Check if there is a message:
-        if (socket.receive(packet_recv, sender, port) == Socket::Done)
-        {
-            //Checking that the address of the sender 
-            //is the same as that of the selected server
-            if(sender == _server_data.address){
-                datatype _datatype;
-                Uint32 datatype_value;
-                //Get the buffer information:
-                packet_recv >> datatype_value;
-                _datatype = (datatype) datatype_value;
-                if(_datatype == CLIENT_READY_SUCCESS){
-                    vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
-                    if(it == _server_data.clients.end()){
-                        status = ERROR;
-                        break;
-                    }
-                        
-                    (*it).status = true;
-                
-                    cout << "Ready " << endl;
-                    status = SUCCESS;
-                    return;
-                }
-            }
-        }
-        elapsed_seconds = chrono::system_clock::now() - start;
-        //Waiting for server response for MAX_RESPONSE_TIME
-    } while(elapsed_seconds.count() <= MAX_RESPONSE_TIME);
-
-    status = ERROR;
 }

@@ -46,8 +46,10 @@ public:
     //Disconnect to Socket UDP
     void disconnect_udp_socket();
     // Listen for some new client connections:
-    void listen_clients(bool& changes);
+    void listen_clients(request_status& status);
     //Disconnected server
     void disconnect();
+    //Game start
+    void start();
 };
 

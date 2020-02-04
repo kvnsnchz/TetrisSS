@@ -27,6 +27,11 @@ enum request_status {
     NOT_READY,
     SUCCESS,
     ERROR,
+    SERVER_DISCONNECTED,
+    READY_SUCCESS,
+    READY_ERROR,
+    NOT_CHANGES,
+    CHANGES,
 };
 
 struct client_data {
