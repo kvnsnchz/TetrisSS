@@ -61,7 +61,7 @@ void Server::disconnect(){
 
 //Listen for new customer connections:
 void Server::listen_clients(request_status& status) {
-    status = NOT_CHANGES;
+    status = NOT_CHANGED;
     socket.setBlocking(false);
     
     Packet packet_recv;;
@@ -139,7 +139,7 @@ void Server::listen_clients(request_status& status) {
                     }
                 }
 
-                status = CHANGES;
+                status = CHANGED;
                 cout << "New client " << sender << endl;
                 
                 break;
@@ -155,7 +155,7 @@ void Server::listen_clients(request_status& status) {
                     //Removing the client of the client list:
                     clients.erase(it);
                     cout << "Delete client " << sender << endl;
-                    status = CHANGES;
+                    status = CHANGED;
                    
                     for(unsigned i = 0; i < clients.size(); i++){
                         if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
@@ -187,7 +187,7 @@ void Server::listen_clients(request_status& status) {
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                     cout << "Server: Send error" << endl;
                 
-                status = CHANGES;
+                status = CHANGED;
                 cout << "Client " << sender << " ready" << endl;
                 break;
             }

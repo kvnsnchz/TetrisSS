@@ -30,8 +30,8 @@ enum request_status {
     SERVER_DISCONNECTED,
     READY_SUCCESS,
     READY_ERROR,
-    NOT_CHANGES,
-    CHANGES,
+    NOT_CHANGED,
+    CHANGED,
 };
 
 struct client_data {

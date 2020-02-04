@@ -181,8 +181,8 @@ void Client::disconnect_server(request_status& status){
     status = SUCCESS;
 }
 
-void Client::listen_sever(request_status& status){
-    status = NOT_CHANGES;
+void Client::listen_server(request_status& status){
+    status = NOT_CHANGED;
     socket.setBlocking(false);
     
     Packet packet_recv;;
@@ -203,6 +203,7 @@ void Client::listen_sever(request_status& status){
             switch ((unsigned)_datatype)
             {
             case CLIENT_READY_SUCCESS:
+            {    
                 vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
                 if(it == _server_data.clients.end()){
                     status = READY_ERROR;
@@ -213,8 +214,9 @@ void Client::listen_sever(request_status& status){
             
                 cout << "Ready " << endl;
                 status = READY_SUCCESS;
-                return;
-            break;
+                
+                break;
+            }
             //Check if the message is of new client info:
             case NEW_CLIENT_INFO:
                 _server_data.clients.clear();
@@ -225,7 +227,7 @@ void Client::listen_sever(request_status& status){
                     packet_recv >> client_status;
                     _server_data.clients.emplace_back(client_data{client_address, client_status});
                 }
-                status = CHANGES;
+                status = CHANGED;
             break;
             //Check if the message is of update client info:
             case UPDATE_CLIENT_INFO:
@@ -239,7 +241,7 @@ void Client::listen_sever(request_status& status){
                 _server_data.clients[pos_client].address = client_address;
                 _server_data.clients[pos_client].status = client_status;
                 cout << "Client update " << _server_data.clients[pos_client].address << _server_data.clients[pos_client].status << endl;
-                status = CHANGES;
+                status = CHANGED;
                 break;
             }
             //Check if the message is of delete client info:
@@ -247,7 +249,7 @@ void Client::listen_sever(request_status& status){
                 unsigned pos_client;
                 packet_recv >> pos_client;
                 _server_data.clients.erase(_server_data.clients.begin() + pos_client);
-                status = CHANGES;
+                status = CHANGED;
             break;
             case SERVER_DISCONNECTION:
                 _server_data.address = IpAddress::None;

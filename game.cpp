@@ -1919,19 +1919,19 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
 
-    bool changes = false;
+    request_status status = NOT_CHANGED;
     // Initialize client-server communication:
     Thread* listen_thread;    
     if (current_client == nullptr) {
         // Look for the clients:
-        listen_thread = new Thread([&] () { current_session->listen_clients(changes); });
+        listen_thread = new Thread([&] () { current_session->listen_clients(status); });
 
         listen_thread->launch();
     } else if (current_session == nullptr) {
         // Look for the clients:
-        // listen_thread = new Thread([&] () { current_client->listen_client(changes); });
+        listen_thread = new Thread([&] () { current_client->listen_server(status); });
 
-        // listen_thread->launch();
+        listen_thread->launch();
     }
 
     // Create a list of clients and initialize server name:
@@ -1998,7 +1998,7 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
         //     player_list = new vector<client_data>(current_session->get_clients());
         // } else if (current_session == nullptr) {
         //     // Listen to server:
-        //     // listen_thread = new Thread([&] () { current_client->listen_sever(); });
+        //     // listen_thread = new Thread([&] () { current_client->listen_server(); });
 
         //     // listen_thread->launch();
 
@@ -2006,15 +2006,21 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
         //     player_list = new vector<client_data>(current_client->get_server_data().clients);
         // }
 
-        // player_list_titles.clear();
-        // for (unsigned i = 0; i < player_list->size(); i++) {
-        //     player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
-        //         Vector2f(window.getSize().x / 4,
-        //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
-        //     player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
-        //         Vector2f(3 * window.getSize().x / 4,
-        //         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
-        // }
+        if (status == CHANGED) {
+            player_list = new vector<client_data>(current_client->get_server_data().clients);
+
+            player_list_titles.clear();
+            for (unsigned i = 0; i < player_list->size(); i++) {
+                player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
+                    Vector2f(window.getSize().x / 4,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+                player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+                    Vector2f(3 * window.getSize().x / 4,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
+            }
+
+            status = NOT_CHANGED;
+        }
 
         Event event;
 
