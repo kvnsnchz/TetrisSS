@@ -4,6 +4,7 @@
 #include "client.hpp"
 
 #define DEF_COU_CHA_FIG 2 
+#define MAX_SESSION_NAME_LENGTH 12
 
 enum state_figure {
     DESCEND_FIGURE,

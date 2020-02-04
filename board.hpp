@@ -1,5 +1,9 @@
 #include "figures.hpp"
 
+// board grid size:
+# define BOARD_GRID_WIDTH 10
+# define BOARD_GRID_HEIGHT 20
+
 enum overflow {
     NONE,
     OVERFLOW_RIGHT,

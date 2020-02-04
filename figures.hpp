@@ -1,9 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <SFML/Graphics.hpp>
+#include "color_constants.hpp"
 
 using namespace sf;
 using namespace std;
+using namespace colors;
 
 // figure grid size (for drawing next figures):
 # define FIGURE_GRID_WIDTH 4

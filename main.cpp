@@ -38,7 +38,7 @@ int main(int argc, char const *argv[]) {
     // set the background image:
     Texture texture;
     try {
-        if (!texture.loadFromFile("background/bg2.jpg")) 
+        if (!texture.loadFromFile("images/bg2.jpg")) 
             throw 0;
     } catch (int e) {
         if (e == 0)
@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]) {
     // set the font of window's text:
     Font font;
     try {
-        if (!font.loadFromFile("amatic/Amatic-Bold.ttf")) 
+        if (!font.loadFromFile("fonts/Amatic-Bold.ttf")) 
             throw 0;
     } catch (int e) {
         if (e == 0)

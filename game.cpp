@@ -8,10 +8,10 @@ Text create_button(const Font& font, const string title, const double& button_si
     new_button.setString(title);
     new_button.setCharacterSize(5 * button_size / 6);
     new_button.setStyle(Text::Bold);
-    new_button.setFillColor(Color(144, 12, 63, 255));
+    new_button.setFillColor(COLOR_DARK_VIOLET);
     if (outline) {
         new_button.setOutlineThickness(button_size / 6);
-        new_button.setOutlineColor(Color(218, 247, 166, 255));
+        new_button.setOutlineColor(COLOR_LIGHT_GREEN);
     }
     if (center_coefficient != 0)
         position.x -= new_button.getGlobalBounds().width / center_coefficient;
@@ -64,14 +64,14 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    pause.setFillColor(Color(144, 12, 63, 255));
-                    pause.setOutlineColor(Color(218, 247, 166, 255));
+                    pause.setFillColor(COLOR_DARK_VIOLET);
+                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, pause)) {
                         // focus pause button:
-                        pause.setFillColor(Color(255, 195, 0, 255));
-                        pause.setOutlineColor(Color(8, 0, 93, 255));
+                        pause.setFillColor(COLOR_YELLOW);
+                        pause.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     }
                     break;
@@ -98,8 +98,8 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                 pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                         
                                 // unfocus pause button:
-                                pause.setFillColor(Color(144, 12, 63, 255));
-                                pause.setOutlineColor(Color(218, 247, 166, 255));
+                                pause.setFillColor(COLOR_DARK_VIOLET);
+                                pause.setOutlineColor(COLOR_LIGHT_GREEN);
                             }
                             break;
                         default:
@@ -122,8 +122,8 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                         break;
 
                                     // focus pause button:
-                                    pause.setFillColor(Color(255, 195, 0, 255));
-                                    pause.setOutlineColor(Color(8, 0, 93, 255));
+                                    pause.setFillColor(COLOR_YELLOW);
+                                    pause.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -147,8 +147,8 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                     }
 
                                     // unfocus pause button:
-                                    pause.setFillColor(Color(144, 12, 63, 255));
-                                    pause.setOutlineColor(Color(218, 247, 166, 255));
+                                    pause.setFillColor(COLOR_DARK_VIOLET);
+                                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
                                     focused_button_counter = 0;
                                     break;
                                 default:
@@ -317,7 +317,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
     // set the game over image:
     Texture texture;
     try {
-        if (!texture.loadFromFile("background/game_over.png")) 
+        if (!texture.loadFromFile("images/game_over.png")) 
             throw 0;
     } catch (int e) {
         if (e == 0)
@@ -363,35 +363,35 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    restart.setFillColor(Color(144, 12, 63, 255));
-                    restart.setOutlineColor(Color(218, 247, 166, 255));
-                    choose_complexity.setFillColor(Color(144, 12, 63, 255));
-                    choose_complexity.setOutlineColor(Color(218, 247, 166, 255));
-                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
-                    exit.setFillColor(Color(144, 12, 63, 255));
-                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                    restart.setFillColor(COLOR_DARK_VIOLET);
+                    restart.setOutlineColor(COLOR_LIGHT_GREEN);
+                    choose_complexity.setFillColor(COLOR_DARK_VIOLET);
+                    choose_complexity.setOutlineColor(COLOR_LIGHT_GREEN);
+                    to_main_menu.setFillColor(COLOR_DARK_VIOLET);
+                    to_main_menu.setOutlineColor(COLOR_LIGHT_GREEN);
+                    exit.setFillColor(COLOR_DARK_VIOLET);
+                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, restart)) {
                         // focus restart button:
-                        restart.setFillColor(Color(255, 195, 0, 255));
-                        restart.setOutlineColor(Color(8, 0, 93, 255));
+                        restart.setFillColor(COLOR_YELLOW);
+                        restart.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, choose_complexity)) {
                         // focus new choose_complexity game button:
-                        choose_complexity.setFillColor(Color(255, 195, 0, 255));
-                        choose_complexity.setOutlineColor(Color(8, 0, 93, 255));
+                        choose_complexity.setFillColor(COLOR_YELLOW);
+                        choose_complexity.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 2;
                     } else if (captured_button(window, to_main_menu)) {
                         // focus to_main_menu button:
-                        to_main_menu.setFillColor(Color(255, 195, 0, 255));
-                        to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                        to_main_menu.setFillColor(COLOR_YELLOW);
+                        to_main_menu.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 3;
                     } else if (captured_button(window, exit)) {
                         // focus exit button:
-                        exit.setFillColor(Color(255, 195, 0, 255));
-                        exit.setOutlineColor(Color(8, 0, 93, 255));
+                        exit.setFillColor(COLOR_YELLOW);
+                        exit.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 4;
                     }
                     break;
@@ -431,8 +431,8 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                         break;
 
                                     // focus restart button:
-                                    restart.setFillColor(Color(255, 195, 0, 255));
-                                    restart.setOutlineColor(Color(8, 0, 93, 255));
+                                    restart.setFillColor(COLOR_YELLOW);
+                                    restart.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -442,11 +442,11 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                         game(window, background, font, game_board->get_complexity());
 
                                     // unfocus restart button:
-                                    restart.setFillColor(Color(144, 12, 63, 255));
-                                    restart.setOutlineColor(Color(218, 247, 166, 255));
+                                    restart.setFillColor(COLOR_DARK_VIOLET);
+                                    restart.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus choose_complexity button:
-                                    choose_complexity.setFillColor(Color(255, 195, 0, 255));
-                                    choose_complexity.setOutlineColor(Color(8, 0, 93, 255));
+                                    choose_complexity.setFillColor(COLOR_YELLOW);
+                                    choose_complexity.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
@@ -456,11 +456,11 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                         complexity_menu(window, background, font);
 
                                     // unfocus choose_complexity button:
-                                    choose_complexity.setFillColor(Color(144, 12, 63, 255));
-                                    choose_complexity.setOutlineColor(Color(218, 247, 166, 255));
+                                    choose_complexity.setFillColor(COLOR_DARK_VIOLET);
+                                    choose_complexity.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus to_main_menu button:
-                                    to_main_menu.setFillColor(Color(255, 195, 0, 255));
-                                    to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                                    to_main_menu.setFillColor(COLOR_YELLOW);
+                                    to_main_menu.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 3:
@@ -470,11 +470,11 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                         main_menu(window, background, font);
 
                                     // unfocus to_main_menu button:
-                                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-                                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+                                    to_main_menu.setFillColor(COLOR_DARK_VIOLET);
+                                    to_main_menu.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus exit button:
-                                    exit.setFillColor(Color(255, 195, 0, 255));
-                                    exit.setOutlineColor(Color(8, 0, 93, 255));
+                                    exit.setFillColor(COLOR_YELLOW);
+                                    exit.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 4:
@@ -484,11 +484,11 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                         window.close();
 
                                     // unfocus exit button:
-                                    exit.setFillColor(Color(144, 12, 63, 255));
-                                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                                    exit.setFillColor(COLOR_DARK_VIOLET);
+                                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus restart button:
-                                    restart.setFillColor(Color(255, 195, 0, 255));
-                                    restart.setOutlineColor(Color(8, 0, 93, 255));
+                                    restart.setFillColor(COLOR_YELLOW);
+                                    restart.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter = 1;
                                     break;
                                 default:
@@ -592,7 +592,7 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
     // set the pause image:
     Texture texture;
     try {
-        if (!texture.loadFromFile("background/pause.png")) 
+        if (!texture.loadFromFile("images/pause.png")) 
             throw 0;
     } catch (int e) {
         if (e == 0)
@@ -637,35 +637,35 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    resume.setFillColor(Color(144, 12, 63, 255));
-                    resume.setOutlineColor(Color(218, 247, 166, 255));
-                    restart.setFillColor(Color(144, 12, 63, 255));
-                    restart.setOutlineColor(Color(218, 247, 166, 255));
-                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
-                    exit.setFillColor(Color(144, 12, 63, 255));
-                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                    resume.setFillColor(COLOR_DARK_VIOLET);
+                    resume.setOutlineColor(COLOR_LIGHT_GREEN);
+                    restart.setFillColor(COLOR_DARK_VIOLET);
+                    restart.setOutlineColor(COLOR_LIGHT_GREEN);
+                    to_main_menu.setFillColor(COLOR_DARK_VIOLET);
+                    to_main_menu.setOutlineColor(COLOR_LIGHT_GREEN);
+                    exit.setFillColor(COLOR_DARK_VIOLET);
+                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, resume)) {
                         // focus resume button:
-                        resume.setFillColor(Color(255, 195, 0, 255));
-                        resume.setOutlineColor(Color(8, 0, 93, 255));
+                        resume.setFillColor(COLOR_YELLOW);
+                        resume.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, restart)) {
                         // focus new restart game button:
-                        restart.setFillColor(Color(255, 195, 0, 255));
-                        restart.setOutlineColor(Color(8, 0, 93, 255));
+                        restart.setFillColor(COLOR_YELLOW);
+                        restart.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 2;
                     } else if (captured_button(window, to_main_menu)) {
                         // focus to_main_menu button:
-                        to_main_menu.setFillColor(Color(255, 195, 0, 255));
-                        to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                        to_main_menu.setFillColor(COLOR_YELLOW);
+                        to_main_menu.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 3;
                     } else if (captured_button(window, exit)) {
                         // focus exit button:
-                        exit.setFillColor(Color(255, 195, 0, 255));
-                        exit.setOutlineColor(Color(8, 0, 93, 255));
+                        exit.setFillColor(COLOR_YELLOW);
+                        exit.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 4;
                     }
                     break;
@@ -705,8 +705,8 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                         break;
 
                                     // focus resume button:
-                                    resume.setFillColor(Color(255, 195, 0, 255));
-                                    resume.setOutlineColor(Color(8, 0, 93, 255));
+                                    resume.setFillColor(COLOR_YELLOW);
+                                    resume.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -716,11 +716,11 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                         return;
 
                                     // unfocus resume button:
-                                    resume.setFillColor(Color(144, 12, 63, 255));
-                                    resume.setOutlineColor(Color(218, 247, 166, 255));
+                                    resume.setFillColor(COLOR_DARK_VIOLET);
+                                    resume.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus restart button:
-                                    restart.setFillColor(Color(255, 195, 0, 255));
-                                    restart.setOutlineColor(Color(8, 0, 93, 255));
+                                    restart.setFillColor(COLOR_YELLOW);
+                                    restart.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
@@ -730,11 +730,11 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                         game(window, background, font, game_board->get_complexity());
 
                                     // unfocus restart button:
-                                    restart.setFillColor(Color(144, 12, 63, 255));
-                                    restart.setOutlineColor(Color(218, 247, 166, 255));
+                                    restart.setFillColor(COLOR_DARK_VIOLET);
+                                    restart.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus to_main_menu button:
-                                    to_main_menu.setFillColor(Color(255, 195, 0, 255));
-                                    to_main_menu.setOutlineColor(Color(8, 0, 93, 255));
+                                    to_main_menu.setFillColor(COLOR_YELLOW);
+                                    to_main_menu.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 3:
@@ -744,11 +744,11 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                         main_menu(window, background, font);
 
                                     // unfocus to_main_menu button:
-                                    to_main_menu.setFillColor(Color(144, 12, 63, 255));
-                                    to_main_menu.setOutlineColor(Color(218, 247, 166, 255));
+                                    to_main_menu.setFillColor(COLOR_DARK_VIOLET);
+                                    to_main_menu.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus exit button:
-                                    exit.setFillColor(Color(255, 195, 0, 255));
-                                    exit.setOutlineColor(Color(8, 0, 93, 255));
+                                    exit.setFillColor(COLOR_YELLOW);
+                                    exit.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 4:
@@ -758,11 +758,11 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                         window.close();
 
                                     // unfocus exit button:
-                                    exit.setFillColor(Color(144, 12, 63, 255));
-                                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                                    exit.setFillColor(COLOR_DARK_VIOLET);
+                                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus resume button:
-                                    resume.setFillColor(Color(255, 195, 0, 255));
-                                    resume.setOutlineColor(Color(8, 0, 93, 255));
+                                    resume.setFillColor(COLOR_YELLOW);
+                                    resume.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter = 1;
                                     break;
                                 default:
@@ -907,49 +907,49 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    singleplayer.setFillColor(Color(144, 12, 63, 255));
-                    singleplayer.setOutlineColor(Color(218, 247, 166, 255));
-                    multiplayer.setFillColor(Color(144, 12, 63, 255));
-                    multiplayer.setOutlineColor(Color(218, 247, 166, 255));
-                    leaderboard.setFillColor(Color(144, 12, 63, 255));
-                    leaderboard.setOutlineColor(Color(218, 247, 166, 255));
-                    settings.setFillColor(Color(144, 12, 63, 255));
-                    settings.setOutlineColor(Color(218, 247, 166, 255));
-                    authors.setFillColor(Color(144, 12, 63, 255));
-                    authors.setOutlineColor(Color(218, 247, 166, 255));
-                    exit.setFillColor(Color(144, 12, 63, 255));
-                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                    singleplayer.setFillColor(COLOR_DARK_VIOLET);
+                    singleplayer.setOutlineColor(COLOR_LIGHT_GREEN);
+                    multiplayer.setFillColor(COLOR_DARK_VIOLET);
+                    multiplayer.setOutlineColor(COLOR_LIGHT_GREEN);
+                    leaderboard.setFillColor(COLOR_DARK_VIOLET);
+                    leaderboard.setOutlineColor(COLOR_LIGHT_GREEN);
+                    settings.setFillColor(COLOR_DARK_VIOLET);
+                    settings.setOutlineColor(COLOR_LIGHT_GREEN);
+                    authors.setFillColor(COLOR_DARK_VIOLET);
+                    authors.setOutlineColor(COLOR_LIGHT_GREEN);
+                    exit.setFillColor(COLOR_DARK_VIOLET);
+                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, singleplayer)) {
                         // focus new single game button:
-                        singleplayer.setFillColor(Color(255, 195, 0, 255));
-                        singleplayer.setOutlineColor(Color(8, 0, 93, 255));
+                        singleplayer.setFillColor(COLOR_YELLOW);
+                        singleplayer.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, multiplayer)) {
                         // focus choose complexity button:
-                        multiplayer.setFillColor(Color(255, 195, 0, 255));
-                        multiplayer.setOutlineColor(Color(8, 0, 93, 255));
+                        multiplayer.setFillColor(COLOR_YELLOW);
+                        multiplayer.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 2;
                     } else if (captured_button(window, leaderboard)) {
                         // focus leaderboard button:
-                        leaderboard.setFillColor(Color(255, 195, 0, 255));
-                        leaderboard.setOutlineColor(Color(8, 0, 93, 255));
+                        leaderboard.setFillColor(COLOR_YELLOW);
+                        leaderboard.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 3;
                     } else if (captured_button(window, settings)) {
                         // focus settings button:
-                        settings.setFillColor(Color(255, 195, 0, 255));
-                        settings.setOutlineColor(Color(8, 0, 93, 255));
+                        settings.setFillColor(COLOR_YELLOW);
+                        settings.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 4;
                     } else if (captured_button(window, authors)) {
                         // focus authors button:
-                        authors.setFillColor(Color(255, 195, 0, 255));
-                        authors.setOutlineColor(Color(8, 0, 93, 255));
+                        authors.setFillColor(COLOR_YELLOW);
+                        authors.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 5;
                     } else if (captured_button(window, exit)) {
                         // focus exit button:
-                        exit.setFillColor(Color(255, 195, 0, 255));
-                        exit.setOutlineColor(Color(8, 0, 93, 255));
+                        exit.setFillColor(COLOR_YELLOW);
+                        exit.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 6;
                     }
                     break;
@@ -995,8 +995,8 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         break;
 
                                     // focus new single game button:
-                                    singleplayer.setFillColor(Color(255, 195, 0, 255));
-                                    singleplayer.setOutlineColor(Color(8, 0, 93, 255));
+                                    singleplayer.setFillColor(COLOR_YELLOW);
+                                    singleplayer.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -1006,11 +1006,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         complexity_menu(window, background, font);
 
                                     // unfocus singleplayer button:
-                                    singleplayer.setFillColor(Color(144, 12, 63, 255));
-                                    singleplayer.setOutlineColor(Color(218, 247, 166, 255));
+                                    singleplayer.setFillColor(COLOR_DARK_VIOLET);
+                                    singleplayer.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus multiplayer button:
-                                    multiplayer.setFillColor(Color(255, 195, 0, 255));
-                                    multiplayer.setOutlineColor(Color(8, 0, 93, 255));
+                                    multiplayer.setFillColor(COLOR_YELLOW);
+                                    multiplayer.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
@@ -1020,11 +1020,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         multiplayer_menu(window, background, font);
 
                                     // unfocus multiplayer button:
-                                    multiplayer.setFillColor(Color(144, 12, 63, 255));
-                                    multiplayer.setOutlineColor(Color(218, 247, 166, 255));
+                                    multiplayer.setFillColor(COLOR_DARK_VIOLET);
+                                    multiplayer.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus leaderboard button:
-                                    leaderboard.setFillColor(Color(255, 195, 0, 255));
-                                    leaderboard.setOutlineColor(Color(8, 0, 93, 255));
+                                    leaderboard.setFillColor(COLOR_YELLOW);
+                                    leaderboard.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 3:
@@ -1034,11 +1034,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         break;
 
                                     // unfocus leaderboard button:
-                                    leaderboard.setFillColor(Color(144, 12, 63, 255));
-                                    leaderboard.setOutlineColor(Color(218, 247, 166, 255));
+                                    leaderboard.setFillColor(COLOR_DARK_VIOLET);
+                                    leaderboard.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus settings button:
-                                    settings.setFillColor(Color(255, 195, 0, 255));
-                                    settings.setOutlineColor(Color(8, 0, 93, 255));
+                                    settings.setFillColor(COLOR_YELLOW);
+                                    settings.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 4:
@@ -1048,11 +1048,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         break;
 
                                     // unfocus settings button:
-                                    settings.setFillColor(Color(144, 12, 63, 255));
-                                    settings.setOutlineColor(Color(218, 247, 166, 255));
+                                    settings.setFillColor(COLOR_DARK_VIOLET);
+                                    settings.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus authors button:
-                                    authors.setFillColor(Color(255, 195, 0, 255));
-                                    authors.setOutlineColor(Color(8, 0, 93, 255));
+                                    authors.setFillColor(COLOR_YELLOW);
+                                    authors.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 5:
@@ -1062,11 +1062,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         break;
 
                                     // unfocus authors button:
-                                    authors.setFillColor(Color(144, 12, 63, 255));
-                                    authors.setOutlineColor(Color(218, 247, 166, 255));
+                                    authors.setFillColor(COLOR_DARK_VIOLET);
+                                    authors.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus exit button:
-                                    exit.setFillColor(Color(255, 195, 0, 255));
-                                    exit.setOutlineColor(Color(8, 0, 93, 255));
+                                    exit.setFillColor(COLOR_YELLOW);
+                                    exit.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 6:
@@ -1076,11 +1076,11 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                         window.close();
 
                                     // unfocus exit button:
-                                    exit.setFillColor(Color(144, 12, 63, 255));
-                                    exit.setOutlineColor(Color(218, 247, 166, 255));
+                                    exit.setFillColor(COLOR_DARK_VIOLET);
+                                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus singleplayer button:
-                                    singleplayer.setFillColor(Color(255, 195, 0, 255));
-                                    singleplayer.setOutlineColor(Color(8, 0, 93, 255));
+                                    singleplayer.setFillColor(COLOR_YELLOW);
+                                    singleplayer.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter = 1;
                                     break;
                                 default:
@@ -1197,28 +1197,28 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    new_session.setFillColor(Color(144, 12, 63, 255));
-                    new_session.setOutlineColor(Color(218, 247, 166, 255));
-                    find_server.setFillColor(Color(144, 12, 63, 255));
-                    find_server.setOutlineColor(Color(218, 247, 166, 255));
-                    back.setFillColor(Color(144, 12, 63, 255));
-                    back.setOutlineColor(Color(218, 247, 166, 255));
+                    new_session.setFillColor(COLOR_DARK_VIOLET);
+                    new_session.setOutlineColor(COLOR_LIGHT_GREEN);
+                    find_server.setFillColor(COLOR_DARK_VIOLET);
+                    find_server.setOutlineColor(COLOR_LIGHT_GREEN);
+                    back.setFillColor(COLOR_DARK_VIOLET);
+                    back.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, new_session)) {
                         // focus new_session button:
-                        new_session.setFillColor(Color(255, 195, 0, 255));
-                        new_session.setOutlineColor(Color(8, 0, 93, 255));
+                        new_session.setFillColor(COLOR_YELLOW);
+                        new_session.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, find_server)) {
                         // focus find_server button:
-                        find_server.setFillColor(Color(255, 195, 0, 255));
-                        find_server.setOutlineColor(Color(8, 0, 93, 255));
+                        find_server.setFillColor(COLOR_YELLOW);
+                        find_server.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 2;  
                     } else if (captured_button(window, back)) {
                         // focus back button:
-                        back.setFillColor(Color(255, 195, 0, 255));
-                        back.setOutlineColor(Color(8, 0, 93, 255));
+                        back.setFillColor(COLOR_YELLOW);
+                        back.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 3;
                     }
                     break;
@@ -1255,8 +1255,8 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                         break;
 
                                     // focus new_session button:
-                                    new_session.setFillColor(Color(255, 195, 0, 255));
-                                    new_session.setOutlineColor(Color(8, 0, 93, 255));
+                                    new_session.setFillColor(COLOR_YELLOW);
+                                    new_session.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -1266,11 +1266,11 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                         create_session(window, background, font);
 
                                     // unfocus new_session button:
-                                    new_session.setFillColor(Color(144, 12, 63, 255));
-                                    new_session.setOutlineColor(Color(218, 247, 166, 255));
+                                    new_session.setFillColor(COLOR_DARK_VIOLET);
+                                    new_session.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus find_server button:
-                                    find_server.setFillColor(Color(255, 195, 0, 255));
-                                    find_server.setOutlineColor(Color(8, 0, 93, 255));
+                                    find_server.setFillColor(COLOR_YELLOW);
+                                    find_server.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
@@ -1280,11 +1280,11 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                         find_servers(window, background, font);
 
                                     // unfocus find_server button:
-                                    find_server.setFillColor(Color(144, 12, 63, 255));
-                                    find_server.setOutlineColor(Color(218, 247, 166, 255));
+                                    find_server.setFillColor(COLOR_DARK_VIOLET);
+                                    find_server.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus back button:
-                                    back.setFillColor(Color(255, 195, 0, 255));
-                                    back.setOutlineColor(Color(8, 0, 93, 255));
+                                    back.setFillColor(COLOR_YELLOW);
+                                    back.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 3:
@@ -1294,11 +1294,11 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                         main_menu(window, background, font);
 
                                     // unfocus back button:
-                                    back.setFillColor(Color(144, 12, 63, 255));
-                                    back.setOutlineColor(Color(218, 247, 166, 255));
+                                    back.setFillColor(COLOR_DARK_VIOLET);
+                                    back.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus new_session button:
-                                    new_session.setFillColor(Color(255, 195, 0, 255));
-                                    new_session.setOutlineColor(Color(8, 0, 93, 255));
+                                    new_session.setFillColor(COLOR_YELLOW);
+                                    new_session.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter = 1;
                                     break;
                                 default:
@@ -1451,65 +1451,65 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    session_name_title.setFillColor(Color(144, 12, 63, 255));
-                    session_name_title.setOutlineColor(Color(218, 247, 166, 255));
-                    max_number_of_players_title.setFillColor(Color(144, 12, 63, 255));
-                    max_number_of_players_title.setOutlineColor(Color(218, 247, 166, 255));
+                    session_name_title.setFillColor(COLOR_DARK_VIOLET);
+                    session_name_title.setOutlineColor(COLOR_LIGHT_GREEN);
+                    max_number_of_players_title.setFillColor(COLOR_DARK_VIOLET);
+                    max_number_of_players_title.setOutlineColor(COLOR_LIGHT_GREEN);
                     if (complexity != 1) {
-                        mechanics.setFillColor(Color(144, 12, 63, 255));
-                        mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                        mechanics.setFillColor(COLOR_DARK_VIOLET);
+                        mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
                     if (complexity != 2) {
-                        STIC.setFillColor(Color(144, 12, 63, 255));
-                        STIC.setOutlineColor(Color(218, 247, 166, 255));
+                        STIC.setFillColor(COLOR_DARK_VIOLET);
+                        STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
                     if (complexity != 3) {
-                        applied_maths.setFillColor(Color(144, 12, 63, 255));
-                        applied_maths.setOutlineColor(Color(218, 247, 166, 255));
+                        applied_maths.setFillColor(COLOR_DARK_VIOLET);
+                        applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
-                    back.setFillColor(Color(144, 12, 63, 255));
-                    back.setOutlineColor(Color(218, 247, 166, 255));
-                    create.setFillColor(Color(144, 12, 63, 255));
-                    create.setOutlineColor(Color(218, 247, 166, 255));
+                    back.setFillColor(COLOR_DARK_VIOLET);
+                    back.setOutlineColor(COLOR_LIGHT_GREEN);
+                    create.setFillColor(COLOR_DARK_VIOLET);
+                    create.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, session_name_title)) {
                         // focus session_name_title button:
-                        session_name_title.setFillColor(Color(255, 195, 0, 255));
-                        session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                        session_name_title.setFillColor(COLOR_YELLOW);
+                        session_name_title.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, max_number_of_players_title)) {
                         // focus max_number_of_players_title button:
-                        max_number_of_players_title.setFillColor(Color(255, 195, 0, 255));
-                        max_number_of_players_title.setOutlineColor(Color(8, 0, 93, 255)); 
+                        max_number_of_players_title.setFillColor(COLOR_YELLOW);
+                        max_number_of_players_title.setOutlineColor(COLOR_DARK_BLUE); 
                         focused_button_counter = 2;
                     } else if (captured_button(window, back)) {
                         // focus back button:
-                        back.setFillColor(Color(255, 195, 0, 255));
-                        back.setOutlineColor(Color(8, 0, 93, 255));
+                        back.setFillColor(COLOR_YELLOW);
+                        back.setOutlineColor(COLOR_DARK_BLUE);
                     } else if (captured_button(window, create)) {
                         // focus create button:
-                        create.setFillColor(Color(255, 195, 0, 255));
-                        create.setOutlineColor(Color(8, 0, 93, 255));
+                        create.setFillColor(COLOR_YELLOW);
+                        create.setOutlineColor(COLOR_DARK_BLUE);
                     } else if (captured_button(window, mechanics)) {
                         // focus mechanics button:
-                        mechanics.setFillColor(Color(255, 195, 0, 255));
-                        mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                        mechanics.setFillColor(COLOR_YELLOW);
+                        mechanics.setOutlineColor(COLOR_DARK_BLUE);
                     } else if (captured_button(window, STIC)) {
                         // focus STIC button:
-                        STIC.setFillColor(Color(255, 195, 0, 255));
-                        STIC.setOutlineColor(Color(8, 0, 93, 255));
+                        STIC.setFillColor(COLOR_YELLOW);
+                        STIC.setOutlineColor(COLOR_DARK_BLUE);
                     } else if (captured_button(window, applied_maths)) {
                         // focus applied Maths button:
-                        applied_maths.setFillColor(Color(255, 195, 0, 255));
-                        applied_maths.setOutlineColor(Color(8, 0, 93, 255));   
+                        applied_maths.setFillColor(COLOR_YELLOW);
+                        applied_maths.setOutlineColor(COLOR_DARK_BLUE);   
                     }
                     break;
                 // If we want to type a text:
                 case Event::TextEntered:
                     if (event.text.unicode < 128 && event.text.unicode != 13 
                         && event.text.unicode != 8 && event.text.unicode != 9) {
-                        if (session_name_captured && session_name.length() <= 12) {
+                        if (session_name_captured && session_name.length() <= MAX_SESSION_NAME_LENGTH) {
                             // Add a new symbol at the end of a session name's string
                             // (maximal length of which - 12 characters):
                             session_name += static_cast<char>(event.text.unicode);
@@ -1564,20 +1564,20 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                             // 3) Choose an easy mode:
                             } else if (captured_button(window, mechanics)) {
                                 // focus mechanics button:
-                                mechanics.setFillColor(Color(255, 195, 0, 255));
-                                mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                                mechanics.setFillColor(COLOR_YELLOW);
+                                mechanics.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 1;
                             // 4) Choose a normal mode:
                             } else if (captured_button(window, STIC)) {
                                 // focus STIC button:
-                                STIC.setFillColor(Color(255, 195, 0, 255));
-                                STIC.setOutlineColor(Color(8, 0, 93, 255));
+                                STIC.setFillColor(COLOR_YELLOW);
+                                STIC.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 2;
                             // 5) Choose a hard mode:
                             } else if (captured_button(window, applied_maths)) {
                                 // focus applied Maths button:
-                                applied_maths.setFillColor(Color(255, 195, 0, 255));
-                                applied_maths.setOutlineColor(Color(8, 0, 93, 255));
+                                applied_maths.setFillColor(COLOR_YELLOW);
+                                applied_maths.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 3;
                             // 6) Go back:
                             } else if (captured_button(window, back))
@@ -1611,8 +1611,8 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     session_name_captured = true;
 
                                     // focus session_name_title button:
-                                    session_name_title.setFillColor(Color(255, 195, 0, 255));
-                                    session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                                    session_name_title.setFillColor(COLOR_YELLOW);
+                                    session_name_title.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -1628,11 +1628,11 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     max_number_of_players_captured = true;
 
                                     // unfocus session_name_title button:
-                                    session_name_title.setFillColor(Color(144, 12, 63, 255));
-                                    session_name_title.setOutlineColor(Color(218, 247, 166, 255));
+                                    session_name_title.setFillColor(COLOR_DARK_VIOLET);
+                                    session_name_title.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus max_number_of_players_title button:
-                                    max_number_of_players_title.setFillColor(Color(255, 195, 0, 255));
-                                    max_number_of_players_title.setOutlineColor(Color(8, 0, 93, 255));
+                                    max_number_of_players_title.setFillColor(COLOR_YELLOW);
+                                    max_number_of_players_title.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
@@ -1641,11 +1641,11 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     max_number_of_players_captured = false;
 
                                     // unfocus max_number_of_players_title button:
-                                    max_number_of_players_title.setFillColor(Color(144, 12, 63, 255));
-                                    max_number_of_players_title.setOutlineColor(Color(218, 247, 166, 255));
+                                    max_number_of_players_title.setFillColor(COLOR_DARK_VIOLET);
+                                    max_number_of_players_title.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus mechanics button:
-                                    mechanics.setFillColor(Color(255, 195, 0, 255));
-                                    mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                                    mechanics.setFillColor(COLOR_YELLOW);
+                                    mechanics.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 3:
@@ -1655,21 +1655,21 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         complexity = 1;
 
                                         // unfocus STIC button:
-                                        STIC.setFillColor(Color(144, 12, 63, 255));
-                                        STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                        STIC.setFillColor(COLOR_DARK_VIOLET);
+                                        STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                                         // unfocus applied Maths button:
-                                        applied_maths.setFillColor(Color(144, 12, 63, 255));
-                                        applied_maths.setOutlineColor(Color(218, 247, 166, 255));
+                                        applied_maths.setFillColor(COLOR_DARK_VIOLET);
+                                        applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
                                         if (complexity != 1) {
                                             // unfocus mechanics button:
-                                            mechanics.setFillColor(Color(144, 12, 63, 255));
-                                            mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                            mechanics.setFillColor(COLOR_DARK_VIOLET);
+                                            mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                                         }
                                         
                                         // focus STIC button:
-                                        STIC.setFillColor(Color(255, 195, 0, 255));
-                                        STIC.setOutlineColor(Color(8, 0, 93, 255));
+                                        STIC.setFillColor(COLOR_YELLOW);
+                                        STIC.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter++;
                                     }
                                     break;
@@ -1680,21 +1680,21 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         complexity = 2;
 
                                         // unfocus mechanics button:
-                                        mechanics.setFillColor(Color(144, 12, 63, 255));
-                                        mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                        mechanics.setFillColor(COLOR_DARK_VIOLET);
+                                        mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                                         // unfocus applied Maths button:
-                                        applied_maths.setFillColor(Color(144, 12, 63, 255));
-                                        applied_maths.setOutlineColor(Color(218, 247, 166, 255));
+                                        applied_maths.setFillColor(COLOR_DARK_VIOLET);
+                                        applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
                                         if (complexity != 2) {
                                             // unfocus STIC button:
-                                            STIC.setFillColor(Color(144, 12, 63, 255));
-                                            STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                            STIC.setFillColor(COLOR_DARK_VIOLET);
+                                            STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                                         }
 
                                         // focus applied Maths button:
-                                        applied_maths.setFillColor(Color(255, 195, 0, 255));
-                                        applied_maths.setOutlineColor(Color(8, 0, 93, 255));
+                                        applied_maths.setFillColor(COLOR_YELLOW);
+                                        applied_maths.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter++;
                                     }
                                     break;
@@ -1705,21 +1705,21 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         complexity = 3;
 
                                         // unfocus mechanics button:
-                                        mechanics.setFillColor(Color(144, 12, 63, 255));
-                                        mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                        mechanics.setFillColor(COLOR_DARK_VIOLET);
+                                        mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                                         // unfocus STIC button:
-                                        STIC.setFillColor(Color(144, 12, 63, 255));
-                                        STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                        STIC.setFillColor(COLOR_DARK_VIOLET);
+                                        STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
                                         if (complexity != 3) {
                                             // unfocus applied Maths button:
-                                            applied_maths.setFillColor(Color(144, 12, 63, 255));
-                                            applied_maths.setOutlineColor(Color(218, 247, 166, 255));
+                                            applied_maths.setFillColor(COLOR_DARK_VIOLET);
+                                            applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                         }
 
                                         // focus back button:
-                                        back.setFillColor(Color(255, 195, 0, 255));
-                                        back.setOutlineColor(Color(8, 0, 93, 255));
+                                        back.setFillColor(COLOR_YELLOW);
+                                        back.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter++;
                                     }
                                     break;
@@ -1730,11 +1730,11 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         return;
 
                                     // unfocus back button:
-                                    back.setFillColor(Color(144, 12, 63, 255));
-                                    back.setOutlineColor(Color(218, 247, 166, 255));
+                                    back.setFillColor(COLOR_DARK_VIOLET);
+                                    back.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus create button:
-                                    create.setFillColor(Color(255, 195, 0, 255));
-                                    create.setOutlineColor(Color(8, 0, 93, 255));
+                                    create.setFillColor(COLOR_YELLOW);
+                                    create.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 7:
@@ -1749,11 +1749,11 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         session_name_captured = true;
 
                                         // unfocus create button:
-                                        create.setFillColor(Color(144, 12, 63, 255));
-                                        create.setOutlineColor(Color(218, 247, 166, 255));
+                                        create.setFillColor(COLOR_DARK_VIOLET);
+                                        create.setOutlineColor(COLOR_LIGHT_GREEN);
                                         // focus session_name_title button:
-                                        session_name_title.setFillColor(Color(255, 195, 0, 255));
-                                        session_name_title.setOutlineColor(Color(8, 0, 93, 255));
+                                        session_name_title.setFillColor(COLOR_YELLOW);
+                                        session_name_title.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter = 1;
                                     }
                                     break;
@@ -2021,21 +2021,21 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    disconnect.setFillColor(Color(144, 12, 63, 255));
-                    disconnect.setOutlineColor(Color(218, 247, 166, 255));
-                    ready.setFillColor(Color(144, 12, 63, 255));
-                    ready.setOutlineColor(Color(218, 247, 166, 255));
+                    disconnect.setFillColor(COLOR_DARK_VIOLET);
+                    disconnect.setOutlineColor(COLOR_LIGHT_GREEN);
+                    ready.setFillColor(COLOR_DARK_VIOLET);
+                    ready.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, disconnect)) {
                         // focus disconnect button:
-                        disconnect.setFillColor(Color(255, 195, 0, 255));
-                        disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                        disconnect.setFillColor(COLOR_YELLOW);
+                        disconnect.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, ready)) {
                         // focus ready button:
-                        ready.setFillColor(Color(255, 195, 0, 255));
-                        ready.setOutlineColor(Color(8, 0, 93, 255)); 
+                        ready.setFillColor(COLOR_YELLOW);
+                        ready.setOutlineColor(COLOR_DARK_BLUE); 
                         focused_button_counter = 2;
                     } 
                     break;
@@ -2083,8 +2083,8 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                         break;
 
                                     // focus disconnect button:
-                                    disconnect.setFillColor(Color(255, 195, 0, 255));
-                                    disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                                    disconnect.setFillColor(COLOR_YELLOW);
+                                    disconnect.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -2098,11 +2098,11 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                         }
                                     } else {
                                         // unfocus disconnect button:
-                                        disconnect.setFillColor(Color(144, 12, 63, 255));
-                                        disconnect.setOutlineColor(Color(218, 247, 166, 255));
+                                        disconnect.setFillColor(COLOR_DARK_VIOLET);
+                                        disconnect.setOutlineColor(COLOR_LIGHT_GREEN);
                                         // focus ready button:
-                                        ready.setFillColor(Color(255, 195, 0, 255));
-                                        ready.setOutlineColor(Color(8, 0, 93, 255));
+                                        ready.setFillColor(COLOR_YELLOW);
+                                        ready.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter++;
                                     }
                                     break;
@@ -2121,11 +2121,11 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                         }
                                     } else {
                                         // unfocus ready button:
-                                        ready.setFillColor(Color(144, 12, 63, 255));
-                                        ready.setOutlineColor(Color(218, 247, 166, 255));
+                                        ready.setFillColor(COLOR_DARK_VIOLET);
+                                        ready.setOutlineColor(COLOR_LIGHT_GREEN);
                                         // focus disconnect button:
-                                        disconnect.setFillColor(Color(255, 195, 0, 255));
-                                        disconnect.setOutlineColor(Color(8, 0, 93, 255));
+                                        disconnect.setFillColor(COLOR_YELLOW);
+                                        disconnect.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter = 1;
                                     }
                                     break;
@@ -2227,7 +2227,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
     // set the wait image:
     Texture texture;
     try {
-        if (!texture.loadFromFile("background/wait.jpg")) 
+        if (!texture.loadFromFile("images/wait.jpg")) 
             throw 0;
     } catch (int e) {
         if (e == 0)
@@ -2317,17 +2317,17 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                     for (int i = 0; (unsigned) i < server_info.size(); i += 3) {
                         for (unsigned j = 0; j < 3; j++) {
                             if (chosen_server != i / 3) {
-                                server_info[i + j].setFillColor(Color(144, 12, 63, 255));
-                                server_info[i + j].setOutlineColor(Color(218, 247, 166, 255));
+                                server_info[i + j].setFillColor(COLOR_DARK_VIOLET);
+                                server_info[i + j].setOutlineColor(COLOR_LIGHT_GREEN);
                             }
                         }
                     }
-                    back.setFillColor(Color(144, 12, 63, 255));
-                    back.setOutlineColor(Color(218, 247, 166, 255));
-                    refresh.setFillColor(Color(144, 12, 63, 255));
-                    refresh.setOutlineColor(Color(218, 247, 166, 255));
-                    connect.setFillColor(Color(144, 12, 63, 255));
-                    connect.setOutlineColor(Color(218, 247, 166, 255));
+                    back.setFillColor(COLOR_DARK_VIOLET);
+                    back.setOutlineColor(COLOR_LIGHT_GREEN);
+                    refresh.setFillColor(COLOR_DARK_VIOLET);
+                    refresh.setOutlineColor(COLOR_LIGHT_GREEN);
+                    connect.setFillColor(COLOR_DARK_VIOLET);
+                    connect.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     for (unsigned i = 0; i < server_info.size(); i += 3) {
@@ -2335,30 +2335,30 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                             || captured_button(window, server_info[i + 1])
                             || captured_button(window, server_info[i + 2])) {
                             // focus proper server buttons:
-                            server_info[i].setFillColor(Color(255, 195, 0, 255));
-                            server_info[i].setOutlineColor(Color(8, 0, 93, 255));
-                            server_info[i + 1].setFillColor(Color(255, 195, 0, 255));
-                            server_info[i + 1].setOutlineColor(Color(8, 0, 93, 255));
-                            server_info[i + 2].setFillColor(Color(255, 195, 0, 255));
-                            server_info[i + 2].setOutlineColor(Color(8, 0, 93, 255));
+                            server_info[i].setFillColor(COLOR_YELLOW);
+                            server_info[i].setOutlineColor(COLOR_DARK_BLUE);
+                            server_info[i + 1].setFillColor(COLOR_YELLOW);
+                            server_info[i + 1].setOutlineColor(COLOR_DARK_BLUE);
+                            server_info[i + 2].setFillColor(COLOR_YELLOW);
+                            server_info[i + 2].setOutlineColor(COLOR_DARK_BLUE);
                             focused_button_counter = i / 3 + 1;
                             break;
                         }
                     }
                     if (captured_button(window, back)) {
                         // focus back button:
-                        back.setFillColor(Color(255, 195, 0, 255));
-                        back.setOutlineColor(Color(8, 0, 93, 255));
+                        back.setFillColor(COLOR_YELLOW);
+                        back.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = current_client->get_servers().size() + 1;
                     } else if (captured_button(window, refresh)) {
                         // focus refresh button:
-                        refresh.setFillColor(Color(255, 195, 0, 255));
-                        refresh.setOutlineColor(Color(8, 0, 93, 255)); 
+                        refresh.setFillColor(COLOR_YELLOW);
+                        refresh.setOutlineColor(COLOR_DARK_BLUE); 
                         focused_button_counter = current_client->get_servers().size() + 2;
                     } else if (captured_button(window, connect)) {
                         // focus connect button:
-                        connect.setFillColor(Color(255, 195, 0, 255));
-                        connect.setOutlineColor(Color(8, 0, 93, 255)); 
+                        connect.setFillColor(COLOR_YELLOW);
+                        connect.setOutlineColor(COLOR_DARK_BLUE); 
                         focused_button_counter = current_client->get_servers().size() + 3;
                     } 
                     break;
@@ -2423,12 +2423,12 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 event.key.code != Keyboard::Return) {
                                 // in this case, Enter won't do nothing:
                                 // focus proper server buttons:
-                                server_info[0].setFillColor(Color(255, 195, 0, 255));
-                                server_info[0].setOutlineColor(Color(8, 0, 93, 255));
-                                server_info[1].setFillColor(Color(255, 195, 0, 255));
-                                server_info[1].setOutlineColor(Color(8, 0, 93, 255));
-                                server_info[2].setFillColor(Color(255, 195, 0, 255));
-                                server_info[2].setOutlineColor(Color(8, 0, 93, 255));
+                                server_info[0].setFillColor(COLOR_YELLOW);
+                                server_info[0].setOutlineColor(COLOR_DARK_BLUE);
+                                server_info[1].setFillColor(COLOR_YELLOW);
+                                server_info[1].setOutlineColor(COLOR_DARK_BLUE);
+                                server_info[2].setFillColor(COLOR_YELLOW);
+                                server_info[2].setOutlineColor(COLOR_DARK_BLUE);
                                 focused_button_counter++;
                                 break;
                             } else if (focused_button_counter == 0 && current_client->get_servers().size() == 0) {
@@ -2437,8 +2437,8 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                     break;
 
                                 // focus back button:
-                                back.setFillColor(Color(255, 195, 0, 255));
-                                back.setOutlineColor(Color(8, 0, 93, 255));
+                                back.setFillColor(COLOR_YELLOW);
+                                back.setOutlineColor(COLOR_DARK_BLUE);
                                 focused_button_counter++;
                                 break;
                             } else if (focused_button_counter == current_client->get_servers().size() + 1) {
@@ -2452,11 +2452,11 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 }
 
                                 // unfocus back button:
-                                back.setFillColor(Color(144, 12, 63, 255));
-                                back.setOutlineColor(Color(218, 247, 166, 255));
+                                back.setFillColor(COLOR_DARK_VIOLET);
+                                back.setOutlineColor(COLOR_LIGHT_GREEN);
                                 // focus refresh button:
-                                refresh.setFillColor(Color(255, 195, 0, 255));
-                                refresh.setOutlineColor(Color(8, 0, 93, 255));
+                                refresh.setFillColor(COLOR_YELLOW);
+                                refresh.setOutlineColor(COLOR_DARK_BLUE);
                                 focused_button_counter++;
                                 break;
                             } else if (focused_button_counter == current_client->get_servers().size() + 2) {
@@ -2485,11 +2485,11 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                     break;
                                 } else {
                                     // unfocus refresh button:
-                                    refresh.setFillColor(Color(144, 12, 63, 255));
-                                    refresh.setOutlineColor(Color(218, 247, 166, 255));
+                                    refresh.setFillColor(COLOR_DARK_VIOLET);
+                                    refresh.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus connect button:
-                                    connect.setFillColor(Color(255, 195, 0, 255));
-                                    connect.setOutlineColor(Color(8, 0, 93, 255));
+                                    connect.setFillColor(COLOR_YELLOW);
+                                    connect.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 }
@@ -2500,22 +2500,22 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                     current_client->connect_server(chosen_server, status);
                                 } else {
                                     // unfocus connect button:
-                                    connect.setFillColor(Color(144, 12, 63, 255));
-                                    connect.setOutlineColor(Color(218, 247, 166, 255));
+                                    connect.setFillColor(COLOR_DARK_VIOLET);
+                                    connect.setOutlineColor(COLOR_LIGHT_GREEN);
                                     
                                     // if we have some servers:
                                     if (current_client->get_servers().size() != 0) {
                                         // focus proper server buttons:
-                                        server_info[0].setFillColor(Color(255, 195, 0, 255));
-                                        server_info[0].setOutlineColor(Color(8, 0, 93, 255));
-                                        server_info[1].setFillColor(Color(255, 195, 0, 255));
-                                        server_info[1].setOutlineColor(Color(8, 0, 93, 255));
-                                        server_info[2].setFillColor(Color(255, 195, 0, 255));
-                                        server_info[2].setOutlineColor(Color(8, 0, 93, 255));
+                                        server_info[0].setFillColor(COLOR_YELLOW);
+                                        server_info[0].setOutlineColor(COLOR_DARK_BLUE);
+                                        server_info[1].setFillColor(COLOR_YELLOW);
+                                        server_info[1].setOutlineColor(COLOR_DARK_BLUE);
+                                        server_info[2].setFillColor(COLOR_YELLOW);
+                                        server_info[2].setOutlineColor(COLOR_DARK_BLUE);
                                     } else {
                                         // focus back button:
-                                        back.setFillColor(Color(255, 195, 0, 255));
-                                        back.setOutlineColor(Color(8, 0, 93, 255));
+                                        back.setFillColor(COLOR_YELLOW);
+                                        back.setOutlineColor(COLOR_DARK_BLUE);
                                     }
                                     focused_button_counter = 1;
                                 }
@@ -2532,27 +2532,27 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
 
                                     if (chosen_server != i / 3) {
                                         // unfocus current server button:
-                                        server_info[i].setFillColor(Color(144, 12, 63, 255));
-                                        server_info[i].setOutlineColor(Color(218, 247, 166, 255));
-                                        server_info[i + 1].setFillColor(Color(144, 12, 63, 255));
-                                        server_info[i + 1].setOutlineColor(Color(218, 247, 166, 255));
-                                        server_info[i + 2].setFillColor(Color(144, 12, 63, 255));
-                                        server_info[i + 2].setOutlineColor(Color(218, 247, 166, 255));
+                                        server_info[i].setFillColor(COLOR_DARK_VIOLET);
+                                        server_info[i].setOutlineColor(COLOR_LIGHT_GREEN);
+                                        server_info[i + 1].setFillColor(COLOR_DARK_VIOLET);
+                                        server_info[i + 1].setOutlineColor(COLOR_LIGHT_GREEN);
+                                        server_info[i + 2].setFillColor(COLOR_DARK_VIOLET);
+                                        server_info[i + 2].setOutlineColor(COLOR_LIGHT_GREEN);
                                     }
                                     
                                     // if it is not a last server:
                                     if ((unsigned) i < current_client->get_servers().size() - 1) {
                                         // focus next server button:
-                                        server_info[i + 3].setFillColor(Color(255, 195, 0, 255));
-                                        server_info[i + 3].setOutlineColor(Color(8, 0, 93, 255));
-                                        server_info[i + 4].setFillColor(Color(255, 195, 0, 255));
-                                        server_info[i + 4].setOutlineColor(Color(8, 0, 93, 255));
-                                        server_info[i + 5].setFillColor(Color(255, 195, 0, 255));
-                                        server_info[i + 5].setOutlineColor(Color(8, 0, 93, 255));
+                                        server_info[i + 3].setFillColor(COLOR_YELLOW);
+                                        server_info[i + 3].setOutlineColor(COLOR_DARK_BLUE);
+                                        server_info[i + 4].setFillColor(COLOR_YELLOW);
+                                        server_info[i + 4].setOutlineColor(COLOR_DARK_BLUE);
+                                        server_info[i + 5].setFillColor(COLOR_YELLOW);
+                                        server_info[i + 5].setOutlineColor(COLOR_DARK_BLUE);
                                     } else {
                                         // focus back button:
-                                        back.setFillColor(Color(255, 195, 0, 255));
-                                        back.setOutlineColor(Color(8, 0, 93, 255));
+                                        back.setFillColor(COLOR_YELLOW);
+                                        back.setOutlineColor(COLOR_DARK_BLUE);
                                     }
                                     focused_button_counter++;
                                     break;
@@ -2697,35 +2697,35 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    mechanics.setFillColor(Color(144, 12, 63, 255));
-                    mechanics.setOutlineColor(Color(218, 247, 166, 255));
-                    STIC.setFillColor(Color(144, 12, 63, 255));
-                    STIC.setOutlineColor(Color(218, 247, 166, 255));
-                    applied_maths.setFillColor(Color(144, 12, 63, 255));
-                    applied_maths.setOutlineColor(Color(218, 247, 166, 255));
-                    back.setFillColor(Color(144, 12, 63, 255));
-                    back.setOutlineColor(Color(218, 247, 166, 255));
+                    mechanics.setFillColor(COLOR_DARK_VIOLET);
+                    mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
+                    STIC.setFillColor(COLOR_DARK_VIOLET);
+                    STIC.setOutlineColor(COLOR_LIGHT_GREEN);
+                    applied_maths.setFillColor(COLOR_DARK_VIOLET);
+                    applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
+                    back.setFillColor(COLOR_DARK_VIOLET);
+                    back.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, mechanics)) {
                         // focus mechanics button:
-                        mechanics.setFillColor(Color(255, 195, 0, 255));
-                        mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                        mechanics.setFillColor(COLOR_YELLOW);
+                        mechanics.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 1;
                     } else if (captured_button(window, STIC)) {
                         // focus STIC button:
-                        STIC.setFillColor(Color(255, 195, 0, 255));
-                        STIC.setOutlineColor(Color(8, 0, 93, 255));
+                        STIC.setFillColor(COLOR_YELLOW);
+                        STIC.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 2;
                     } else if (captured_button(window, applied_maths)) {
                         // focus applied Maths button:
-                        applied_maths.setFillColor(Color(255, 195, 0, 255));
-                        applied_maths.setOutlineColor(Color(8, 0, 93, 255));
+                        applied_maths.setFillColor(COLOR_YELLOW);
+                        applied_maths.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 3;             
                     } else if (captured_button(window, back)) {
                         // focus back button:
-                        back.setFillColor(Color(255, 195, 0, 255));
-                        back.setOutlineColor(Color(8, 0, 93, 255));
+                        back.setFillColor(COLOR_YELLOW);
+                        back.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = 4;
                     }
                     break;
@@ -2764,8 +2764,8 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                         break;
 
                                     // focus mechanics button:
-                                    mechanics.setFillColor(Color(255, 195, 0, 255));
-                                    mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                                    mechanics.setFillColor(COLOR_YELLOW);
+                                    mechanics.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
@@ -2775,11 +2775,11 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                         game(window, background, font, 1);
 
                                     // unfocus mechanics button:
-                                    mechanics.setFillColor(Color(144, 12, 63, 255));
-                                    mechanics.setOutlineColor(Color(218, 247, 166, 255));
+                                    mechanics.setFillColor(COLOR_DARK_VIOLET);
+                                    mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus STIC button:
-                                    STIC.setFillColor(Color(255, 195, 0, 255));
-                                    STIC.setOutlineColor(Color(8, 0, 93, 255));
+                                    STIC.setFillColor(COLOR_YELLOW);
+                                    STIC.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
@@ -2789,11 +2789,11 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                         game(window, background, font, 2);
 
                                     // unfocus STIC button:
-                                    STIC.setFillColor(Color(144, 12, 63, 255));
-                                    STIC.setOutlineColor(Color(218, 247, 166, 255));
+                                    STIC.setFillColor(COLOR_DARK_VIOLET);
+                                    STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus applied Maths button:
-                                    applied_maths.setFillColor(Color(255, 195, 0, 255));
-                                    applied_maths.setOutlineColor(Color(8, 0, 93, 255));
+                                    applied_maths.setFillColor(COLOR_YELLOW);
+                                    applied_maths.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 3:
@@ -2803,11 +2803,11 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                         game(window, background, font, 3);
 
                                     // unfocus applied Maths button:
-                                    applied_maths.setFillColor(Color(144, 12, 63, 255));
-                                    applied_maths.setOutlineColor(Color(218, 247, 166, 255));
+                                    applied_maths.setFillColor(COLOR_DARK_VIOLET);
+                                    applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus back button:
-                                    back.setFillColor(Color(255, 195, 0, 255));
-                                    back.setOutlineColor(Color(8, 0, 93, 255));
+                                    back.setFillColor(COLOR_YELLOW);
+                                    back.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 4:
@@ -2817,11 +2817,11 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                         main_menu(window, background, font);
 
                                     // unfocus back button:
-                                    back.setFillColor(Color(144, 12, 63, 255));
-                                    back.setOutlineColor(Color(218, 247, 166, 255));
+                                    back.setFillColor(COLOR_DARK_VIOLET);
+                                    back.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus mechanics button:
-                                    mechanics.setFillColor(Color(255, 195, 0, 255));
-                                    mechanics.setOutlineColor(Color(8, 0, 93, 255));
+                                    mechanics.setFillColor(COLOR_YELLOW);
+                                    mechanics.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter = 1;
                                     break;
                                 default:

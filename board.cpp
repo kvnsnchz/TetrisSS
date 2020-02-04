@@ -14,8 +14,8 @@ Board::Board(RenderWindow& window, const unsigned& initial_complexity, const Vec
 // Initialize game board 20x10,
 // two more y coordinates to create figures outside (on top of) the game board:
 void Board::initialize(RenderWindow& window, const unsigned& initial_complexity, const Vector2f& initial_cell_size){
-    x_dimension = 10;
-    y_dimension = 22;
+    x_dimension = BOARD_GRID_WIDTH;
+    y_dimension = BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT;
 
     // initialize game complexity:
     complexity = initial_complexity;
@@ -42,9 +42,9 @@ void Board::initialize(RenderWindow& window, const unsigned& initial_complexity,
 
     // draw the initial grid:
     for(int i = 0; i < x_dimension; i++) {
-        for(int j = 2; j < y_dimension; j++) {
+        for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - 2) * cell_size.y + j - 2 + 5.0f);
+            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
 
             window.draw(grid[i][j]);
         }
@@ -62,7 +62,7 @@ Figure* Board::create_figure() {
     // 1 - Figure_O; 2 - Figure_I; 3 - Figure_T;
     // 4 - Figure_L; 5 - Figure_J; 6 - Figure_Z; 7 - Figure_S:
     random_device generator;
-    uniform_int_distribution<unsigned> distribution(1,7);
+    uniform_int_distribution<unsigned> distribution(1, 7);
     unsigned figure_number = distribution(generator);
 
     // Using switch to construct chosen figure:
@@ -113,8 +113,7 @@ void Board::set_cell_size(const Vector2f& new_cell_size) {
     cell_size.y = new_cell_size.y;
 
     // Update next figures' cell size:
-    for (unsigned i = 0; i < 4; i++)
-        next_figure->set_grid(x_dimension, new_cell_size);
+    next_figure->set_grid(x_dimension, new_cell_size);
 };
 
 int Board::get_x_dim() const {
@@ -144,10 +143,10 @@ void Board::set_next_figure(Figure* figure) {
 // print game board:
 void Board::print_board(RenderWindow& window, const Font& font, const double& font_size) {
     for(int i = 0; i < x_dimension; i++) {
-        for(int j = 2; j < y_dimension; j++) {
+        for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - 2) * cell_size.y + j - 2 + 5.0f);
+            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
 
             // Update cell color:
             switch(map[i][j]) {
@@ -172,7 +171,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
                     break;
                 case 5:
                 case 50:
-                    grid[i][j].setFillColor(Color(144, 12, 63, 255));
+                    grid[i][j].setFillColor(COLOR_DARK_VIOLET);
                     break;
                 case 6:
                 case 60:
@@ -197,13 +196,13 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 15.0f);
     next_figure_title.setCharacterSize(font_size);
     next_figure_title.setStyle(Text::Bold);
-    next_figure_title.setFillColor(Color(144, 12, 63, 255));
+    next_figure_title.setFillColor(COLOR_DARK_VIOLET);
     window.draw(next_figure_title);
 
     // next figure itself (its grid):
     figure_to_draw = next_figure->get_grid();
-    for (unsigned i = 0; i < 4; i++)
-        for (unsigned j = 0; j < 2; j++)
+    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++)
             window.draw(figure_to_draw[i][j]);
 
     // draw a score:
@@ -213,7 +212,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + 2 * cell_size.y + 30.0f);
     score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
-    score_title.setFillColor(Color(144, 12, 63, 255));
+    score_title.setFillColor(COLOR_DARK_VIOLET);
     window.draw(score_title);
 };
 
@@ -226,9 +225,6 @@ overflow Board::is_empty(const Point& point) const {
         return OVERFLOW_UP;
     if(point.get_y() >= y_dimension)
         return OVERFLOW_DOWN;
-    //if(point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension){
-      //  return false;
-   // }
 
     if (map[point.get_x()][point.get_y()] == 0 || map[point.get_x()][point.get_y()] == current_figure->get_color_code())
         return NONE;
@@ -349,7 +345,6 @@ void Board::change_points_rotated(const overflow& overf){
 
     if(overf != NONE)
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
-           // change_point(*current_figure->get_points()[i]);
             if(overf == OVERFLOW_DOWN)
                 current_figure->get_points()[i]->increment_y(-1);
                 
@@ -398,11 +393,11 @@ void Board::rotate(bool right){
 void Board::erase_lines(const unsigned& complexity) {
     // initialize the indexes of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
-    int begin = 22;
-    int end = 2;
+    int begin = y_dimension + FIGURE_GRID_HEIGHT;
+    int end = FIGURE_GRID_HEIGHT;
 
     // calculate these indices:
-    for (unsigned i = 0; i < 4; i++) {
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
         if (begin > current_figure->get_points()[i]->get_y())
             begin = current_figure->get_points()[i]->get_y();
         if (end < current_figure->get_points()[i]->get_y())
@@ -515,7 +510,7 @@ void Board::fix_current_figure() {
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < x_dimension; j++)
-        if (map[j][2] >= 10)
+        if (map[j][FIGURE_GRID_HEIGHT] >= 10)
              return true;
     
     return false;
@@ -524,10 +519,10 @@ bool Board::game_over() {
 Board::~Board() {};
 
 void Board::print(){
-    for (int i = 2; i < y_dimension; i++) {
+    for (int i = FIGURE_GRID_HEIGHT; i < y_dimension; i++) {
         cout << "| ";
         for (int j = 0; j < x_dimension; j++) {
-            if(map[j][i] < 10)
+            if(map[j][i] < (unsigned) x_dimension)
                 cout << " " << map[j][i] << " "; 
             else
                 cout << map[j][i] << " "; 
@@ -538,10 +533,10 @@ void Board::print(){
 ostream& operator <<(ostream& stream, const Board& board) {
     // display a game board starting from the 2nd x coordinate,
     // indices 0 and 1 are reserver for new figure creation zone:
-    for (int i = 2; i < board.y_dimension; i++) {
+    for (int i = FIGURE_GRID_HEIGHT; i < board.y_dimension; i++) {
         stream << "| ";
         for (int j = 0; j < board.x_dimension; j++) {
-            if(board.map[j][i] < 10)
+            if(board.map[j][i] < (unsigned) board.get_x_dim())
                 stream << " " << board.map[j][i] << " "; 
             else
                 stream << board.map[j][i] << " "; 

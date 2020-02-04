@@ -102,10 +102,10 @@ void Figure_O::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[0][0].setFillColor(Color(255, 216, 0, 255));
-    grid[0][1].setFillColor(Color(255, 216, 0, 255));
-    grid[1][0].setFillColor(Color(255, 216, 0, 255));
-    grid[1][1].setFillColor(Color(255, 216, 0, 255));  
+    grid[0][0].setFillColor(COLOR_YELLOW);
+    grid[0][1].setFillColor(COLOR_YELLOW);
+    grid[1][0].setFillColor(COLOR_YELLOW);
+    grid[1][1].setFillColor(COLOR_YELLOW);  
 }
 
 // Stick figure initialization:
@@ -128,10 +128,10 @@ void Figure_I::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[0][0].setFillColor(Color(28, 230, 199, 255));
-    grid[1][0].setFillColor(Color(28, 230, 199, 255));
-    grid[2][0].setFillColor(Color(28, 230, 199, 255));
-    grid[3][0].setFillColor(Color(28, 230, 199, 255)); 
+    grid[0][0].setFillColor(COLOR_CYAN);
+    grid[1][0].setFillColor(COLOR_CYAN);
+    grid[2][0].setFillColor(COLOR_CYAN);
+    grid[3][0].setFillColor(COLOR_CYAN); 
 }
 
 // T figure initialization:
@@ -154,10 +154,10 @@ void Figure_T::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[1][0].setFillColor(Color(248, 131, 6, 255));
-    grid[0][1].setFillColor(Color(248, 131, 6, 255));
-    grid[1][1].setFillColor(Color(248, 131, 6, 255));
-    grid[2][1].setFillColor(Color(248, 131, 6, 255)); 
+    grid[1][0].setFillColor(COLOR_ORANGE);
+    grid[0][1].setFillColor(COLOR_ORANGE);
+    grid[1][1].setFillColor(COLOR_ORANGE);
+    grid[2][1].setFillColor(COLOR_ORANGE); 
 }
 
 // L figure initialization:
@@ -180,10 +180,10 @@ void Figure_L::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[2][0].setFillColor(Color(248, 6, 248, 255));
-    grid[0][1].setFillColor(Color(248, 6, 248, 255));
-    grid[1][1].setFillColor(Color(248, 6, 248, 255));
-    grid[2][1].setFillColor(Color(248, 6, 248, 255)); 
+    grid[2][0].setFillColor(COLOR_PINK);
+    grid[0][1].setFillColor(COLOR_PINK);
+    grid[1][1].setFillColor(COLOR_PINK);
+    grid[2][1].setFillColor(COLOR_PINK); 
 }
 
 // J figure initialization:
@@ -206,10 +206,10 @@ void Figure_J::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[0][0].setFillColor(Color(144, 12, 63, 255));
-    grid[0][1].setFillColor(Color(144, 12, 63, 255));
-    grid[1][1].setFillColor(Color(144, 12, 63, 255));
-    grid[2][1].setFillColor(Color(144, 12, 63, 255)); 
+    grid[0][0].setFillColor(COLOR_DARK_VIOLET);
+    grid[0][1].setFillColor(COLOR_DARK_VIOLET);
+    grid[1][1].setFillColor(COLOR_DARK_VIOLET);
+    grid[2][1].setFillColor(COLOR_DARK_VIOLET); 
 }
 
 // Z figure initialization:
@@ -232,10 +232,10 @@ void Figure_Z::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[0][0].setFillColor(Color(220, 0, 20, 255));
-    grid[1][0].setFillColor(Color(220, 0, 20, 255));
-    grid[1][1].setFillColor(Color(220, 0, 20, 255));
-    grid[2][1].setFillColor(Color(220, 0, 20, 255)); 
+    grid[0][0].setFillColor(COLOR_RED);
+    grid[1][0].setFillColor(COLOR_RED);
+    grid[1][1].setFillColor(COLOR_RED);
+    grid[2][1].setFillColor(COLOR_RED); 
 }
 
 // S figure initialization:
@@ -258,8 +258,8 @@ void Figure_S::initialize(const unsigned& x_dim, const Vector2f& cell_size) {
         };
 
     // set the figure`s own color according to the color code for certain cells:
-    grid[1][0].setFillColor(Color(46, 228, 25, 255));
-    grid[2][0].setFillColor(Color(46, 228, 25, 255));
-    grid[0][1].setFillColor(Color(46, 228, 25, 255));
-    grid[1][1].setFillColor(Color(46, 228, 25, 255));     
+    grid[1][0].setFillColor(COLOR_GREEN_SALAD);
+    grid[2][0].setFillColor(COLOR_GREEN_SALAD);
+    grid[0][1].setFillColor(COLOR_GREEN_SALAD);
+    grid[1][1].setFillColor(COLOR_GREEN_SALAD);     
 }
