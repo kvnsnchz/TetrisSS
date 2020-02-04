@@ -229,6 +229,9 @@ void Client::listen_sever(){
             }
             //Check if the message is of delete client info:
             case DELETE_CLIENT_INFO:
+                unsigned pos_client;
+                packet_recv >> pos_client;
+                _server_data.clients.erase(_server_data.clients.begin() + pos_client);
             break;
             }
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
