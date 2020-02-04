@@ -40,8 +40,8 @@ public:
     //Disconnect from the game server:
     void disconnect_server(request_status& status);
     //Listen the server
-    void listen_sever();
+    void listen_sever(request_status& status);
     //Ready to play
-    void ready(request_status& status);
+    void ready();
 };
 
