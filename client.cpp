@@ -266,6 +266,14 @@ void Client::ready(request_status& status){
                 packet_recv >> datatype_value;
                 _datatype = (datatype) datatype_value;
                 if(_datatype == CLIENT_READY_SUCCESS){
+                    vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
+                    if(it == _server_data.clients.end()){
+                        status = ERROR;
+                        break;
+                    }
+                        
+                    (*it).status = true;
+                
                     cout << "Ready " << endl;
                     status = SUCCESS;
                     return;

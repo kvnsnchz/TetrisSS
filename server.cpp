@@ -115,8 +115,9 @@ void Server::listen_clients(bool& changes) {
                 
                 if(gen_packet_send.getDataSize() > 0){
                     for(unsigned i = 0; i < clients.size(); i ++){
-                        if (socket.send(gen_packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
-                            cout << "Server: Send error" << endl;
+                        if(clients[i].address != sender)
+                            if (socket.send(gen_packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                                cout << "Server: Send error" << endl;
                     }
                 }
 
@@ -149,8 +150,9 @@ void Server::listen_clients(bool& changes) {
                 packet_send << (*it).status;
 
                 for(unsigned i = 0; i < clients.size(); i++){
-                    if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
-                        cout << "Server: Send error" << endl;
+                    if(clients[i].address != sender)
+                        if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                            cout << "Server: Send error" << endl;
                 }
 
                 packet_send.clear();
