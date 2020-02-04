@@ -1927,6 +1927,11 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
         listen_thread = new Thread([&] () { current_session->listen_clients(changes); });
 
         listen_thread->launch();
+    } else if (current_session == nullptr) {
+        // Look for the clients:
+        // listen_thread = new Thread([&] () { current_client->listen_client(changes); });
+
+        // listen_thread->launch();
     }
 
     // Create a list of clients and initialize server name:
@@ -2225,6 +2230,9 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
 
     search_thread->launch();
 
+    // Create a thread to establish connection:
+    Thread* connect_thread;
+
     // set the wait image:
     Texture texture;
     try {
@@ -2274,17 +2282,6 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 6);
 
     vector<Text> server_info;
-    for (unsigned i = 0; i < current_client->get_servers().size(); i++) {
-        server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
-            Vector2f(window.getSize().x / 6,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-        server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
-            Vector2f(3 * window.getSize().x / 6,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-        server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/4", button_size,
-            Vector2f(5 * window.getSize().x / 6,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-    }
 
     // Initialize back button:
     Text back = create_button(font, "Back", button_size,
@@ -2302,7 +2299,18 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
 
     while(window.isOpen()) {
-        // number_of_buttons = 3 + current_client->get_servers().size();
+        // Fullfill the list of servers:
+        for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
+            server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
+                Vector2f(window.getSize().x / 6,
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+            server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
+                Vector2f(3 * window.getSize().x / 6,
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+            server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
+                Vector2f(5 * window.getSize().x / 6,
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+        }
 
         Event event;
 
@@ -2332,9 +2340,9 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
 
                     // If appropriate mouse position was captured:
                     for (unsigned i = 0; i < server_info.size(); i += 3) {
-                        if (captured_button(window, server_info[i]) 
+                        if (status != NOT_READY && (captured_button(window, server_info[i])
                             || captured_button(window, server_info[i + 1])
-                            || captured_button(window, server_info[i + 2])) {
+                            || captured_button(window, server_info[i + 2]))) {
                             // focus proper server buttons:
                             server_info[i].setFillColor(COLOR_YELLOW);
                             server_info[i].setOutlineColor(COLOR_DARK_BLUE);
@@ -2346,17 +2354,17 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                             break;
                         }
                     }
-                    if (captured_button(window, back)) {
+                    if (captured_button(window, back) && status != NOT_READY) {
                         // focus back button:
                         back.setFillColor(COLOR_YELLOW);
                         back.setOutlineColor(COLOR_DARK_BLUE);
                         focused_button_counter = current_client->get_servers().size() + 1;
-                    } else if (captured_button(window, refresh)) {
+                    } else if (captured_button(window, refresh) && status != NOT_READY) {
                         // focus refresh button:
                         refresh.setFillColor(COLOR_YELLOW);
                         refresh.setOutlineColor(COLOR_DARK_BLUE); 
                         focused_button_counter = current_client->get_servers().size() + 2;
-                    } else if (captured_button(window, connect)) {
+                    } else if (captured_button(window, connect) && status != NOT_READY) {
                         // focus connect button:
                         connect.setFillColor(COLOR_YELLOW);
                         connect.setOutlineColor(COLOR_DARK_BLUE); 
@@ -2368,45 +2376,31 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                         case Mouse::Left:
                             // If appropriate mouse position was captured:
                             for (unsigned i = 0; i < server_info.size(); i += 3) {
-                                if (captured_button(window, server_info[i]) 
+                                if (status != NOT_READY && (captured_button(window, server_info[i])
                                     || captured_button(window, server_info[i + 1])
-                                    || captured_button(window, server_info[i + 2])) {
+                                    || captured_button(window, server_info[i + 2]))) {
                                     // i + 1) Choose a proper server:
                                     chosen_server = i / 3;
                                     break;
                                 }
                             }
                             // current_client->get_servers().size() + 1) Go back:
-                            if (captured_button(window, back)) {
-                                cout << focused_button_counter  << endl;
+                            if (captured_button(window, back) && status != NOT_READY) {
                                 search_thread->terminate();
                                 current_client->disconnect_udp_socket();
                                 return;
                             // current_client->get_servers().size() + 2) Refresh list of servers:
-                            } else if (captured_button(window, refresh)) {
-                                cout << focused_button_counter << endl;
-                                cout << server_info.size() / 3 << endl;
-                                cout << current_client->get_servers().size() << endl;
+                            } else if (captured_button(window, refresh) && status != NOT_READY ) {
                                 search_thread->terminate();
 
                                 search_thread = new Thread([&] () { current_client->search_servers(); });
 
                                 search_thread->launch();
-
-                                for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
-                                    server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
-                                        Vector2f(window.getSize().x / 6,
-                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
-                                        Vector2f(3 * window.getSize().x / 6,
-                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
-                                        Vector2f(5 * window.getSize().x / 6,
-                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                                }
                             // current_client->get_servers().size() + 3) Get connect or not:
-                            } else if (captured_button(window, connect) && chosen_server != -1) {
-                                current_client->connect_server(chosen_server, status);
+                            } else if (captured_button(window, connect) && chosen_server != -1 && status != NOT_READY) {
+                                connect_thread = new Thread([&] () { current_client->connect_server(chosen_server, status); });
+                                
+                                connect_thread->launch();
                             };
                             break;
                         default:
@@ -2421,7 +2415,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                             // focus or push the button according to 
                             // the current focused_button_counter value:
                             if (focused_button_counter == 0 && current_client->get_servers().size() && 
-                                event.key.code != Keyboard::Return) {
+                                event.key.code != Keyboard::Return && status != NOT_READY) {
                                 // in this case, Enter won't do nothing:
                                 // focus proper server buttons:
                                 server_info[0].setFillColor(COLOR_YELLOW);
@@ -2432,7 +2426,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 server_info[2].setOutlineColor(COLOR_DARK_BLUE);
                                 focused_button_counter++;
                                 break;
-                            } else if (focused_button_counter == 0 && current_client->get_servers().size() == 0) {
+                            } else if (focused_button_counter == 0 && current_client->get_servers().size() == 0 && status != NOT_READY) {
                                 // in this case, Enter won't do nothing:
                                 if (event.key.code == Keyboard::Return)
                                     break;
@@ -2442,10 +2436,9 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 back.setOutlineColor(COLOR_DARK_BLUE);
                                 focused_button_counter++;
                                 break;
-                            } else if (focused_button_counter == current_client->get_servers().size() + 1) {
+                            } else if (focused_button_counter == current_client->get_servers().size() + 1 && status != NOT_READY) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
-                                    cout << focused_button_counter  << endl;
                                     // execute back button:
                                     search_thread->terminate();
                                     current_client->disconnect_udp_socket();
@@ -2460,29 +2453,15 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 refresh.setOutlineColor(COLOR_DARK_BLUE);
                                 focused_button_counter++;
                                 break;
-                            } else if (focused_button_counter == current_client->get_servers().size() + 2) {
+                            } else if (focused_button_counter == current_client->get_servers().size() + 2 && status != NOT_READY) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
-                                    cout << focused_button_counter  << endl;
                                     // execute refresh button:
                                     search_thread->terminate();
 
                                     search_thread = new Thread([&] () { current_client->search_servers(); });
 
                                     search_thread->launch();
-
-                                    for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
-                                        server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
-                                            Vector2f(window.getSize().x / 6,
-                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                                        server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
-                                            Vector2f(3 * window.getSize().x / 6,
-                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                                        server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
-                                            Vector2f(5 * window.getSize().x / 6,
-                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                                    }
-
                                     break;
                                 } else {
                                     // unfocus refresh button:
@@ -2494,11 +2473,13 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                     focused_button_counter++;
                                     break;
                                 }
-                            } else if (focused_button_counter == current_client->get_servers().size() + 3) {
+                            } else if (focused_button_counter == current_client->get_servers().size() + 3 && status != NOT_READY) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
                                     // execute connect button:
-                                    current_client->connect_server(chosen_server, status);
+                                    connect_thread = new Thread([&] () { current_client->connect_server(chosen_server, status); });
+                                
+                                    connect_thread->launch();
                                 } else {
                                     // unfocus connect button:
                                     connect.setFillColor(COLOR_DARK_VIOLET);
@@ -2522,8 +2503,8 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                 }
                                 break;
                             }
-                            for (int i = 0; (unsigned) i < server_info.size(); i += 3) {
-                                if (focused_button_counter == (unsigned) i + 1) {
+                            for (int i = 0; (unsigned) i < server_info.size(); i+=3) {
+                                if (focused_button_counter == (unsigned) i / 3 + 1 && status != NOT_READY) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // choose a server:
@@ -2542,7 +2523,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                     }
                                     
                                     // if it is not a last server:
-                                    if ((unsigned) i < current_client->get_servers().size() - 1) {
+                                    if ((unsigned) i / 3 < current_client->get_servers().size() - 1) {
                                         // focus next server button:
                                         server_info[i + 3].setFillColor(COLOR_YELLOW);
                                         server_info[i + 3].setOutlineColor(COLOR_DARK_BLUE);
@@ -2646,6 +2627,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
         window.draw(connect);
         if (status == NOT_READY)
             window.draw(wait);
+            
         window.display();
     }
 };
