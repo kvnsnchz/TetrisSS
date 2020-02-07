@@ -15,11 +15,15 @@ enum datatype {
     SERVER_CONN_RESPONSE_ERROR,
     SERVER_DISCONNECTION,
     CLIENT_DISCONNECTION,
+    CLIENT_NOT_READY,
+    CLIENT_NOT_READY_SUCCESS,
     CLIENT_READY,
     CLIENT_READY_SUCCESS,
     NEW_CLIENT_INFO,
     UPDATE_CLIENT_INFO,
     DELETE_CLIENT_INFO,
+    SERVER_GAME_START,
+    CLIENT_GAME_UPDATE,
 };
 
 enum request_status {
@@ -30,13 +34,17 @@ enum request_status {
     SERVER_DISCONNECTED,
     READY_SUCCESS,
     READY_ERROR,
+    NOT_READY_SUCCESS,
+    NOT_READY_ERROR,
     NOT_CHANGED,
     CHANGED,
+    GAME_START,
 };
 
 struct client_data {
     IpAddress address;
     bool status;
+    unsigned **map;
     bool operator == (client_data other_client){
        return address == other_client.address;
     };

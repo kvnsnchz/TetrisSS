@@ -60,6 +60,8 @@ class Board {
 
         long get_score() const;
 
+        unsigned** get_map() const;
+
         Figure* get_next_figure() const;
         void set_current_figure(Figure* figure);
         void set_next_figure(Figure* figure);

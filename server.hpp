@@ -17,15 +17,18 @@ private:
     // IPv4 addresses of clients:
     vector<client_data> clients;
     UdpSocket socket;
+    IpAddress local_ip_address;
 public:
     Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
-        clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
+        local_ip_address = IpAddress::getLocalAddress();
+        clients.emplace_back(client_data{local_ip_address, false});
         connect_udp_socket();
     };
     Server(string s_name, Uint32 max_cli, Uint32 lvl): 
         server_name(s_name), max_clients(max_cli), level(lvl) 
     {
-        clients.emplace_back(client_data{IpAddress::getLocalAddress(), false});
+        local_ip_address = IpAddress::getLocalAddress();
+        clients.emplace_back(client_data{local_ip_address, false});
         connect_udp_socket();
     };
     ~Server(){
@@ -49,6 +52,8 @@ public:
     void listen_clients(request_status& status);
     //Disconnected server
     void disconnect();
+    //Server ready or not ready to play
+    void ready(bool is_ready);
     //Game start
     void start();
 };

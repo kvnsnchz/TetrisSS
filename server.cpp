@@ -42,7 +42,6 @@ void Server::disconnect_udp_socket(){
 }
 
 void Server::disconnect(){
-    socket.setBlocking(true);
     //Filling send buffer:
     Packet packet_send;
     //Server disconnection request:
@@ -59,6 +58,42 @@ void Server::disconnect(){
     clients.clear();
 }
 
+//Server ready or not ready to play
+void Server::ready(bool is_ready){
+    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{local_ip_address, false});
+    if(it == clients.end())
+        return;
+        
+    (*it).status = is_ready;
+    //Filling send buffer:
+    Packet packet_send;
+
+    packet_send << UPDATE_CLIENT_INFO;
+    packet_send << (Uint32)(it - clients.begin());
+    packet_send << (*it).address.toString();
+    packet_send << (*it).status;
+
+    for(unsigned i = 0; i < clients.size(); i++){
+        if(clients[i].address != local_ip_address)
+            if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                cout << "Server: Send error" << endl;
+    }
+    
+}
+
+//Game start
+void Server::start(){
+    //Filling send buffer:
+    Packet packet_send;
+
+    packet_send << SERVER_GAME_START;
+
+    for(unsigned i = 0; i < clients.size(); i++){
+        if(clients[i].address != local_ip_address)
+            if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                cout << "Server: Send error" << endl;
+    }
+}
 //Listen for new customer connections:
 void Server::listen_clients(request_status& status) {
     status = NOT_CHANGED;
@@ -133,7 +168,7 @@ void Server::listen_clients(request_status& status) {
                 
                 if(gen_packet_send.getDataSize() > 0){
                     for(unsigned i = 0; i < clients.size(); i ++){
-                        if(clients[i].address != sender)
+                        if(clients[i].address != sender && clients[i].address != local_ip_address)
                             if (socket.send(gen_packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
                                 cout << "Server: Send error" << endl;
                     }
@@ -166,7 +201,7 @@ void Server::listen_clients(request_status& status) {
             }
             //Check if the message is as ready client message:
             case CLIENT_READY:
-                //Buffer filling with success message
+            {    //Buffer filling with success message
                 vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
                 if(it == clients.end())
                     break;
@@ -177,7 +212,7 @@ void Server::listen_clients(request_status& status) {
                 packet_send << (*it).status;
 
                 for(unsigned i = 0; i < clients.size(); i++){
-                    if(clients[i].address != sender)
+                    if(clients[i].address != sender && clients[i].address != local_ip_address)
                         if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
                             cout << "Server: Send error" << endl;
                 }
@@ -190,6 +225,33 @@ void Server::listen_clients(request_status& status) {
                 status = CHANGED;
                 cout << "Client " << sender << " ready" << endl;
                 break;
+            }
+            case CLIENT_NOT_READY:
+                //Buffer filling with success message
+                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                if(it == clients.end())
+                    break;
+                (*it).status = false;
+                packet_send << UPDATE_CLIENT_INFO;
+                packet_send << (Uint32)(it - clients.begin());
+                packet_send << (*it).address.toString();
+                packet_send << (*it).status;
+
+                for(unsigned i = 0; i < clients.size(); i++){
+                    if(clients[i].address != sender && clients[i].address != local_ip_address)
+                        if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                            cout << "Server: Send error" << endl;
+                }
+
+                packet_send.clear();
+                packet_send << CLIENT_NOT_READY_SUCCESS;
+                if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
+                    cout << "Server: Send error" << endl;
+                
+                status = CHANGED;
+                cout << "Client " << sender << " ready" << endl;
+                break;
+
             }
            
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;

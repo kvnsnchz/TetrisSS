@@ -82,7 +82,6 @@ void Client::search_servers(){
 //Connect to a specific game server from the available list:
 void Client::connect_server(const unsigned pos, request_status& status){
     //Checking that the selected server is in the list:
-    socket.setBlocking(true);
 
     if(pos > servers.size()){
         status = ERROR;
@@ -162,7 +161,6 @@ void Client::connect_server(const unsigned pos, request_status& status){
 
 //Disconnect from the game server:
 void Client::disconnect_server(request_status& status){
-    socket.setBlocking(true);
     //Filling send buffer:
     Packet packet_send;
     //client disconnection request:
@@ -217,6 +215,21 @@ void Client::listen_server(request_status& status){
                 
                 break;
             }
+            case CLIENT_NOT_READY_SUCCESS:
+            {    
+                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
+                if(it == _server_data.clients.end()){
+                    status = NOT_READY_ERROR;
+                    break;
+                }
+                    
+                (*it).status = false;
+            
+                cout << "Ready " << endl;
+                status = NOT_READY_SUCCESS;
+                
+                break;
+            }
             //Check if the message is of new client info:
             case NEW_CLIENT_INFO:
                 _server_data.clients.clear();
@@ -255,24 +268,45 @@ void Client::listen_server(request_status& status){
                 _server_data.address = IpAddress::None;
                 status = SERVER_DISCONNECTED;
                 return;
+            case SERVER_GAME_START:
+                status = GAME_START;
+                return;
             }
             std::cout << "Received bytes from " << sender << " on port " << port << std::endl;
         }
     }
 }
 
-void Client::ready(){
-    socket.setBlocking(true);
-    
+void Client::ready(bool is_ready){
     //Filling send buffer:
     Packet packet_send;
-    //Client ready:
-    packet_send << CLIENT_READY;
+    if(is_ready)
+        //Client ready:
+        packet_send << CLIENT_READY;
+    else
+        //Client not ready:
+        packet_send << CLIENT_NOT_READY;
     
-    //Sending ready client message: 
+    //Sending ready/not ready client message: 
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
         cout << "Client: Send error" << endl;
     }
 
 }
+
+void Client::gaming(Board& board, request_status& status){
+    //Filling send buffer:
+    Packet packet_send;
+    
+    packet_send << CLIENT_GAME_UPDATE;
+    packet_send << (Int64)board.get_score();
+
+    unsigned** map = board.get_map();
+    for(unsigned i = 0; i < board.get_x_dim(); i ++){
+        for(unsigned j = 0; j < board.get_y_dim(); j ++){
+            packet_send << map[i][j];
+        }
+    }
+    
+} 
