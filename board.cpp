@@ -128,6 +128,10 @@ long Board::get_score() const {
     return score;
 };
 
+unsigned** Board::get_map() const {
+    return map;
+}
+
 Figure* Board::get_next_figure() const {
     return next_figure;
 };

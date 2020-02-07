@@ -4,6 +4,7 @@
 #include <chrono>
 #include <boost/algorithm/string.hpp>
 #include "sockets_constants.hpp"
+#include "board.hpp"
 
 #define MAX_SEARCH_TIME 10
 #define MAX_CONNECTION_TIME 2
@@ -41,7 +42,9 @@ public:
     void disconnect_server(request_status& status);
     //Listen the server
     void listen_server(request_status& status);
-    //Ready to play
-    void ready();
+    //Ready or not ready to play
+    void ready(bool);
+    //Gaming
+    void gaming(Board&, request_status&);
 };
 
