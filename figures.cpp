@@ -1,3 +1,5 @@
+#define figureCPP
+
 #include "figures.hpp"
 
 void Point::set_x(int& x_new) {

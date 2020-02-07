@@ -1,3 +1,5 @@
+#define boardCPP
+
 #include "board.hpp"
 #include <random>
 #include <algorithm>
@@ -213,7 +215,8 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     Text score_title;
     score_title.setFont(font);
     score_title.setString("Score: \n" + to_string(score));
-    score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + 2 * cell_size.y + 30.0f);
+    score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
+        next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
     score_title.setFillColor(COLOR_DARK_VIOLET);

@@ -1,3 +1,6 @@
+#ifndef serverHPP
+#define serverHPP
+
 #include <iostream>
 #include <thread>
 #include <boost/algorithm/string.hpp>
@@ -62,3 +65,4 @@ public:
     void listen_game(request_status& status);
 };
 
+#endif

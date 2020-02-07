@@ -1,3 +1,6 @@
+#ifndef clientHPP
+#define clientHPP
+
 #include <iostream>
 #include <thread>
 #include <cstring>
@@ -50,3 +53,4 @@ public:
     void listen_game(request_status& status);
 };
 
+#endif

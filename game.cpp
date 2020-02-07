@@ -1,13 +1,17 @@
+#define gameCPP
+
 #include "game.hpp"
 
 // new button initialization function (for code reduction):
-Text create_button(const Font& font, const string title, const double& button_size, Vector2f position, const bool& outline, const unsigned& center_coefficient) {
+Text create_button(Font& font, const string title, const double& button_size,
+    Vector2f position, const bool& outline, const unsigned& center_coefficient) {
     // Initialize new button:
     Text new_button;
     new_button.setFont(font);
-    new_button.setString(title);
     new_button.setCharacterSize(5 * button_size / 6);
     new_button.setStyle(Text::Bold);
+    new_button.setString(title);
+    
     new_button.setFillColor(COLOR_DARK_VIOLET);
     if (outline) {
         new_button.setOutlineThickness(button_size / 6);
@@ -31,7 +35,7 @@ bool captured_button(RenderWindow& window, Text& button) {
         return false;                               
 };
 
-void game(RenderWindow& window, Sprite& background, const Font& font, const unsigned& complexity) {
+void Menu::game(const unsigned& complexity) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // button size:
@@ -48,7 +52,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
     Text pause = create_button(font, "Pause", button_size,
         Vector2f((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
 
-    state_figure _state_figure = DESCEND_FIGURE;
+    figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
     // We are using descend counter to manage the figures' fall rate:
@@ -82,7 +86,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                             // 1) pause game:
                             if (captured_button(window, pause)) {
                                 // execute pause button:
-                                pause_menu(window, background, game_board, font);
+                                pause_menu(game_board);
                                         
                                 // update cell size:
                                 cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -130,7 +134,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // execute pause button:
-                                        pause_menu(window, background, game_board, font);
+                                        pause_menu(game_board);
 
                                         // update cell size:
                                         cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -158,7 +162,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                         // if Escape is pushed: 
                         case Keyboard::Escape:
                             // execute pause button:
-                            pause_menu(window, background, game_board, font);
+                            pause_menu(game_board);
 
                             // update cell size:
                             cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -176,7 +180,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                         // while we want to move a current figure to the right:
                         case Keyboard::D:
                         case Keyboard::Right:
-                            if(_state_figure == STOP_FIGURE){
+                            if(_figure_state == STOP_FIGURE){
                                 bool step_done = game_board->step_right(true);
                                 if(step_done)
                                     count_change_figure++;
@@ -191,7 +195,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                         case Keyboard::A:
                         case Keyboard::Q:
                         case Keyboard::Left:
-                            if(_state_figure == STOP_FIGURE){
+                            if(_figure_state == STOP_FIGURE){
                                 bool step_done = game_board->step_left(true);
                                 if(step_done)
                                     count_change_figure++;
@@ -205,16 +209,16 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
                         // while we want to fall faster:
                         case Keyboard::S:
                         case Keyboard::Down:
-                            if(_state_figure != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE)
                                 game_board->step_down();
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
-                            if(_state_figure != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE)
                                 game_board->rotate(false);
                             break;
                         case Keyboard::H:
-                            if(_state_figure != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE)
                                 game_board->rotate(true);
                             break;
                         default:
@@ -263,24 +267,24 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
         // set delay according to the complexity:
         if ((float) descend_counter >= 300.0f / complexity) {
              
-            if(_state_figure == STOP_FIGURE)
+            if(_figure_state == STOP_FIGURE)
                 count_change_figure--;
             if(count_change_figure <= 0)
-                _state_figure = CHANGE_FIGURE;
-            if(_state_figure == DESCEND_FIGURE)
-                _state_figure = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+                _figure_state = CHANGE_FIGURE;
+            if(_figure_state == DESCEND_FIGURE)
+                _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
             // if we can't move down no more:
-            if (_state_figure == CHANGE_FIGURE) {
+            if (_figure_state == CHANGE_FIGURE) {
 
                 count_change_figure = DEF_COU_CHA_FIG;
-                _state_figure = DESCEND_FIGURE;
+                _figure_state = DESCEND_FIGURE;
                 // check for the full lines:
                 game_board->fix_current_figure();
                 game_board->erase_lines(complexity);
 
                 // if we have reached game over condition:
                 if (game_board->game_over())
-                    game_over_menu(window, background, game_board, font);
+                    game_over_menu(game_board);
 
                 // putting next figure into a current figure:
                 game_board->set_current_figure(game_board->get_next_figure());
@@ -300,7 +304,7 @@ void game(RenderWindow& window, Sprite& background, const Font& font, const unsi
     delete game_board;
 }
 
-void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board, const Font& font) {
+void Menu::game_over_menu(Board* game_board) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -401,13 +405,13 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                             // If appropriate mouse position was captured:
                             // 1) Restart game:
                             if (captured_button(window, restart))
-                                game(window, background, font, game_board->get_complexity());
+                                game(game_board->get_complexity());
                             // 2) Go to cemplexity menu:
                             else if (captured_button(window, choose_complexity))
-                                complexity_menu(window, background, font);
+                                complexity_menu();
                             // 3) Go to main menu:
                             else if (captured_button(window, to_main_menu))
-                                main_menu(window, background, font);
+                                main_menu();
                             // 4) Exit:
                             else if (captured_button(window, exit))
                                 window.close();
@@ -439,7 +443,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute restart button:
-                                        game(window, background, font, game_board->get_complexity());
+                                        game(game_board->get_complexity());
 
                                     // unfocus restart button:
                                     restart.setFillColor(COLOR_DARK_VIOLET);
@@ -453,7 +457,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute choose_complexity button:
-                                        complexity_menu(window, background, font);
+                                        complexity_menu();
 
                                     // unfocus choose_complexity button:
                                     choose_complexity.setFillColor(COLOR_DARK_VIOLET);
@@ -467,7 +471,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute to_main_menu button:
-                                        main_menu(window, background, font);
+                                        main_menu();
 
                                     // unfocus to_main_menu button:
                                     to_main_menu.setFillColor(COLOR_DARK_VIOLET);
@@ -570,7 +574,7 @@ void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board,
     }
 }
 
-void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, const Font& font) {
+void Menu::pause_menu(Board* game_board) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -678,10 +682,10 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                 return;
                             // 2) Restart game:
                             else if (captured_button(window, restart))
-                                game(window, background, font, game_board->get_complexity());
+                                game(game_board->get_complexity());
                             // 3) Go to main menu:
                             else if (captured_button(window, to_main_menu))
-                                main_menu(window, background, font);
+                                main_menu();
                             // 4) Exit:
                             else if (captured_button(window, exit))
                                 window.close();
@@ -727,7 +731,7 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute restart button:
-                                        game(window, background, font, game_board->get_complexity());
+                                        game(game_board->get_complexity());
 
                                     // unfocus restart button:
                                     restart.setFillColor(COLOR_DARK_VIOLET);
@@ -741,7 +745,7 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute to_main_menu button:
-                                        main_menu(window, background, font);
+                                        main_menu();
 
                                     // unfocus to_main_menu button:
                                     to_main_menu.setFillColor(COLOR_DARK_VIOLET);
@@ -856,7 +860,9 @@ void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, con
     }
 }
 
-void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
+void Menu::main_menu() {
+    window.create(VideoMode (VideoMode::getDesktopMode().width / 2, VideoMode::getDesktopMode().height), "TetrisSS 1.0");
+
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -864,12 +870,12 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
     // button size:
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
-
+    
     // Initialize new single game button:
     Text singleplayer = create_button(font, "Singleplayer", button_size,
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 15) / 2));
-
+    
     // Initialize new multiplayer game button:
     Text multiplayer = create_button(font, "Multiplayer", button_size,
         Vector2f(window.getSize().x / 2,
@@ -894,7 +900,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
     Text exit = create_button(font, "Exit", button_size,
         Vector2f(window.getSize().x / 2,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 15) / 2 + (button_size + 15) * 5));
-    
+
     while (window.isOpen()) {
         Event event;
 
@@ -959,10 +965,10 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                             // If appropriate mouse position was captured:
                             // 1) Start new single game:
                             if (captured_button(window, singleplayer))
-                                complexity_menu(window, background, font);
+                                complexity_menu();
                             // 2) Go to multiplayer menu:
                             else if (captured_button(window, multiplayer))
-                                multiplayer_menu(window, background, font);
+                                multiplayer_menu();
                             // 3) Check highscores:
                             else if (captured_button(window, leaderboard))
                                 break;
@@ -1003,7 +1009,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute singleplayer button:
-                                        complexity_menu(window, background, font);
+                                        complexity_menu();
 
                                     // unfocus singleplayer button:
                                     singleplayer.setFillColor(COLOR_DARK_VIOLET);
@@ -1017,7 +1023,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // Go to multiplayer menu:
-                                        multiplayer_menu(window, background, font);
+                                        multiplayer_menu();
 
                                     // unfocus multiplayer button:
                                     multiplayer.setFillColor(COLOR_DARK_VIOLET);
@@ -1156,7 +1162,7 @@ void main_menu(RenderWindow& window, Sprite& background, const Font& font) {
     }    
 }
 
-void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font) { 
+void Menu::multiplayer_menu() { 
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1228,13 +1234,13 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                             // If appropriate mouse position was captured:
                             // 1) Go to new session menu:
                             if (captured_button(window, new_session))
-                                create_session(window, background, font);
+                                create_session();
                             // 2) Find a server:
                             else if (captured_button(window, find_server))
-                                find_servers(window, background, font);
+                                find_servers();
                             // 3) Go back:
                             else if (captured_button(window, back))
-                                return;
+                                main_menu();
                             break;
                         default:
                             break;
@@ -1263,7 +1269,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute new_session button:
-                                        create_session(window, background, font);
+                                        create_session();
 
                                     // unfocus new_session button:
                                     new_session.setFillColor(COLOR_DARK_VIOLET);
@@ -1277,7 +1283,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute find_server button:
-                                        find_servers(window, background, font);
+                                        find_servers();
 
                                     // unfocus find_server button:
                                     find_server.setFillColor(COLOR_DARK_VIOLET);
@@ -1291,7 +1297,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute back button:
-                                        main_menu(window, background, font);
+                                        main_menu();
 
                                     // unfocus back button:
                                     back.setFillColor(COLOR_DARK_VIOLET);
@@ -1362,7 +1368,7 @@ void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font
     }
 };
 
-void create_session(RenderWindow& window, Sprite& background, const Font& font) {
+void Menu::create_session() {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1581,12 +1587,12 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                 complexity = 3;
                             // 6) Go back:
                             } else if (captured_button(window, back))
-                                return;
+                                multiplayer_menu();
                             // 7) Create a new session (if all required information is entered):
                             else if (captured_button(window, create) && session_name != ""
                                 && complexity != 0 && max_number_of_players != 0) { 
                                 Server* current_session = new Server(session_name, max_number_of_players, complexity);
-                                session_menu(window, background, font, current_session, nullptr);
+                                session_menu(current_session, nullptr);
                             }
                             break;
                         default:
@@ -1727,7 +1733,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute back button:
-                                        return;
+                                        multiplayer_menu();
 
                                     // unfocus back button:
                                     back.setFillColor(COLOR_DARK_VIOLET);
@@ -1743,7 +1749,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
                                         && complexity != 0 && max_number_of_players != 0) {
                                         // execute create button:
                                         Server* current_session = new Server(session_name, max_number_of_players, complexity);
-                                        session_menu(window, background, font, current_session, nullptr);
+                                        session_menu(current_session, nullptr);
                                     } else {
                                         // capture session name field:
                                         session_name_captured = true;
@@ -1910,7 +1916,7 @@ void create_session(RenderWindow& window, Sprite& background, const Font& font) 
 };
 
 // Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, Client* current_client) {
+void Menu::session_menu(Server* current_session, Client* current_client) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1988,28 +1994,14 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
 
     while(window.isOpen()) {
-        // if (current_client == nullptr) {
-        //     // Look for the clients:
-        //     listen_thread = new Thread([&] () { current_session->listen_clients(); });
-
-        //     listen_thread->launch();
-
-        //     // Update a list of players:
-        //     player_list = new vector<client_data>(current_session->get_clients());
-        // } else if (current_session == nullptr) {
-        //     // Listen to server:
-        //     // listen_thread = new Thread([&] () { current_client->listen_server(); });
-
-        //     // listen_thread->launch();
-
-        //     // Update a list of players:
-        //     player_list = new vector<client_data>(current_client->get_server_data().clients);
-        // }
-
+        // If we have some changes:
         if (status == CHANGED) {
-            player_list = new vector<client_data>(current_client->get_server_data().clients);
+            if (current_client == nullptr)
+                player_list = new vector<client_data>(current_session->get_clients());
+            else if (current_session == nullptr)
+                player_list = new vector<client_data>(current_client->get_server_data().clients);
 
-            player_list_titles.clear();
+            // Refresh player list:
             for (unsigned i = 0; i < player_list->size(); i++) {
                 player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
                     Vector2f(window.getSize().x / 4,
@@ -2060,9 +2052,10 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                 if (current_client == nullptr) {
                                     listen_thread->terminate();
                                     return;
-                                } else {
-                                    find_servers(window, background, font);
+                                } else if (current_session == nullptr) {
+                                    find_servers();
                                 }
+                                break;
                             // 2) Get ready or not:
                             } else if (captured_button(window, ready)) { 
                                 if (player_list->at(current_player_index).status) {
@@ -2105,9 +2098,10 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
                                         if (current_client == nullptr) {
                                             listen_thread->terminate();
                                             return;
-                                        } else {
-                                            find_servers(window, background, font);
+                                        } else if (current_session == nullptr) {
+                                            find_servers();
                                         }
+                                        break;
                                     } else {
                                         // unfocus disconnect button:
                                         disconnect.setFillColor(COLOR_DARK_VIOLET);
@@ -2219,7 +2213,7 @@ void session_menu(RenderWindow& window, Sprite& background, const Font& font, Se
 };
 
 // Find servers function:
-void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
+void Menu::find_servers() {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
 
@@ -2313,7 +2307,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
             server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
                 Vector2f(3 * window.getSize().x / 6,
                 (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-            server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/4", button_size,
+            server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/" + to_string(current_client->get_servers()[server_info.size() / 3].max_clients), button_size,
                 Vector2f(5 * window.getSize().x / 6,
                 (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
         }
@@ -2394,7 +2388,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                             if (captured_button(window, back) && status != NOT_READY) {
                                 search_thread->terminate();
                                 current_client->disconnect_udp_socket();
-                                return;
+                                multiplayer_menu();
                             // current_client->get_servers().size() + 2) Refresh list of servers:
                             } else if (captured_button(window, refresh) && status != NOT_READY ) {
                                 search_thread->terminate();
@@ -2448,7 +2442,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
                                     // execute back button:
                                     search_thread->terminate();
                                     current_client->disconnect_udp_socket();
-                                    return;
+                                    multiplayer_menu();
                                 }
 
                                 // unfocus back button:
@@ -2612,7 +2606,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
 
         if (status == SUCCESS) {
             cout << current_client->get_server_data().clients.size() << endl;
-            session_menu(window, background, font, nullptr, current_client);
+            session_menu(nullptr, current_client);
         }
 
         // Clear window:
@@ -2638,7 +2632,7 @@ void find_servers(RenderWindow& window, Sprite& background, const Font& font) {
     }
 };
 
-void complexity_menu(RenderWindow& window, Sprite& background, const Font& font) {
+void Menu::complexity_menu() {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -2724,16 +2718,16 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                             // If appropriate mouse position was captured:
                             // 1) Starting to play in the easy mode:
                             if (captured_button(window, mechanics))
-                                game(window, background, font, 1);
+                                game(1);
                             // 2) Starting to play in the normal mode:
                             else if (captured_button(window, STIC))
-                                game(window, background, font, 2);
+                                game(2);
                             // 3) Starting to play in the hard mode:
                             else if (captured_button(window, applied_maths))
-                                game(window, background, font, 3);
+                                game(3);
                             // 4) Go back:
                             else if (captured_button(window, back))
-                                return;
+                                main_menu();
                             break;
                         default:
                             break;
@@ -2761,7 +2755,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute mechanics button:
-                                        game(window, background, font, 1);
+                                        game(1);
 
                                     // unfocus mechanics button:
                                     mechanics.setFillColor(COLOR_DARK_VIOLET);
@@ -2775,7 +2769,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute STIC button:
-                                        game(window, background, font, 2);
+                                        game(2);
 
                                     // unfocus STIC button:
                                     STIC.setFillColor(COLOR_DARK_VIOLET);
@@ -2789,7 +2783,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute applied Maths button:
-                                        game(window, background, font, 3);
+                                        game(3);
 
                                     // unfocus applied Maths button:
                                     applied_maths.setFillColor(COLOR_DARK_VIOLET);
@@ -2803,7 +2797,7 @@ void complexity_menu(RenderWindow& window, Sprite& background, const Font& font)
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute back button:
-                                        main_menu(window, background, font);
+                                        main_menu();
 
                                     // unfocus back button:
                                     back.setFillColor(COLOR_DARK_VIOLET);

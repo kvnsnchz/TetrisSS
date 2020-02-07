@@ -1,3 +1,5 @@
+#define endHPP
+
 #include "server.hpp"
 
 void Server::set_server_name(const string& server_name) {

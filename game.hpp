@@ -1,40 +1,58 @@
+#ifndef gameHPP
+#define gameHPP
+
 #include <unistd.h>
-#include "board.hpp"
 #include "server.hpp"
 #include "client.hpp"
 
 #define DEF_COU_CHA_FIG 2 
 #define MAX_SESSION_NAME_LENGTH 12
 
-enum state_figure {
-    DESCEND_FIGURE,
-    STOP_FIGURE,
-    CHANGE_FIGURE
-};
-
 // new button initialization function (for code reduction):
-Text create_button(const Font& font, const string title, const double& button_size, Vector2f position, const bool& outline = true, const unsigned& center_coefficient = 2);
+Text create_button(Font& font, const string title, const double& button_size,
+    Vector2f position, const bool& outline = true, const unsigned& center_coefficient = 2);
 
 // captured button identifier:
 bool captured_button(RenderWindow& window, Text& button);
 
-void game(RenderWindow& window, Sprite& background, const Font& font, const unsigned& complexity);
+// Menu class to initialize desktop hierarchy:
+class Menu {
+    private:
+        RenderWindow window;
+        Sprite background;
+        Font font;
 
-void game_over_menu(RenderWindow& window, Sprite& background, Board* game_board, const Font& font);
+        friend Text create_button(Font& font, const string title, const double& button_size,
+            Vector2f position, const bool& outline, const unsigned& center_coefficient);
 
-void pause_menu(RenderWindow& window, Sprite& background, Board* game_board, const Font& font);
+        friend bool captured_button(RenderWindow& window, Text& button);
+    public:
+        Menu(const Sprite& new_background, const Font& new_font): background(new_background), font(new_font) {
+            RenderWindow window();
+        };
+        
+        void game(const unsigned& complexity);
 
-void main_menu(RenderWindow& window, Sprite& background, const Font& font);
+        void game_over_menu(Board* game_board);
 
-void multiplayer_menu(RenderWindow& window, Sprite& background, const Font& font);
+        void pause_menu(Board* game_board);
 
-// Set up and create a new session as a server:
-void create_session(RenderWindow& window, Sprite& background, const Font& font);
+        void main_menu();
 
-// Manage just created session as a server:
-void session_menu(RenderWindow& window, Sprite& background, const Font& font, Server* current_session, Client* current_client);
+        void multiplayer_menu();
 
-// Find servers function:
-void find_servers(RenderWindow& window, Sprite& background, const Font& font);
+        // Set up and create a new session as a server:
+        void create_session();
 
-void complexity_menu(RenderWindow& window, Sprite& background, const Font& font);
+        // Manage just created session as a server:
+        void session_menu(Server* current_session, Client* current_client);
+
+        // Find servers function:
+        void find_servers();
+
+        void complexity_menu();
+
+        ~Menu() {};
+};
+
+#endif

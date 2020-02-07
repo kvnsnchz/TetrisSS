@@ -1,3 +1,6 @@
+#ifndef boardHPP
+#define boardHPP
+
 #include "figures.hpp"
 
 // board grid size:
@@ -83,3 +86,5 @@ class Board {
 
         ~Board();        
 };
+
+#endif
