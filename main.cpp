@@ -25,15 +25,6 @@ int main(int argc, char const *argv[]) {
     //      });
     //      thread.launch();
     //  }
-    // get user's resolution:
-    Vector2f resolution(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height);
-
-    // create the game window
-    // which size depends on user's screen resolution:
-    RenderWindow window(VideoMode(min(41.0f * 14 + 20.0f, resolution.x / 2), min(41.0f * 20 + 9.0f, resolution.y - 100.0f)), "TetrisSS 1.0");
-    
-    // set window's size:
-    window.setSize(Vector2u(min(41.0f * 14 + 20.0f, resolution.x / 2), min(41.0f * 20 + 9.0f, resolution.y - 100.0f)));
 
     // set the background image:
     Texture texture;
@@ -60,7 +51,11 @@ int main(int argc, char const *argv[]) {
     background.setTexture(texture);
     background.setColor(Color(255, 255, 255, 200));
 
-    main_menu(window, background, font);
-   // threads[0].join();
+    // create the game menu:
+    Menu* menu = new Menu(background, font);
+
+    menu->main_menu();
+    
+    // threads[0].join();
     return 0;
 }

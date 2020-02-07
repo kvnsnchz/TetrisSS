@@ -6,6 +6,12 @@ using namespace sf;
 using namespace std;
 using namespace colors;
 
+enum figure_state {
+    DESCEND_FIGURE,
+    STOP_FIGURE,
+    CHANGE_FIGURE
+};
+
 // figure grid size (for drawing next figures):
 # define FIGURE_GRID_WIDTH 4
 # define FIGURE_GRID_HEIGHT 2
