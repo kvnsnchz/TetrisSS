@@ -34,7 +34,7 @@ class Menu {
 
         void pause_menu(Board* game_board);
 
-        void main_menu();
+        void main_menu(const bool& initialization = false);
 
         void multiplayer_menu();
 

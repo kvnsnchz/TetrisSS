@@ -54,7 +54,7 @@ int main(int argc, char const *argv[]) {
     // create the game menu:
     Menu* menu = new Menu(background, font);
 
-    menu->main_menu();
+    menu->main_menu(true);
     
     // threads[0].join();
     return 0;
