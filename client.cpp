@@ -303,8 +303,8 @@ void Client::gaming(Board& board, request_status& status){
     packet_send << (Int64)board.get_score();
 
     unsigned** map = board.get_map();
-    for(unsigned i = 0; i < board.get_x_dim(); i ++){
-        for(unsigned j = 0; j < board.get_y_dim(); j ++){
+    for(int i = 0; i < board.get_x_dim(); i ++){
+        for(int j = 0; j < board.get_y_dim(); j ++){
             packet_send << map[i][j];
         }
     }

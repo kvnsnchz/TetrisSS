@@ -12,6 +12,7 @@ enum figure_state {
     CHANGE_FIGURE
 };
 
+
 // figure grid size (for drawing next figures):
 # define FIGURE_GRID_WIDTH 4
 # define FIGURE_GRID_HEIGHT 2

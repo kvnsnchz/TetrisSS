@@ -1,5 +1,4 @@
 #include <unistd.h>
-#include "board.hpp"
 #include "server.hpp"
 #include "client.hpp"
 
