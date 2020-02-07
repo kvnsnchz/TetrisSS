@@ -295,7 +295,8 @@ void Client::ready(bool is_ready){
 
 }
 
-void Client::gaming(Board& board, request_status& status){
+//Sending board data
+void Client::send_board_data(Board& board){
     //Filling send buffer:
     Packet packet_send;
     
@@ -305,8 +306,55 @@ void Client::gaming(Board& board, request_status& status){
     unsigned** map = board.get_map();
     for(unsigned i = 0; i < board.get_x_dim(); i ++){
         for(unsigned j = 0; j < board.get_y_dim(); j ++){
-            packet_send << map[i][j];
+            packet_send << (Int32)map[i][j];
         }
     }
     
+    //Sending board data message: 
+    if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
+    {
+        cout << "Client: Send error" << endl;
+    }
 } 
+
+//Listen the server during the game
+void Client::listen_game(request_status& status){
+    status = NOT_CHANGED;
+    socket.setBlocking(false);
+    
+    Packet packet_recv;;
+    IpAddress sender;
+    unsigned short port;
+
+    while(true){
+        //Check if there is a message:
+        if (socket.receive(packet_recv, sender, port) == Socket::Done){
+            //Get the buffer information:
+            datatype _datatype;
+            Uint32 datatype_value;
+
+            packet_recv >> datatype_value;
+            _datatype = (datatype) datatype_value;
+            
+            switch ((unsigned)_datatype)
+            {
+                case SERVER_GAME_UPDATE:
+                    for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
+                        Int64 score;
+                        packet_recv >> score;
+                        _server_data.clients[i].score = (long)score;
+                        
+                        for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
+                            for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
+                                Int32 value;
+                                packet_recv >> value;
+                                _server_data.clients[i].map[j][k] = (unsigned)value;
+                            }
+                        }
+                    }
+                    status = CHANGED;
+                    break;
+            }
+        }
+    }
+}

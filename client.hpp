@@ -44,7 +44,9 @@ public:
     void listen_server(request_status& status);
     //Ready or not ready to play
     void ready(bool);
-    //Gaming
-    void gaming(Board&, request_status&);
+    //Sending board data
+    void send_board_data(Board&);
+    //Listen the server during the game
+    void listen_game(request_status& status);
 };
 

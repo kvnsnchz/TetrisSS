@@ -56,5 +56,9 @@ public:
     void ready(bool is_ready);
     //Game start
     void start();
+    //Sending clients board data
+    void send_clients_board_data();
+    //Listen clients during the game
+    void listen_game(request_status& status);
 };
 

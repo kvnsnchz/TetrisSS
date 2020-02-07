@@ -258,3 +258,72 @@ void Server::listen_clients(request_status& status) {
         }
     }
 }
+
+//Sending clients board data
+void Server::send_clients_board_data(){
+    //Filling send buffer:
+    Packet packet_send;
+    
+    packet_send << SERVER_GAME_UPDATE;
+
+    for(unsigned i = 0; i < clients.size(); i ++){
+        packet_send << (Int64)clients[i].score;
+
+        for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
+            for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
+                packet_send << (Int32)clients[i].map[j][k];
+            }
+        }
+    }
+    
+    for(unsigned i = 0; i < clients.size(); i ++){
+        //Sending board data message: 
+        if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+        {
+            cout << "Client: Send error" << endl;
+        }
+    }
+    
+}
+
+//Listen clients during the game
+void Server::listen_clients(request_status& status){
+    status = NOT_CHANGED;
+    socket.setBlocking(false);
+    
+    Packet packet_recv;;
+    IpAddress sender;
+    unsigned short port;
+
+    while(true){
+        //Check if there is a message:
+        if (socket.receive(packet_recv, sender, port) == Socket::Done){
+            datatype _datatype;
+            Uint32 datatype_value;
+            //Get the buffer information:
+            packet_recv >> datatype_value;
+            _datatype = (datatype) datatype_value;
+            
+            switch ((unsigned)_datatype)
+            {
+                case CLIENT_GAME_UPDATE:
+                    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                    if(it == clients.end())
+                        break;
+
+                    Int64 score;
+                    packet_recv >> score;
+                    (*it).score = score;
+
+                    for(unsigned i = 0; i < BOARD_GRID_WIDTH; i ++){
+                        for(unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; i ++){
+                            Int32 value;
+                            packet_recv >> value;
+                            (*it).map[i][j] = value;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
