@@ -860,8 +860,10 @@ void Menu::pause_menu(Board* game_board) {
     }
 }
 
-void Menu::main_menu() {
-    window.create(VideoMode (VideoMode::getDesktopMode().width / 2, VideoMode::getDesktopMode().height), "TetrisSS 1.0");
+void Menu::main_menu(const bool& initialization) {
+    if (initialization)
+        window.create(VideoMode (VideoMode::getDesktopMode().width / 2, VideoMode::getDesktopMode().height),
+            "TetrisSS 1.0");
 
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
