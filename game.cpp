@@ -1929,7 +1929,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
 
     request_status status = NOT_CHANGED;
     // Initialize client-server communication:
-    Thread* listen_thread;    
+    Thread* listen_thread = nullptr;    
     if (current_client == nullptr) {
         // Look for the clients:
         listen_thread = new Thread([&] () { current_session->listen_clients(status); });
@@ -1943,7 +1943,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
     }
 
     // Create a list of clients and initialize server name:
-    vector<client_data> *player_list;
+    vector<client_data> *player_list = nullptr;
     string server_name = "";
     if (current_client == nullptr) {
         player_list = new vector<client_data>(current_session->get_clients());

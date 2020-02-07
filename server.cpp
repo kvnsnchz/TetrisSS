@@ -289,7 +289,7 @@ void Server::send_clients_board_data(){
 }
 
 //Listen clients during the game
-void Server::listen_clients(request_status& status){
+void Server::listen_game(request_status& status){
     status = NOT_CHANGED;
     socket.setBlocking(false);
     
