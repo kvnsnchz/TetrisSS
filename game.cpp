@@ -2475,6 +2475,8 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                             if (captured_button(window, disconnect)) {
                                 if (current_client == nullptr) {
                                     listen_thread->terminate();
+                                    current_session->disconnect();
+                                    current_session->disconnect_udp_socket();
                                     return;
                                 } else if (current_session == nullptr) {
                                     listen_thread->terminate();
@@ -2538,6 +2540,8 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     if (event.key.code == Keyboard::Return) {
                                         if (current_client == nullptr) {
                                             listen_thread->terminate();
+                                            current_session->disconnect();
+                                            current_session->disconnect_udp_socket();
                                             return;
                                         } else if (current_session == nullptr) {
                                             request_status status;
