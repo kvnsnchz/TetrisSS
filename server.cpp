@@ -325,8 +325,8 @@ void Server::listen_game(request_status& status){
 
                     packet_recv >> (*it).score;
 
-                    for(unsigned i = 0; i < BOARD_GRID_WIDTH; i ++){
-                        for(unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; j ++){
+                    for(unsigned i = 0; i < BOARD_GRID_WIDTH; i++){
+                        for(unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; j++){
                             Int32 value;
                             packet_recv >> value;
                             (*it).map[i][j] = value;

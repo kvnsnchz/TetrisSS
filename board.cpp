@@ -162,8 +162,12 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
         for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(player_index * ((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + i * cell_size.x + i + (player_index + 1) * 5.0f,
-                (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
+            if (player_index > 0)
+                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + player_index * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (player_index + 2) * 5.0f,
+                    (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
+            else
+                grid[i][j].setPosition(i * (cell_size.x + 1) + 5.0f,
+                    (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
 
             // Update cell color:
             switch(map[i][j]) {
@@ -244,13 +248,13 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
 };
 
 overflow Board::is_empty(const Point& point) const {
-    if(point.get_x() < 0 )
+    if (point.get_x() < 0)
         return OVERFLOW_LEFT;
-    if(point.get_x() >= x_dimension)
+    if (point.get_x() >= x_dimension)
         return OVERFLOW_RIGHT;
-    if(point.get_y() < 0)
+    if (point.get_y() < 0)
         return OVERFLOW_UP;
-    if(point.get_y() >= y_dimension)
+    if (point.get_y() >= y_dimension)
         return OVERFLOW_DOWN;
 
     if (map[point.get_x()][point.get_y()] == 0 || map[point.get_x()][point.get_y()] == current_figure->get_color_code())
@@ -260,7 +264,7 @@ overflow Board::is_empty(const Point& point) const {
 };
 
 void Board::change_point(const Point& point, const int& new_value, const bool& from_rotation) {
-    if(point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension){
+    if (point.get_x() < 0 || point.get_x() >= x_dimension || point.get_y() < 0 || point.get_y() >= y_dimension) {
         return;
     }
 
@@ -271,7 +275,7 @@ bool Board::step_down() {
     bool is_free = true;
     
     for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
-        if(current_figure->get_points()[i]->get_y() + 1 >= y_dimension){
+        if(current_figure->get_points()[i]->get_y() + 1 >= y_dimension) {
             is_free = false;
             break;
         }
@@ -282,7 +286,7 @@ bool Board::step_down() {
         };
     };
 ;
-    if(is_free) {
+    if (is_free) {
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
             change_point(*current_figure->get_points()[i]);
             current_figure->get_points()[i]->increment_y();
