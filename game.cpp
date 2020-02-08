@@ -2055,7 +2055,12 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     listen_thread->terminate();
                                     return;
                                 } else if (current_session == nullptr) {
+                                    listen_thread->terminate();
+                                    request_status status;
+                                    current_client->disconnect_server(status);
+                                    current_client->disconnect_udp_socket();
                                     find_servers();
+                                    return;
                                 }
                                 break;
                             // 2) Get ready or not:
@@ -2101,7 +2106,11 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                             listen_thread->terminate();
                                             return;
                                         } else if (current_session == nullptr) {
+                                            request_status status;
+                                            current_client->disconnect_server(status);
+                                            current_client->disconnect_udp_socket();
                                             find_servers();
+                                            return;
                                         }
                                         break;
                                     } else {
