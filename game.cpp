@@ -55,9 +55,13 @@ void Menu::game(const unsigned& complexity) {
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
+    // Boolean variable to stop descend thread during the pause:
+    bool is_paused = false;
+
+    // Using a thread to fall down:
     Thread descend_thread([&] () {
         for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
-            if (descend_counter >= 24000 / complexity) {
+            if (!is_paused && descend_counter >= 30 / complexity) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -83,6 +87,8 @@ void Menu::game(const unsigned& complexity) {
 
                 descend_counter = 0;
             }
+
+            sf::sleep(seconds(0.02f));
         }
     });
 
@@ -119,7 +125,9 @@ void Menu::game(const unsigned& complexity) {
                             // 1) pause game:
                             if (captured_button(window, pause)) {
                                 // execute pause button:
+                                is_paused = true;
                                 pause_menu(game_board);
+                                is_paused = false;
                                         
                                 // update cell size:
                                 cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -167,7 +175,9 @@ void Menu::game(const unsigned& complexity) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // execute pause button:
+                                        is_paused = true;
                                         pause_menu(game_board);
+                                        is_paused = false;
 
                                         // update cell size:
                                         cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -195,7 +205,9 @@ void Menu::game(const unsigned& complexity) {
                         // if Escape is pushed: 
                         case Keyboard::Escape:
                             // execute pause button:
+                            is_paused = true;
                             pause_menu(game_board);
+                            is_paused = false;
 
                             // update cell size:
                             cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
