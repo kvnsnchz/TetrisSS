@@ -10,7 +10,7 @@
 #include "board.hpp"
 
 #define MAX_SEARCH_TIME 10
-#define MAX_CONNECTION_TIME 2
+#define MAX_CONNECTION_TIME 10
 #define MAX_RESPONSE_TIME 1
 
 using namespace ports_number;

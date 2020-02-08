@@ -2400,6 +2400,8 @@ void Menu::find_servers() {
                                 search_thread->launch();
                             // current_client->get_servers().size() + 3) Get connect or not:
                             } else if (captured_button(window, connect) && chosen_server != -1 && status != NOT_READY) {
+                                search_thread->terminate();
+
                                 connect_thread = new Thread([&] () { current_client->connect_server(chosen_server, status); });
                                 
                                 connect_thread->launch();
@@ -2478,6 +2480,8 @@ void Menu::find_servers() {
                             } else if (focused_button_counter == current_client->get_servers().size() + 3 && status != NOT_READY) {
                                 // if we have pressed Enter:
                                 if (event.key.code == Keyboard::Return) {
+                                    search_thread->terminate();
+                                
                                     // execute connect button:
                                     connect_thread = new Thread([&] () { current_client->connect_server(chosen_server, status); });
                                 

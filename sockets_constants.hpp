@@ -1,3 +1,6 @@
+#ifndef SOCKETS_CONSTANTS
+#define SOCKETS_CONSTANTS
+
 #include <SFML/Network.hpp>
 #include <string>
 #include "board.hpp"
@@ -5,8 +8,6 @@
 using namespace std;
 using namespace sf;
 
-#ifndef SOCKETS_CONSTANTS
-#define SOCKETS_CONSTANTS
 
 enum datatype {
     SERVER_INFO_REQUEST,
@@ -46,11 +47,13 @@ enum request_status {
 struct client_data {
     IpAddress address;
     bool status;
-    long score;
+    Uint64 score;
     unsigned map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT];
     bool operator == (client_data other_client){
        return address == other_client.address;
     };
+    friend Packet& operator <<(sf::Packet& packet, client_data& _client_data);
+    friend Packet& operator >>(sf::Packet& packet, client_data& _client_data);
 };
 
 struct server_data {
@@ -63,7 +66,10 @@ struct server_data {
     bool operator == (server_data other_server){
         return address == other_server.address;
     };
+    friend Packet& operator <<(sf::Packet& packet, server_data& _server_data);
+    friend Packet& operator >>(sf::Packet& packet, server_data& _server_data);
 };
+
 
 namespace ports_number {
     const unsigned short SERVER_PORT = 2004;

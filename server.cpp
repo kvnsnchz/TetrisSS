@@ -72,8 +72,7 @@ void Server::ready(bool is_ready){
 
     packet_send << UPDATE_CLIENT_INFO;
     packet_send << (Uint32)(it - clients.begin());
-    packet_send << (*it).address.toString();
-    packet_send << (*it).status;
+    packet_send << (*it);
 
     for(unsigned i = 0; i < clients.size(); i++){
         if(clients[i].address != local_ip_address)
@@ -122,11 +121,12 @@ void Server::listen_clients(request_status& status) {
             case SERVER_INFO_REQUEST:
                 if(clients.size() <= max_clients){
                     //Filling send buffer:
+                    server_data _server_data{
+                        local_ip_address, server_name, (Uint32)clients.size(), level, max_clients, vector<client_data>()
+                    };
+
                     packet_send << SERVER_INFO_RESPONSE;
-                    packet_send << server_name;
-                    packet_send << (Uint32)clients.size();
-                    packet_send << level;
-                    packet_send << max_clients;                    
+                    packet_send << _server_data;                   
                     //Send server information to client 
                     if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                         cout << "Server: Send error" << endl;
@@ -147,37 +147,38 @@ void Server::listen_clients(request_status& status) {
                     if(find(clients.begin(), clients.end(), _client_data) == clients.end())
                         clients.emplace_back(_client_data);
                     //Buffer filling with success message
+                    server_data _server_data{
+                        local_ip_address, server_name, (Uint32)clients.size(), level, max_clients, vector<client_data>()
+                    };
+
                     packet_send << SERVER_CONN_RESPONSE_SUCCESS;
-                    packet_send << server_name;
-                    packet_send << (Uint32)clients.size();
-                    packet_send << level;
-                    packet_send << max_clients;
+                    packet_send << _server_data;
 
                     gen_packet_send << NEW_CLIENT_INFO;
                    
                     for(unsigned i = 0; i < clients.size(); i ++){
-                        packet_send << clients[i].address.toString();
-                        packet_send << clients[i].status;
+                        packet_send << clients[i];
 
-                        gen_packet_send << clients[i].address.toString();
-                        gen_packet_send << clients[i].status;
+                        gen_packet_send << clients[i];
                     }
                     
                 }
                 //Send information to client
                 if (socket.send(packet_send, sender, CLIENT_PORT) != sf::Socket::Done)
                     cout << "Server: Send error" << endl;
-                
+                    
                 if(gen_packet_send.getDataSize() > 0){
                     for(unsigned i = 0; i < clients.size(); i ++){
                         if(clients[i].address != sender && clients[i].address != local_ip_address)
                             if (socket.send(gen_packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
                                 cout << "Server: Send error" << endl;
                     }
+                    status = CHANGED;
+                    cout << "New client " << sender << endl;
+                    break;
                 }
 
-                status = CHANGED;
-                cout << "New client " << sender << endl;
+                cout << "Error new client " << sender << endl;
                 
                 break;
             //Check if the message is a request of disconnection:
@@ -210,8 +211,7 @@ void Server::listen_clients(request_status& status) {
                 (*it).status = true;
                 packet_send << UPDATE_CLIENT_INFO;
                 packet_send << (Uint32)(it - clients.begin());
-                packet_send << (*it).address.toString();
-                packet_send << (*it).status;
+                packet_send << (*it);
 
                 for(unsigned i = 0; i < clients.size(); i++){
                     if(clients[i].address != sender && clients[i].address != local_ip_address)
@@ -236,9 +236,8 @@ void Server::listen_clients(request_status& status) {
                 (*it).status = false;
                 packet_send << UPDATE_CLIENT_INFO;
                 packet_send << (Uint32)(it - clients.begin());
-                packet_send << (*it).address.toString();
-                packet_send << (*it).status;
-
+                packet_send << (*it);
+                
                 for(unsigned i = 0; i < clients.size(); i++){
                     if(clients[i].address != sender && clients[i].address != local_ip_address)
                         if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
@@ -269,7 +268,7 @@ void Server::send_clients_board_data(){
     packet_send << SERVER_GAME_UPDATE;
 
     for(unsigned i = 0; i < clients.size(); i ++){
-        packet_send << (Int64)clients[i].score;
+        packet_send << clients[i].score;
 
         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
             for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
@@ -313,9 +312,7 @@ void Server::listen_game(request_status& status){
                     if(it == clients.end())
                         break;
 
-                    Int64 score;
-                    packet_recv >> score;
-                    (*it).score = score;
+                    packet_recv >> (*it).score;
 
                     for(unsigned i = 0; i < BOARD_GRID_WIDTH; i ++){
                         for(unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; i ++){

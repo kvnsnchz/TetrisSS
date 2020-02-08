@@ -63,11 +63,7 @@ void Client::search_servers(){
                 if(it == servers.end()){
                     server_data _server_data;
                     _server_data.address = sender;
-                    packet_recv >> _server_data.name;
-                    packet_recv >> _server_data.clients_quantity;
-                    packet_recv >> _server_data.level;
-                    packet_recv >> _server_data.max_clients;
-
+                    packet_recv >> _server_data;
                     servers.emplace_back(_server_data);
                     
                     cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
@@ -107,7 +103,7 @@ void Client::connect_server(const unsigned pos, request_status& status){
     chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
     chrono::duration<double> elapsed_seconds;
     //Setting non blocking socket:
-    socket.setBlocking(false);
+  //  socket.setBlocking(false);
     
     do{
         Packet packet_recv;
@@ -129,7 +125,7 @@ void Client::connect_server(const unsigned pos, request_status& status){
                 {
                 //Check if the message is a server connection response error:
                 case SERVER_CONN_RESPONSE_ERROR:
-                    servers.erase(servers.begin() + pos);
+                   // servers.erase(servers.begin() + pos);
                     status = ERROR;
                     return;
                 //Check if the message is a server connection response success:
@@ -141,11 +137,9 @@ void Client::connect_server(const unsigned pos, request_status& status){
                     packet_recv >> _server_data.max_clients;
                 
                     for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
-                        string client_address;
-                        bool client_status;
-                        packet_recv >> client_address;
-                        packet_recv >> client_status;
-                        _server_data.clients.emplace_back(client_data{client_address, client_status});
+                        client_data _client_data;
+                        packet_recv >> _client_data;
+                        _server_data.clients.emplace_back(_client_data);
                     }
                     status = SUCCESS;
                     cout << "Connected to the Server " << _server_data.address << endl;
@@ -236,11 +230,9 @@ void Client::listen_server(request_status& status){
             case NEW_CLIENT_INFO:
                 _server_data.clients.clear();
                 for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
-                    string client_address;
-                    bool client_status;
-                    packet_recv >> client_address;
-                    packet_recv >> client_status;
-                    _server_data.clients.emplace_back(client_data{client_address, client_status});
+                    client_data _client_data;
+                    packet_recv >> _client_data;
+                    _server_data.clients.emplace_back(_client_data);
                 }
                 status = CHANGED;
             break;
@@ -248,13 +240,10 @@ void Client::listen_server(request_status& status){
             case UPDATE_CLIENT_INFO:
             {    
                 unsigned pos_client;
-                string client_address;
-                bool client_status;
+
                 packet_recv >> pos_client;
-                packet_recv >> client_address;
-                packet_recv >> client_status;
-                _server_data.clients[pos_client].address = client_address;
-                _server_data.clients[pos_client].status = client_status;
+                packet_recv >> _server_data.clients[pos_client];
+
                 cout << "Client update " << _server_data.clients[pos_client].address << _server_data.clients[pos_client].status << endl;
                 status = CHANGED;
                 break;
@@ -342,9 +331,7 @@ void Client::listen_game(request_status& status){
             {
                 case SERVER_GAME_UPDATE:
                     for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
-                        Int64 score;
-                        packet_recv >> score;
-                        _server_data.clients[i].score = (long)score;
+                        packet_recv >> _server_data.clients[i].score;
                         
                         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
                             for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
