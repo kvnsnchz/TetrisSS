@@ -8,6 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include "sockets_constants.hpp"
 #include "board.hpp"
+#include "player.hpp"
 
 #define MAX_SEARCH_TIME 10
 #define MAX_CONNECTION_TIME 10
@@ -15,7 +16,7 @@
 
 using namespace ports_number;
 
-class Client
+class Client: public Player
 {
 private:
     //IPv4 address of the game server:
@@ -24,15 +25,21 @@ private:
     vector<server_data> servers;
     UdpSocket socket;
 public:
-    Client() {
+    Client(): Player() {
         connect_udp_socket();
     };
+    
+    Client(const bool& new_player_status): Player(new_player_status) {
+        connect_udp_socket();
+    };
+
     ~Client() {
         disconnect_udp_socket();
     }
 
     server_data get_server_data() const;
     vector<server_data> get_servers() const;
+
     //Connect to Socket UDP
     void connect_udp_socket();
     //Disconnect to Socket UDP

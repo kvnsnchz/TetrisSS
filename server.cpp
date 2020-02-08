@@ -82,20 +82,31 @@ void Server::ready(bool is_ready){
     
 }
 
-//Game start
-void Server::start(){
-    //Filling send buffer:
+// Start multiplayer game
+bool Server::start() {
+    // Check everyone's readiness:
+    for (unsigned i = 0; i < clients.size(); i++) {
+        if (!clients[i].status) {
+            cout << "Can't start a game, some players aren't ready!!!" << endl;
+            return false;
+        }
+    }
+    
+    // Filling send buffer:
     Packet packet_send;
 
     packet_send << SERVER_GAME_START;
 
-    for(unsigned i = 0; i < clients.size(); i++){
-        if(clients[i].address != local_ip_address)
+    for (unsigned i = 0; i < clients.size(); i++) {
+        if (clients[i].address != local_ip_address)
             if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
                 cout << "Server: Send error" << endl;
     }
+
+    return true;
 }
-//Listen for new customer connections:
+
+// Listen for new customer connections:
 void Server::listen_clients(request_status& status) {
     status = NOT_CHANGED;
     socket.setBlocking(false);
@@ -225,7 +236,7 @@ void Server::listen_clients(request_status& status) {
                     cout << "Server: Send error" << endl;
                 
                 status = CHANGED;
-                cout << "Client " << sender << " ready" << endl;
+                cout << "Client " << sender << "is ready" << endl;
                 break;
             }
             case CLIENT_NOT_READY:
@@ -250,7 +261,7 @@ void Server::listen_clients(request_status& status) {
                     cout << "Server: Send error" << endl;
                 
                 status = CHANGED;
-                cout << "Client " << sender << " ready" << endl;
+                cout << "Client " << sender << "is not ready" << endl;
                 break;
 
             }
@@ -261,7 +272,7 @@ void Server::listen_clients(request_status& status) {
 }
 
 //Sending clients board data
-void Server::send_clients_board_data(){
+void Server::send_clients_board_data() {
     //Filling send buffer:
     Packet packet_send;
     
@@ -292,7 +303,7 @@ void Server::listen_game(request_status& status){
     status = NOT_CHANGED;
     socket.setBlocking(false);
     
-    Packet packet_recv;;
+    Packet packet_recv;
     IpAddress sender;
     unsigned short port;
 

@@ -102,20 +102,12 @@ void Board::add_figure() {
         change_point(*current_figure->get_points()[i], current_figure->get_color_code());
 };
 
+unsigned** Board::get_map() const {
+    return map;
+}
+
 unsigned Board::get_complexity() {
     return complexity;
-};
-
-void Board::set_complexity(const unsigned& new_complexity) {
-    complexity = new_complexity;
-};
-
-void Board::set_cell_size(const Vector2f& new_cell_size) {
-    cell_size.x = new_cell_size.x;
-    cell_size.y = new_cell_size.y;
-
-    // Update next figures' cell size:
-    next_figure->set_grid(x_dimension, new_cell_size);
 };
 
 int Board::get_x_dim() const {
@@ -130,14 +122,32 @@ long Board::get_score() const {
     return score;
 };
 
-unsigned** Board::get_map() const {
-    return map;
-}
-
 Figure* Board::get_next_figure() const {
     return next_figure;
 };
-        
+
+void Board::set_map(const unsigned new_map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT]) {
+    for (unsigned i = 0; i < BOARD_GRID_WIDTH; i++)
+        for (unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; j++)
+            map[i][j] = map[i][j];
+};
+
+void Board::set_complexity(const unsigned& new_complexity) {
+    complexity = new_complexity;
+};
+
+void Board::set_cell_size(const Vector2f& new_cell_size) {
+    cell_size.x = new_cell_size.x;
+    cell_size.y = new_cell_size.y;
+
+    // Update next figures' cell size:
+    next_figure->set_grid(x_dimension, new_cell_size);
+};
+
+void Board::set_score(const long& new_score) {
+    score = new_score;
+};
+
 void Board::set_current_figure(Figure* figure) {
     current_figure = figure;
 };
@@ -147,12 +157,13 @@ void Board::set_next_figure(Figure* figure) {
 };
 
 // print game board:
-void Board::print_board(RenderWindow& window, const Font& font, const double& font_size) {
+void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index) {
     for(int i = 0; i < x_dimension; i++) {
         for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
-            grid[i][j].setPosition(i * cell_size.x + i + 5.0f, (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
+            grid[i][j].setPosition(player_index * ((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + i * cell_size.x + i + (player_index + 1) * 5.0f,
+                (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
 
             // Update cell color:
             switch(map[i][j]) {
@@ -195,31 +206,40 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
         }
     }   
 
-    // update next figure:
+    // if the function was called from sinpleplayer:
     Text next_figure_title;
-    next_figure_title.setFont(font);
-    next_figure_title.setString("Next Figure:");
-    next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 15.0f);
-    next_figure_title.setCharacterSize(font_size);
-    next_figure_title.setStyle(Text::Bold);
-    next_figure_title.setFillColor(COLOR_DARK_VIOLET);
-    window.draw(next_figure_title);
+    if (player_index == 0) {
+        // update next figure:
+        next_figure_title.setFont(font);
+        next_figure_title.setString("Next Figure:");
+        next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 15.0f);
+        next_figure_title.setCharacterSize(font_size);
+        next_figure_title.setStyle(Text::Bold);
+        next_figure_title.setFillColor(COLOR_DARK_VIOLET);
+        window.draw(next_figure_title);
 
-    // next figure itself (its grid):
-    figure_to_draw = next_figure->get_grid();
-    for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
-        for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++)
-            window.draw(figure_to_draw[i][j]);
+        // next figure itself (its grid):
+        figure_to_draw = next_figure->get_grid();
+        for (unsigned i = 0; i < FIGURE_GRID_WIDTH; i++)
+            for (unsigned j = 0; j < FIGURE_GRID_HEIGHT; j++)
+                window.draw(figure_to_draw[i][j]);
+    }
 
     // draw a score:
     Text score_title;
     score_title.setFont(font);
-    score_title.setString("Score: \n" + to_string(score));
-    score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
-        next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
-    score_title.setFillColor(COLOR_DARK_VIOLET);
+    score_title.setFillColor(COLOR_DARK_VIOLET);score_title.setString("Player " + to_string(player_index) + "\nScore: \n" + to_string(score));
+    if (player_index == 0) {
+        score_title.setString("My Score: \n" + to_string(score));
+        score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
+            next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
+    } else {
+        score_title.setString("Player " + to_string(player_index + 1) + "\nScore: \n" + to_string(score));
+        score_title.setPosition(grid[3][y_dimension - 1].getPosition().x, 
+            (y_dimension - FIGURE_GRID_HEIGHT) * (cell_size.y + 1) + 4.0f);
+    }
     window.draw(score_title);
 };
 

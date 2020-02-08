@@ -53,24 +53,22 @@ class Board {
         // adding figure on top of the board:
         void add_figure();
         
+        unsigned** get_map() const;
         unsigned get_complexity();
-        void set_complexity(const unsigned& new_complexity);
-
-        void set_cell_size(const Vector2f& new_cell_size);
-
         int get_x_dim() const;
         int get_y_dim() const;
-
         long get_score() const;
-
-        unsigned** get_map() const;
-
         Figure* get_next_figure() const;
+
+        void set_map(const unsigned new_map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT]);
+        void set_complexity(const unsigned& new_complexity);
+        void set_cell_size(const Vector2f& new_cell_size);
+        void set_score(const long& new_score);
         void set_current_figure(Figure* figure);
         void set_next_figure(Figure* figure);
 
         // draw game board:
-        void print_board(RenderWindow& window, const Font& font, const double& font_size);
+        void print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index = 0);
 
         void change_point(const Point& point, const int& new_value = 0, const bool& from_rotation = false);
         bool step_down();

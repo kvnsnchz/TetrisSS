@@ -31,7 +31,11 @@ class Menu {
             RenderWindow window();
         };
         
+        // Function to play:
         void game(const unsigned& complexity);
+
+        // Multiplayer game function:
+        void multiplayer_game(Server* current_session, Client* current_client);
 
         void game_over_menu(Board* game_board);
 

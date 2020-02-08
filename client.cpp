@@ -9,6 +9,7 @@ server_data Client::get_server_data() const {
 vector<server_data> Client::get_servers() const {
     return servers;
 }
+
 //Connect to udp socket
 void Client::connect_udp_socket(){
     if (socket.bind(CLIENT_PORT) != sf::Socket::Done)
@@ -17,10 +18,12 @@ void Client::connect_udp_socket(){
         return;
     }
 }
+
 //Disconnect to udp socket
 void Client::disconnect_udp_socket(){
     socket.unbind();
 }
+
 //Search for available game servers:
 void Client::search_servers(){
     //Filling send buffer:
