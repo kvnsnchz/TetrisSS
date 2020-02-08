@@ -64,7 +64,7 @@ public:
     //Game start
     bool start();
     //Sending clients board data
-    void send_clients_board_data();
+    void send_clients_board_data(Board& board);
     //Listen clients during the game
     void listen_game(request_status& status);
 };
