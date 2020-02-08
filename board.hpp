@@ -68,7 +68,7 @@ class Board {
         void set_next_figure(Figure* figure);
 
         // draw game board:
-        void print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index = 0);
+        void print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index = 0, const unsigned& board_index = 0);
 
         void change_point(const Point& point, const int& new_value = 0, const bool& from_rotation = false);
         bool step_down();

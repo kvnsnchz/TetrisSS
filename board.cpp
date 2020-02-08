@@ -129,7 +129,7 @@ Figure* Board::get_next_figure() const {
 void Board::set_map(const unsigned new_map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT]) {
     for (unsigned i = 0; i < BOARD_GRID_WIDTH; i++)
         for (unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; j++)
-            map[i][j] = map[i][j];
+            map[i][j] = new_map[i][j];
 };
 
 void Board::set_complexity(const unsigned& new_complexity) {
@@ -157,13 +157,13 @@ void Board::set_next_figure(Figure* figure) {
 };
 
 // print game board:
-void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index) {
+void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index, const unsigned& board_index) {
     for(int i = 0; i < x_dimension; i++) {
         for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
-            if (player_index > 0)
-                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + player_index * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (player_index + 2) * 5.0f,
+            if (board_index > 0)
+                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 1) * 10.0f,
                     (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
             else
                 grid[i][j].setPosition(i * (cell_size.x + 1) + 5.0f,
@@ -212,11 +212,11 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
 
     // if the function was called from sinpleplayer:
     Text next_figure_title;
-    if (player_index == 0) {
+    if (board_index == 0) {
         // update next figure:
         next_figure_title.setFont(font);
         next_figure_title.setString("Next Figure:");
-        next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 15.0f);
+        next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 4.0f, 15.0f);
         next_figure_title.setCharacterSize(font_size);
         next_figure_title.setStyle(Text::Bold);
         next_figure_title.setFillColor(COLOR_DARK_VIOLET);
@@ -234,14 +234,17 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setFont(font);
     score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
-    score_title.setFillColor(COLOR_DARK_VIOLET);score_title.setString("Player " + to_string(player_index) + "\nScore: \n" + to_string(score));
-    if (player_index == 0) {
+    score_title.setFillColor(COLOR_DARK_VIOLET);
+    if (board_index == 0) {
         score_title.setString("My Score: \n" + to_string(score));
         score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
             next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     } else {
-        score_title.setString("Player " + to_string(player_index + 1) + "\nScore: \n" + to_string(score));
-        score_title.setPosition(grid[3][y_dimension - 1].getPosition().x, 
+        if (player_index + 1 >= board_index)
+            score_title.setString("Player " + to_string(board_index + 1) + "\nScore: \n" + to_string(score));
+        else
+            score_title.setString("Player " + to_string(board_index) + "\nScore: \n" + to_string(score));
+        score_title.setPosition(grid[0][y_dimension - 1].getPosition().x + (grid[x_dimension - 1][y_dimension - 1].getPosition().x + 20.0f - grid[0][y_dimension - 1].getPosition().x - score_title.getGlobalBounds().width) / 2,
             (y_dimension - FIGURE_GRID_HEIGHT) * (cell_size.y + 1) + 4.0f);
     }
     window.draw(score_title);

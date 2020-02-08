@@ -427,9 +427,9 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 } else {
                     other_game_boards[i]->set_map(player_list->at(i).map);
                     other_game_boards[i]->set_score(player_list->at(i).score);
-                } 
+                }
             }
-        
+    
             sf::sleep(seconds(0.1f));
         }
     });
@@ -688,7 +688,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         }
 
         for (unsigned i = 0; i < number_of_players - 1; i++)
-            other_game_boards[i]->print_board(window, font, i + 1);
+            other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_player_index, i + 1);
 
         // display what we have just drawn:
         window.display();
