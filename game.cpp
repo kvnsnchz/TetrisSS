@@ -429,6 +429,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     other_game_boards[i]->set_score(player_list->at(i).score);
                 } 
             }
+            sf::sleep(seconds(0.1f));
         }
     });
 
