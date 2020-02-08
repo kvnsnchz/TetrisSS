@@ -365,9 +365,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         listen_thread->launch();
     }
 
-    // Initialize the thread for boards update:
-    Thread* update_thread = new Thread([&] () { return; });
-
     // Create a list of clients and initialize server name and complexity:
     vector<client_data> *player_list = nullptr;
     string server_name = "";
@@ -391,8 +388,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Initialize the index of current player:
     unsigned current_player_index = 0;
     for (unsigned i = 0; i < player_list->size(); i++)
-        if (player_list->at(i).address == IpAddress::getLocalAddress())
+        if (player_list->at(i).address == IpAddress::getLocalAddress()) {
             current_player_index = i;
+            break;   
+        }
 
     // create the game board: 
     Board* game_board = new Board(window, complexity, own_cell_size);
@@ -409,11 +408,9 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
-    // We are using descend counter to manage the figures' fall rate:
-    for (int descend_counter = 0; window.isOpen(); descend_counter++) {
-        update_thread->terminate();
-        
-        update_thread = new Thread([&] () {
+    // Initialize the thread for boards update:
+    Thread* update_thread = new Thread([&] () {
+        while (true) {
             player_list->clear();
             if (current_client == nullptr) {
                 current_session->send_clients_board_data();
@@ -423,16 +420,22 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 player_list = new vector<client_data>(current_client->get_server_data().clients);
             }
 
-            for (unsigned i = 0; i < number_of_players; i++) {
-                if (i != current_player_index) {
+            for (unsigned i = 0; i < number_of_players - 1; i++) {
+                if (i >= current_player_index) {
+                    other_game_boards[i]->set_map(player_list->at(i + 1).map);
+                    other_game_boards[i]->set_score(player_list->at(i + 1).score);
+                } else {
                     other_game_boards[i]->set_map(player_list->at(i).map);
                     other_game_boards[i]->set_score(player_list->at(i).score);
-                }    
+                } 
             }
-        });
+        }
+    });
 
-        update_thread->launch();
-        
+    update_thread->launch();
+
+    // We are using descend counter to manage the figures' fall rate:
+    for (int descend_counter = 0; window.isOpen(); descend_counter++) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -683,7 +686,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         }
 
         for (unsigned i = 0; i < number_of_players - 1; i++)
-            other_game_boards[i]->print_board(window, font, current_player_index);
+            other_game_boards[i]->print_board(window, font, i + 1);
 
         // display what we have just drawn:
         window.display();
@@ -2345,8 +2348,10 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
     // Initialize the index of current player:
     unsigned current_player_index = 0;
     for (unsigned i = 0; i < player_list->size(); i++)
-        if (player_list->at(i).address == IpAddress::getLocalAddress())
+        if (player_list->at(i).address == IpAddress::getLocalAddress()) {
             current_player_index = i;
+            break;
+        }
     
     // Initialize session title:
     Text session_title = create_button(font, "Session " + server_name, button_size,
@@ -2417,8 +2422,10 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
             }
 
             status = NOT_CHANGED;
-        } else if (status == GAME_START && current_session == nullptr)
+        } else if (status == GAME_START && current_session == nullptr) {
+            listen_thread->terminate();
             multiplayer_game(nullptr, current_client); 
+        }
 
         Event event;
 
@@ -2496,8 +2503,10 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     player_list_titles[2 * current_player_index + 1].setString("Ready");
                                 }
                             // 3) Start new multiplayer game:
-                            } else if (button_multiplier == 3 && captured_button(window, start) && current_session->start())
+                            } else if (button_multiplier == 3 && captured_button(window, start) && current_session->start()) {
+                                listen_thread->terminate();
                                 multiplayer_game(current_session, nullptr);
+                            }
                             break;
                         default:
                             break;
@@ -2589,6 +2598,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                 case 3:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return && current_session->start()) {
+                                        listen_thread->terminate();
                                         // execute start button:
                                         multiplayer_game(current_session, nullptr);
                                     } else if (event.key.code == Keyboard::Tab) {
