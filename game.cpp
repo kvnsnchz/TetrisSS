@@ -55,38 +55,38 @@ void Menu::game(const unsigned& complexity) {
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
-    // Thread descend_thread([&] () {
-    //     for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
-    //         if (descend_counter >= 24000 / complexity) {
-    //             if(_figure_state == STOP_FIGURE)
-    //                 count_change_figure--;
-    //             if(count_change_figure <= 0)
-    //                 _figure_state = CHANGE_FIGURE;
-    //             if(_figure_state == DESCEND_FIGURE)
-    //                 _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-    //             // if we can't move down no more:
-    //             if (_figure_state == CHANGE_FIGURE) {
+    Thread descend_thread([&] () {
+        for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
+            if (descend_counter >= 24000 / complexity) {
+                if(_figure_state == STOP_FIGURE)
+                    count_change_figure--;
+                if(count_change_figure <= 0)
+                    _figure_state = CHANGE_FIGURE;
+                if(_figure_state == DESCEND_FIGURE)
+                    _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+                // if we can't move down no more:
+                if (_figure_state == CHANGE_FIGURE) {
 
-    //                 count_change_figure = DEF_COU_CHA_FIG;
-    //                 _figure_state = DESCEND_FIGURE;
-    //                 // check for the full lines:
-    //                 game_board->fix_current_figure();
-    //                 game_board->erase_lines(complexity);
+                    count_change_figure = DEF_COU_CHA_FIG;
+                    _figure_state = DESCEND_FIGURE;
+                    // check for the full lines:
+                    game_board->fix_current_figure();
+                    game_board->erase_lines(complexity);
 
-    //                 // putting next figure into a current figure:
-    //                 game_board->set_current_figure(game_board->get_next_figure());
-    //                 // adding new current figure on the board:
-    //                 game_board->add_figure();
-    //                 // creating the next figure:
-    //                 game_board->set_next_figure(game_board->create_figure());
-    //             }
+                    // putting next figure into a current figure:
+                    game_board->set_current_figure(game_board->get_next_figure());
+                    // adding new current figure on the board:
+                    game_board->add_figure();
+                    // creating the next figure:
+                    game_board->set_next_figure(game_board->create_figure());
+                }
 
-    //             descend_counter = 0;
-    //         }
-    //     }
-    // });
+                descend_counter = 0;
+            }
+        }
+    });
 
-    // descend_thread.launch();
+    descend_thread.launch();
 
     // We are using descend counter to manage the figures' fall rate:
     for (int descend_counter = 0; window.isOpen(); descend_counter++) {
@@ -297,36 +297,38 @@ void Menu::game(const unsigned& complexity) {
         window.draw(pause);
         
         // set delay according to the complexity:
-        if ((float) descend_counter >= 300.0f / complexity) {
+        // if ((float) descend_counter >= 300.0f / complexity) {
              
-            if(_figure_state == STOP_FIGURE)
-                count_change_figure--;
-            if(count_change_figure <= 0)
-                _figure_state = CHANGE_FIGURE;
-            if(_figure_state == DESCEND_FIGURE)
-                _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-            // if we can't move down no more:
-            if (_figure_state == CHANGE_FIGURE) {
+        //     if(_figure_state == STOP_FIGURE)
+        //         count_change_figure--;
+        //     if(count_change_figure <= 0)
+        //         _figure_state = CHANGE_FIGURE;
+        //     if(_figure_state == DESCEND_FIGURE)
+        //         _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+        //     // if we can't move down no more:
+        //     if (_figure_state == CHANGE_FIGURE) {
 
-                count_change_figure = DEF_COU_CHA_FIG;
-                _figure_state = DESCEND_FIGURE;
-                // check for the full lines:
-                game_board->fix_current_figure();
-                game_board->erase_lines(complexity);
+        //         count_change_figure = DEF_COU_CHA_FIG;
+        //         _figure_state = DESCEND_FIGURE;
+        //         // check for the full lines:
+        //         game_board->fix_current_figure();
+        //         game_board->erase_lines(complexity);
 
-                // if we have reached game over condition:
-                if (game_board->game_over())
-                    game_over_menu(game_board);
+        //         // putting next figure into a current figure:
+        //         game_board->set_current_figure(game_board->get_next_figure());
+        //         // adding new current figure on the board:
+        //         game_board->add_figure();
+        //         // creating the next figure:
+        //         game_board->set_next_figure(game_board->create_figure());
+        //     }
 
-                // putting next figure into a current figure:
-                game_board->set_current_figure(game_board->get_next_figure());
-                // adding new current figure on the board:
-                game_board->add_figure();
-                // creating the next figure:
-                game_board->set_next_figure(game_board->create_figure());
-            }
+        //     descend_counter = 0;
+        // }
 
-            descend_counter = 0;
+        // if we have reached game over condition:
+        if (game_board->game_over()) {
+            descend_thread.terminate();
+            game_over_menu(game_board);
         }
 
         // display what we have just drawn:
