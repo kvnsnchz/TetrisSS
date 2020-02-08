@@ -1,3 +1,5 @@
+#define gameCPP
+
 #include "game.hpp"
 
 // new button initialization function (for code reduction):
@@ -52,6 +54,39 @@ void Menu::game(const unsigned& complexity) {
 
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
+
+    // Thread descend_thread([&] () {
+    //     for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
+    //         if (descend_counter >= 24000 / complexity) {
+    //             if(_figure_state == STOP_FIGURE)
+    //                 count_change_figure--;
+    //             if(count_change_figure <= 0)
+    //                 _figure_state = CHANGE_FIGURE;
+    //             if(_figure_state == DESCEND_FIGURE)
+    //                 _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+    //             // if we can't move down no more:
+    //             if (_figure_state == CHANGE_FIGURE) {
+
+    //                 count_change_figure = DEF_COU_CHA_FIG;
+    //                 _figure_state = DESCEND_FIGURE;
+    //                 // check for the full lines:
+    //                 game_board->fix_current_figure();
+    //                 game_board->erase_lines(complexity);
+
+    //                 // putting next figure into a current figure:
+    //                 game_board->set_current_figure(game_board->get_next_figure());
+    //                 // adding new current figure on the board:
+    //                 game_board->add_figure();
+    //                 // creating the next figure:
+    //                 game_board->set_next_figure(game_board->create_figure());
+    //             }
+
+    //             descend_counter = 0;
+    //         }
+    //     }
+    // });
+
+    // descend_thread.launch();
 
     // We are using descend counter to manage the figures' fall rate:
     for (int descend_counter = 0; window.isOpen(); descend_counter++) {
@@ -261,7 +296,6 @@ void Menu::game(const unsigned& complexity) {
         // draw pause button:
         window.draw(pause);
         
-        // (float) descend_counter / (500000 * window.getSize().x * window.getSize().y) >= 0.0000003f / complexity;
         // set delay according to the complexity:
         if ((float) descend_counter >= 300.0f / complexity) {
              
@@ -301,6 +335,363 @@ void Menu::game(const unsigned& complexity) {
 
     delete game_board;
 }
+
+// Multiplayer game function:
+void Menu::multiplayer_game(Server* current_session, Client* current_client) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // own button size:
+    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+
+    // initialize own cell size according the current window size:
+    Vector2f own_cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
+
+    // initialize other player's cell size:
+    Vector2f other_cell_size(own_cell_size.x / 2, own_cell_size.y / 2);
+
+    request_status status = NOT_CHANGED;
+    // Initialize client-server communication:
+    Thread* listen_thread = nullptr;    
+    if (current_client == nullptr) {
+        // Look for the clients:
+        listen_thread = new Thread([&] () { current_session->listen_game(status); });
+
+        listen_thread->launch();
+    } else if (current_session == nullptr) {
+        // Look for the clients:
+        listen_thread = new Thread([&] () { current_client->listen_game(status); });
+
+        listen_thread->launch();
+    }
+
+    // Initialize the thread for boards update:
+    Thread* update_thread = new Thread([&] () { return; });
+
+    // Create a list of clients and initialize server name and complexity:
+    vector<client_data> *player_list = nullptr;
+    string server_name = "";
+    unsigned complexity = 0;
+    if (current_client == nullptr) {
+        player_list = new vector<client_data>(current_session->get_clients());
+        server_name = current_session->get_server_name();
+        complexity = current_session->get_level();
+    } else if (current_session == nullptr) {
+        player_list = new vector<client_data>(current_client->get_server_data().clients);
+        server_name = current_client->get_server_data().name;
+        complexity = current_client->get_server_data().level;
+    }
+
+    // Initialize the number of players in the current session:
+    unsigned number_of_players = player_list->size();
+
+    window.setSize(Vector2u ((own_cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players,
+        (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
+
+    // Initialize the index of current player:
+    unsigned current_player_index = 0;
+    for (unsigned i = 0; i < player_list->size(); i++)
+        if (player_list->at(i).address == IpAddress::getLocalAddress())
+            current_player_index = i;
+
+    // create the game board: 
+    Board* game_board = new Board(window, complexity, own_cell_size);
+
+    // create game boards of the other players:
+    vector<Board*> other_game_boards;
+    for (unsigned i = 0; i < number_of_players - 1; i++)
+        other_game_boards.emplace_back(new Board(window, complexity, other_cell_size));
+
+    // Initialize pause button:
+    Text pause = create_button(font, "Pause", button_size,
+        Vector2f((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
+
+    figure_state _figure_state = DESCEND_FIGURE;
+    int count_change_figure = DEF_COU_CHA_FIG;
+
+    // We are using descend counter to manage the figures' fall rate:
+    for (int descend_counter = 0; window.isOpen(); descend_counter++) {
+        update_thread->terminate();
+        
+        update_thread = new Thread([&] () {
+            player_list->clear();
+            if (current_client == nullptr) {
+                current_session->send_clients_board_data();
+                player_list = new vector<client_data>(current_session->get_clients());
+            } else if (current_session == nullptr) {
+                current_client->send_board_data(*game_board);
+                player_list = new vector<client_data>(current_client->get_server_data().clients);
+            }
+
+            for (unsigned i = 0; i < number_of_players; i++) {
+                if (i != current_player_index) {
+                    other_game_boards[i]->set_map(player_list->at(i).map);
+                    other_game_boards[i]->set_score(player_list->at(i).score);
+                }    
+            }
+        });
+
+        update_thread->launch();
+        
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    pause.setFillColor(COLOR_DARK_VIOLET);
+                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
+
+                    // If appropriate mouse position was captured:
+                    if (captured_button(window, pause)) {
+                        // focus pause button:
+                        pause.setFillColor(COLOR_YELLOW);
+                        pause.setOutlineColor(COLOR_DARK_BLUE);
+                        focused_button_counter = 1;
+                    }
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) pause game:
+                            if (captured_button(window, pause)) {
+                                // execute pause button:
+                                pause_menu(game_board);
+                                        
+                                // update cell size:
+                                own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                game_board->set_cell_size(own_cell_size);
+
+                                // update button size:
+                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+
+                                // update all the buttons and their positions:
+                                pause.setCharacterSize(5 * button_size / 6);
+                                pause.setOutlineThickness(button_size / 6);
+                                pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                        
+                                // unfocus pause button:
+                                pause.setFillColor(COLOR_DARK_VIOLET);
+                                pause.setOutlineColor(COLOR_LIGHT_GREEN);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // if we pressed some button:
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // focus pause button:
+                                    pause.setFillColor(COLOR_YELLOW);
+                                    pause.setOutlineColor(COLOR_DARK_BLUE);
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        // execute pause button:
+                                        pause_menu(game_board);
+
+                                        // update cell size:
+                                        own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        game_board->set_cell_size(own_cell_size);
+
+                                        // update button size:
+                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                                    
+                                        // update all the buttons and their positions:
+                                        pause.setCharacterSize(5 * button_size / 6);
+                                        pause.setOutlineThickness(button_size / 6);
+                                        pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                                    }
+
+                                    // unfocus pause button:
+                                    pause.setFillColor(COLOR_DARK_VIOLET);
+                                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
+                                    focused_button_counter = 0;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        // if Escape is pushed: 
+                        case Keyboard::Escape:
+                            // execute pause button:
+                            pause_menu(game_board);
+
+                            // update cell size:
+                            own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            game_board->set_cell_size(own_cell_size);
+
+                            // update button size:
+                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+
+                            // update all the buttons and their positions:
+                            pause.setCharacterSize(5 * button_size / 6);
+                            pause.setOutlineThickness(button_size / 6);
+                            pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                            break;
+                        // while we want to move a current figure to the right:
+                        case Keyboard::D:
+                        case Keyboard::Right:
+                            if(_figure_state == STOP_FIGURE){
+                                bool step_done = game_board->step_right(true);
+                                if(step_done)
+                                    count_change_figure++;
+                                else
+                                    count_change_figure = 0;
+                                break;
+                            }
+                            
+                            game_board->step_right(false);
+                            break;
+                        // while we want to move a current figure to the left:
+                        case Keyboard::A:
+                        case Keyboard::Q:
+                        case Keyboard::Left:
+                            if(_figure_state == STOP_FIGURE){
+                                bool step_done = game_board->step_left(true);
+                                if(step_done)
+                                    count_change_figure++;
+                                else
+                                   count_change_figure = 0;
+                                break;
+                            }
+
+                            game_board->step_left(false);
+                            break;
+                        // while we want to fall faster:
+                        case Keyboard::S:
+                        case Keyboard::Down:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->step_down();
+                            break;
+                        case Keyboard::G:
+                        case Keyboard::Up:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->rotate(false);
+                            break;
+                        case Keyboard::H:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->rotate(true);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if ((window.getSize().y < 600) || (window.getSize().x < 400))
+                        window.setSize(Vector2u(400, 600));
+                    
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update own cell size:
+                    own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    game_board->set_cell_size(own_cell_size);
+
+                    // update other players' cell size:
+                    other_cell_size.x = own_cell_size.x / 2;
+                    other_cell_size.y = own_cell_size.y / 2;
+                    for (unsigned i = 0; i < number_of_players - 1; i++)
+                        other_game_boards[i]->set_cell_size(other_cell_size);
+
+                    // update button size:
+                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+
+                    // update all the buttons and their positions:
+                    pause.setCharacterSize(5 * button_size / 6);
+                    pause.setOutlineThickness(button_size / 6);
+                    pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // clear game window:
+        window.clear();
+
+        // draw background:
+        window.draw(background);
+
+        // draw a board:
+        game_board->print_board(window, font, 5 * button_size / 6);
+        // draw pause button:
+        window.draw(pause);
+        
+        // (float) descend_counter / (500000 * window.getSize().x * window.getSize().y) >= 0.0000003f / complexity;
+        // set delay according to the complexity:
+        if ((float) descend_counter >= 300.0f / complexity) {
+             
+            if(_figure_state == STOP_FIGURE)
+                count_change_figure--;
+            if(count_change_figure <= 0)
+                _figure_state = CHANGE_FIGURE;
+            if(_figure_state == DESCEND_FIGURE)
+                _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+            // if we can't move down no more:
+            if (_figure_state == CHANGE_FIGURE) {
+
+                count_change_figure = DEF_COU_CHA_FIG;
+                _figure_state = DESCEND_FIGURE;
+                // check for the full lines:
+                game_board->fix_current_figure();
+                game_board->erase_lines(complexity);
+
+                // if we have reached game over condition:
+                if (game_board->game_over()) {
+                    update_thread->terminate();
+                    listen_thread->terminate();
+                    game_over_menu(game_board);
+                }
+
+                // putting next figure into a current figure:
+                game_board->set_current_figure(game_board->get_next_figure());
+                // adding new current figure on the board:
+                game_board->add_figure();
+                // creating the next figure:
+                game_board->set_next_figure(game_board->create_figure());
+            }
+
+            descend_counter = 0;
+        }
+
+        for (unsigned i = 0; i < number_of_players - 1; i++)
+            other_game_boards[i]->print_board(window, font, current_player_index);
+
+        // display what we have just drawn:
+        window.display();
+    }
+
+    delete game_board;
+    other_game_boards.clear();
+};
 
 void Menu::game_over_menu(Board* game_board) {
     // counter of the currently chosen button:
@@ -1437,12 +1828,12 @@ void Menu::create_session() {
     // Initialize back button:
     Text back = create_button(font, "Back", button_size,
         Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 4);
    
     // Initialize create button:
     Text create = create_button(font, "Create", button_size,
         Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 4);
 
     // We are using enter text counter to manage the display of the entered text:
     for (unsigned enter_text_counter = 0; window.isOpen(); enter_text_counter++) {
@@ -1591,7 +1982,7 @@ void Menu::create_session() {
                             // 7) Create a new session (if all required information is entered):
                             else if (captured_button(window, create) && session_name != ""
                                 && complexity != 0 && max_number_of_players != 0) { 
-                                Server* current_session = new Server(session_name, max_number_of_players, complexity);
+                                Server* current_session = new Server(false, session_name, max_number_of_players, complexity);
                                 session_menu(current_session, nullptr);
                             }
                             break;
@@ -1748,7 +2139,7 @@ void Menu::create_session() {
                                     if (event.key.code == Keyboard::Return && session_name != ""
                                         && complexity != 0 && max_number_of_players != 0) {
                                         // execute create button:
-                                        Server* current_session = new Server(session_name, max_number_of_players, complexity);
+                                        Server* current_session = new Server(false, session_name, max_number_of_players, complexity);
                                         session_menu(current_session, nullptr);
                                     } else {
                                         // capture session name field:
@@ -1983,15 +2374,28 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
     }
 
+    // control button multiplier:
+    unsigned button_multiplier = 2;
+    if (current_client == nullptr)
+        button_multiplier = 3;
+
     // Initialize disconnect button:
     Text disconnect = create_button(font, "Disconnect", button_size,
-        Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+        Vector2f(window.getSize().x / (2 * button_multiplier),
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f), true, 2 * button_multiplier);
    
     // Initialize ready button:
     Text ready = create_button(font, "Ready", button_size,
-        Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f));
+        Vector2f(3 * window.getSize().x / (2 * button_multiplier),
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f), true, 2 * button_multiplier);
+
+    // Server has one more button:
+    Text start;
+    if (button_multiplier == 3)
+        // Initialize start button:
+        start = create_button(font, "Start", button_size,
+            Vector2f(5 * window.getSize().x / (2 * button_multiplier),
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f), true, 2 * button_multiplier);
 
     while(window.isOpen()) {
         // If we have some changes:
@@ -2002,6 +2406,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                 player_list = new vector<client_data>(current_client->get_server_data().clients);
 
             // Refresh player list:
+            player_list_titles.clear();
             for (unsigned i = 0; i < player_list->size(); i++) {
                 player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
                     Vector2f(window.getSize().x / 4,
@@ -2012,7 +2417,8 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
             }
 
             status = NOT_CHANGED;
-        }
+        } else if (status == GAME_START && current_session == nullptr)
+            multiplayer_game(nullptr, current_client); 
 
         Event event;
 
@@ -2029,6 +2435,10 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                     disconnect.setOutlineColor(COLOR_LIGHT_GREEN);
                     ready.setFillColor(COLOR_DARK_VIOLET);
                     ready.setOutlineColor(COLOR_LIGHT_GREEN);
+                    if (button_multiplier == 3) {
+                        start.setFillColor(COLOR_DARK_VIOLET);
+                        start.setOutlineColor(COLOR_LIGHT_GREEN);
+                    }
 
                     // If appropriate mouse position was captured:
                     if (captured_button(window, disconnect)) {
@@ -2041,7 +2451,12 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                         ready.setFillColor(COLOR_YELLOW);
                         ready.setOutlineColor(COLOR_DARK_BLUE); 
                         focused_button_counter = 2;
-                    } 
+                    } else if (button_multiplier == 3 && captured_button(window, start)) {
+                        // focus start button:
+                        start.setFillColor(COLOR_YELLOW);
+                        start.setOutlineColor(COLOR_DARK_BLUE); 
+                        focused_button_counter = 3;
+                    }
                     break;
                 case Event::MouseButtonPressed:
                     switch (event.key.code) {
@@ -2060,14 +2475,24 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                             } else if (captured_button(window, ready)) { 
                                 if (player_list->at(current_player_index).status) {
                                     ready.setString("Ready");
+                                    if (current_client == nullptr)
+                                        current_session->ready(false);
+                                    else if (current_session == nullptr)
+                                        current_client->ready(false);
                                     player_list->at(current_player_index).status = false;
                                     player_list_titles[2 * current_player_index + 1].setString("Not Ready");
                                 } else {
                                     ready.setString("Not Ready");
+                                    if (current_client == nullptr)
+                                        current_session->ready(true);
+                                    else if (current_session == nullptr)
+                                        current_client->ready(true);
                                     player_list->at(current_player_index).status = true;
                                     player_list_titles[2 * current_player_index + 1].setString("Ready");
                                 }
-                            }
+                            // 3) Start new multiplayer game:
+                            } else if (button_multiplier == 3 && captured_button(window, start) && current_session->start())
+                                multiplayer_game(current_session, nullptr);
                             break;
                         default:
                             break;
@@ -2118,10 +2543,18 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                         // execute ready button:
                                         if (player_list->at(current_player_index).status) {
                                             ready.setString("Ready");
+                                            if (current_client == nullptr)
+                                                current_session->ready(false);
+                                            else if (current_session == nullptr)
+                                                current_client->ready(false);
                                             player_list->at(current_player_index).status = false;
                                             player_list_titles[2 * current_player_index + 1].setString("Not Ready");
                                         } else {
                                             ready.setString("Not Ready");
+                                            if (current_client == nullptr)
+                                                current_session->ready(true);
+                                            else if (current_session == nullptr)
+                                                current_client->ready(true);
                                             player_list->at(current_player_index).status = true;
                                             player_list_titles[2 * current_player_index + 1].setString("Ready");
                                         }
@@ -2129,6 +2562,31 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                         // unfocus ready button:
                                         ready.setFillColor(COLOR_DARK_VIOLET);
                                         ready.setOutlineColor(COLOR_LIGHT_GREEN);
+                                        // for the client:
+                                        if (button_multiplier == 2) {
+                                            // focus disconnect button:
+                                            disconnect.setFillColor(COLOR_YELLOW);
+                                            disconnect.setOutlineColor(COLOR_DARK_BLUE);
+                                            focused_button_counter = 1;
+                                        // for the server:
+                                        } else if (button_multiplier == 3) {
+                                            // focus start button:
+                                            start.setFillColor(COLOR_YELLOW);
+                                            start.setOutlineColor(COLOR_DARK_BLUE);
+                                            focused_button_counter++;
+                                        }
+                                    }
+                                    break;
+                                case 3:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return && current_session->start()) {
+                                        // execute start button:
+                                        multiplayer_game(current_session, nullptr);
+                                    } else if (event.key.code == Keyboard::Tab) {
+                                        // unfocus start button:
+                                        start.setFillColor(COLOR_DARK_VIOLET);
+                                        start.setOutlineColor(COLOR_LIGHT_GREEN);
+                                        
                                         // focus disconnect button:
                                         disconnect.setFillColor(COLOR_YELLOW);
                                         disconnect.setOutlineColor(COLOR_DARK_BLUE);
@@ -2139,7 +2597,6 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     break;
                             }
                             break;
-                        
                         default:
                             break;
                     }
@@ -2181,13 +2638,21 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
 
                     disconnect.setCharacterSize(5 * button_size / 6);
                     disconnect.setOutlineThickness(button_size / 6);
-                    disconnect.setPosition((window.getSize().x - disconnect.getGlobalBounds().width) / 4,
+                    disconnect.setPosition((window.getSize().x - disconnect.getGlobalBounds().width) / (2 * button_multiplier),
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
                     
                     ready.setCharacterSize(5 * button_size / 6);
                     ready.setOutlineThickness(button_size / 6);
-                    ready.setPosition(3 * (window.getSize().x - disconnect.getGlobalBounds().width) / 4,
+                    ready.setPosition(3 * (window.getSize().x - ready.getGlobalBounds().width) / (2 * button_multiplier),
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    
+                    if (button_multiplier == 3) {
+                        start.setCharacterSize(5 * button_size / 6);
+                        start.setOutlineThickness(button_size / 6);
+                        start.setPosition(5 * (window.getSize().x - start.getGlobalBounds().width) / (2 * button_multiplier),
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                    }
+                    
                     break;
                 default:
                     break;
@@ -2208,6 +2673,8 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
             window.draw(player_list_titles[i]);
         window.draw(disconnect);
         window.draw(ready);
+        if (button_multiplier == 3)
+            window.draw(start);
         window.display();
     }
 };

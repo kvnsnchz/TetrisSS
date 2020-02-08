@@ -1,13 +1,17 @@
+#ifndef serverHPP
+#define serverHPP
+
 #include <iostream>
 #include <thread>
 #include <boost/algorithm/string.hpp>
 #include "sockets_constants.hpp"
+#include "player.hpp"
 
 #define MAX_CLIENTS 4
 
 using namespace ports_number;
 
-class Server
+class Server: public Player
 {
 private:
     string server_name;
@@ -19,18 +23,20 @@ private:
     UdpSocket socket;
     IpAddress local_ip_address;
 public:
-    Server(): server_name(""), max_clients(MAX_CLIENTS), level(0) {
+    Server(): Player(), server_name(""), max_clients(MAX_CLIENTS), level(0) {
         local_ip_address = IpAddress::getLocalAddress();
         clients.emplace_back(client_data{local_ip_address, false});
         connect_udp_socket();
     };
-    Server(string s_name, Uint32 max_cli, Uint32 lvl): 
-        server_name(s_name), max_clients(max_cli), level(lvl) 
+
+    Server(const bool& new_player_status, string s_name, Uint32 max_cli, Uint32 lvl): 
+        Player(new_player_status), server_name(s_name), max_clients(max_cli), level(lvl) 
     {
         local_ip_address = IpAddress::getLocalAddress();
         clients.emplace_back(client_data{local_ip_address, false});
         connect_udp_socket();
     };
+    
     ~Server(){
         disconnect_udp_socket();
     };
@@ -38,7 +44,8 @@ public:
     void set_server_name(const string&);
     void set_max_clients(const Uint32&);
     void set_level(const Uint32&);
-    
+    void set_player_status(const bool& new_player_status);
+
     string get_server_name() const;
     vector<client_data> get_clients() const;
     Uint32 get_max_clients() const;
@@ -55,6 +62,11 @@ public:
     //Server ready or not ready to play
     void ready(bool is_ready);
     //Game start
-    void start();
+    bool start();
+    //Sending clients board data
+    void send_clients_board_data();
+    //Listen clients during the game
+    void listen_game(request_status& status);
 };
 
+#endif

@@ -1,5 +1,6 @@
 #include <SFML/Network.hpp>
 #include <string>
+#include "board.hpp"
 
 using namespace std;
 using namespace sf;
@@ -24,6 +25,7 @@ enum datatype {
     DELETE_CLIENT_INFO,
     SERVER_GAME_START,
     CLIENT_GAME_UPDATE,
+    SERVER_GAME_UPDATE,
 };
 
 enum request_status {
@@ -44,7 +46,8 @@ enum request_status {
 struct client_data {
     IpAddress address;
     bool status;
-    unsigned **map;
+    long score;
+    unsigned map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT];
     bool operator == (client_data other_client){
        return address == other_client.address;
     };

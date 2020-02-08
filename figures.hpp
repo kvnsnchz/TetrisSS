@@ -1,3 +1,6 @@
+#ifndef figureHPP
+#define figureHPP
+
 #include <iostream>
 #include <vector>
 #include "color_constants.hpp"
@@ -140,3 +143,5 @@ class Figure_S: public Figure_Simple_Rotation {
         
         virtual void initialize(const unsigned&, const Vector2f&);
 };
+
+#endif
