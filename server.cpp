@@ -272,28 +272,34 @@ void Server::listen_clients(request_status& status) {
 }
 
 //Sending clients board data
-void Server::send_clients_board_data() {
+void Server::send_clients_board_data(Board& board) {
     //Filling send buffer:
     Packet packet_send;
     
     packet_send << SERVER_GAME_UPDATE;
 
     for(unsigned i = 0; i < clients.size(); i ++){
+        if(clients[i].address == local_ip_address)
+            clients[i].score = board.get_score();
+
         packet_send << clients[i].score;
 
         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
             for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
+                if(clients[i].address == local_ip_address)
+                    clients[i].map[j][k] = board.get_map()[j][k];
                 packet_send << (Int32)clients[i].map[j][k];
             }
         }
     }
     
     for(unsigned i = 0; i < clients.size(); i ++){
-        //Sending board data message: 
-        if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
-        {
-            cout << "Client: Send error" << endl;
-        }
+        if(clients[i].address != local_ip_address)
+            //Sending board data message: 
+            if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+            {
+                cout << "Client: Send error" << endl;
+            }
     }
     
 }

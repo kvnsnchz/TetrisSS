@@ -415,7 +415,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         while (true) {
             player_list->clear();
             if (current_client == nullptr) {
-                current_session->send_clients_board_data();
+                current_session->send_clients_board_data(*game_board);
                 player_list = new vector<client_data>(current_session->get_clients());
             } else if (current_session == nullptr) {
                 current_client->send_board_data(*game_board);
