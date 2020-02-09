@@ -341,9 +341,10 @@ void Server::listen_game(request_status& status){
                 case CLIENT_GAME_PAUSE:
                 {
                     vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
-
+                    cout << "GAME PAUSE" << endl;
                     if(it != clients.end())
                         (*it).status = STATUS_PAUSED;
+                    cout << "Client " << (*it).nickname << endl;
                     break;
                 }
                 case CLIENT_GAME_RESUME:
