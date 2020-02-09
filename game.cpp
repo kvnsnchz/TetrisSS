@@ -597,6 +597,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             if(_figure_state != STOP_FIGURE)
                                 game_board->step_down();
                             break;
+                        case Keyboard::Space:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->hard_drop();
+                            break;
                         case Keyboard::G:
                         case Keyboard::Up:
                             if(_figure_state != STOP_FIGURE)
