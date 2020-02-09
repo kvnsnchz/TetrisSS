@@ -907,17 +907,21 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // initialize other player's cell size:
     Vector2f other_cell_size(own_cell_size.x / 2, own_cell_size.y / 2);
 
+    unsigned complexity = 0;
+    // create the game board: 
+    Board* game_board = new Board(window, complexity, own_cell_size);
+
     request_status status = NOT_CHANGED;
     // Initialize client-server communication:
     Thread* listen_thread = nullptr;    
     if (current_client == nullptr) {
         // Look for the clients:
-        listen_thread = new Thread([&] () { current_session->listen_game(status); });
+        listen_thread = new Thread([&] () { current_session->listen_game(*game_board, status); });
 
         listen_thread->launch();
     } else if (current_session == nullptr) {
         // Look for the clients:
-        listen_thread = new Thread([&] () { current_client->listen_game(status); });
+        listen_thread = new Thread([&] () { current_client->listen_game(*game_board, status); });
 
         listen_thread->launch();
     }
@@ -925,7 +929,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Create a list of clients and initialize server name and complexity:
     vector<client_data> *player_list = nullptr;
     string server_name = "";
-    unsigned complexity = 0;
+
     if (current_client == nullptr) {
         player_list = new vector<client_data>(current_session->get_clients());
         server_name = current_session->get_player_nickname();
@@ -961,8 +965,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
             break;   
         }
 
-    // create the game board: 
-    Board* game_board = new Board(window, complexity, own_cell_size);
 
     // create game boards of the other players:
     vector<Board*> other_game_boards;
@@ -1142,7 +1144,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                         if (current_client == nullptr) {
                                             current_session->pause(true);
                                         } else if (current_session == nullptr) {
-                                            current_client->pause(true);s
+                                            current_client->pause(true);
                                         }
                                         game_board->get_descend_thread()->launch();
 
@@ -1323,7 +1325,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
 // Multiplayer pause menu:
 void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client) {
-    
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1373,7 +1374,6 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
             0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 2));
 
     while (window.isOpen()) {
-
         Event event;
         // If someone's pressed pause:
         bool is_pause = false;  
