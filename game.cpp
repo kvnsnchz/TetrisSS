@@ -2861,11 +2861,13 @@ void Menu::find_servers(const string& nickname) {
     Text connect = create_button(font, "Connect", button_size,
         Vector2f(5 * window.getSize().x / 6 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
+   
+   
+   // update_thread->launch();
 
-    sf::Mutex mutex;     
-    Thread* update_thread = new Thread([&] () {
-        while (true) {
-            if (search_status == CHANGED) {
+    while(window.isOpen()) {
+
+        if (search_status == CHANGED) {
                 cout << "Yes" << endl;
 
                 server_info.clear();
@@ -2882,17 +2884,11 @@ void Menu::find_servers(const string& nickname) {
                         Vector2f(5 * window.getSize().x / 6,
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
                 }
-                mutex.lock();
+
                 search_status = NOT_CHANGED;
-                mutex.unlock();
-            }
-            sf::sleep(seconds(0.2f));
+             //   cout << "Hola" << endl;
         }
-    });
 
-    update_thread->launch();
-
-    while(window.isOpen()) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -2968,7 +2964,6 @@ void Menu::find_servers(const string& nickname) {
                             // current_client->get_servers().size() + 1) Go back:
                             if (captured_button(window, back) && status != NOT_READY) {
                                 search_thread->terminate();
-                                update_thread->terminate();
 
                                 current_client->disconnect_udp_socket();
                                 return;
@@ -3024,7 +3019,6 @@ void Menu::find_servers(const string& nickname) {
                                 if (event.key.code == Keyboard::Return) {
                                     // execute back button:
                                     search_thread->terminate();
-                                    update_thread->terminate();
 
                                     current_client->disconnect_udp_socket();
                                     return;
