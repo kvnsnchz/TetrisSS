@@ -4,8 +4,11 @@
 #include "figures.hpp"
 
 // board grid size:
-# define BOARD_GRID_WIDTH 10
-# define BOARD_GRID_HEIGHT 20
+#define BOARD_GRID_WIDTH 10
+#define BOARD_GRID_HEIGHT 20
+
+#define STOP_FIGURE_FACTOR 10
+#define SHADOW_COLOR_CODE 101
 
 enum overflow {
     NONE,
@@ -38,6 +41,8 @@ class Board {
         Figure* next_figure;
         // Using a thread to fall down:
         Thread* descend_thread;
+        // Shadow points
+        vector<Point> shadow_points;
 
         friend ostream& operator <<(ostream& stream, const Board& board);
 
@@ -62,7 +67,7 @@ class Board {
         long get_score() const;
         Figure* get_next_figure() const;
         Thread* get_descend_thread() const;
-
+        
         void set_map(const unsigned new_map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT]);
         void set_complexity(const unsigned& new_complexity);
         void set_cell_size(const Vector2f& new_cell_size);

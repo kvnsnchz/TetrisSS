@@ -61,7 +61,7 @@ void Menu::game(const unsigned& complexity) {
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
         for ( ; window.isOpen(); descend_counter++) {
-            if (descend_counter >= 30 / complexity) {
+            if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -424,7 +424,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
             }
         
-            if (descend_counter >= 30 / complexity) {
+            if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -2820,7 +2820,8 @@ void Menu::find_servers() {
     Text connect = create_button(font, "Connect", button_size,
         Vector2f(5 * window.getSize().x / 6 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
-            
+
+    sf::Mutex mutex;     
     Thread* update_thread = new Thread([&] () {
         while (true) {
             if (search_status == CHANGED) {
@@ -2840,9 +2841,11 @@ void Menu::find_servers() {
                         Vector2f(5 * window.getSize().x / 6,
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
                 }
-
+                mutex.lock();
                 search_status = NOT_CHANGED;
+                mutex.unlock();
             }
+            sf::sleep(seconds(0.2f));
         }
     });
 

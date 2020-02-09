@@ -56,6 +56,7 @@ void Board::initialize(RenderWindow& window, const unsigned& initial_complexity,
 }
 
 Figure* Board::create_figure() {
+    shadow_points.clear();
     // figure that we are going to create:
     Figure* new_figure;
 
@@ -182,32 +183,35 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
                 case 0:
                     grid[i][j].setFillColor(Color(121, 163, 249, 180));
                     break;
-                case 1:
-                case 10:
+                case SHADOW_COLOR_CODE:
+                    grid[i][j].setFillColor(Color(208, 227, 255, 215));
+                    break;
+                case FIGURE_O_COLOR_CODE:
+                case FIGURE_O_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(255, 216, 0, 255));
                     break;
-                case 2:
-                case 20:
+                case FIGURE_I_COLOR_CODE:
+                case FIGURE_I_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(28, 230, 199, 255));
                     break;
-                case 3:
-                case 30:
+                case FIGURE_T_COLOR_CODE:
+                case FIGURE_T_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(248, 131, 6, 255));
                     break;
-                case 4:
-                case 40:
+                case FIGURE_L_COLOR_CODE:
+                case FIGURE_L_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(248, 6, 248, 255));
                     break;
-                case 5:
-                case 50:
+                case FIGURE_J_COLOR_CODE:
+                case FIGURE_J_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(COLOR_DARK_VIOLET);
                     break;
-                case 6:
-                case 60:
+                case FIGURE_Z_COLOR_CODE:
+                case FIGURE_Z_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(220, 0, 20, 255));
                     break;
-                case 7:
-                case 70:
+                case FIGURE_S_COLOR_CODE:
+                case FIGURE_S_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(46, 228, 25, 255));
                     break;
                 default:
@@ -268,7 +272,10 @@ overflow Board::is_empty(const Point& point) const {
     if (point.get_y() >= y_dimension)
         return OVERFLOW_DOWN;
 
-    if (map[point.get_x()][point.get_y()] == 0 || map[point.get_x()][point.get_y()] == current_figure->get_color_code())
+    if (map[point.get_x()][point.get_y()] == 0 
+            || map[point.get_x()][point.get_y()] == current_figure->get_color_code()
+            || map[point.get_x()][point.get_y()] == SHADOW_COLOR_CODE
+        )
         return NONE;
     else 
         return OVERFLOW_DOWN;
@@ -305,13 +312,84 @@ bool Board::step_down() {
 
         for (unsigned i = 0; i < current_figure->get_points().size(); i++)
             change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+
+        shadow();
+    }
+    else{
+        shadow_points.clear();
     }
         
     return is_free;
 };
 
 void Board::hard_drop() {
-    while(step_down()){}
+    bool is_free = true;
+    vector<Point> current_points;
+
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++){
+        current_points.emplace_back(*current_figure->get_points()[i]);
+    }
+
+    while(is_free){
+        for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
+            if(current_figure->get_points()[i]->get_y() + 1 >= y_dimension) {
+                is_free = false;
+                break;
+            }
+
+            if (is_empty(Point(current_figure->get_points()[i]->get_x(), current_figure->get_points()[i]->get_y() + 1)) != NONE) {
+                is_free = false;
+                break;
+            }
+        }
+
+        if(is_free)
+            for (unsigned i = 0; i < current_figure->get_points().size(); i++) 
+                current_figure->get_points()[i]->increment_y();
+    }
+    
+    for (unsigned i = 0; i < current_points.size(); i++) 
+        change_point(current_points[i]);
+
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++)
+        change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+}
+
+void Board::shadow(){
+    bool is_free = true;
+
+    if(shadow_points.size() > 0){
+        for (unsigned i = 0; i < shadow_points.size(); i++) 
+            if(map[shadow_points[i].get_x()][shadow_points[i].get_y()] != current_figure->get_color_code())
+                change_point(shadow_points[i]);
+        shadow_points.clear();
+    }
+
+    for (unsigned i = 0; i < current_figure->get_points().size(); i++){
+        shadow_points.emplace_back(*current_figure->get_points()[i]);
+    }
+
+    while(is_free){
+        for (unsigned i = 0; i < shadow_points.size(); i++) {
+            if(shadow_points[i].get_y() + 1 >= y_dimension) {
+                is_free = false;
+                break;
+            }
+
+            if (is_empty(Point(shadow_points[i].get_x(), shadow_points[i].get_y() + 1)) != NONE) {
+                is_free = false;
+                break;
+            }
+        }
+
+        if(is_free)
+            for (unsigned i = 0; i < shadow_points.size(); i++) 
+                shadow_points[i].increment_y();
+    }
+
+    for (unsigned i = 0; i < shadow_points.size(); i++)
+        if(map[shadow_points[i].get_x()][shadow_points[i].get_y()] != current_figure->get_color_code())
+            change_point(shadow_points[i], SHADOW_COLOR_CODE);
 }
 
 bool Board::step_left(const bool& with_floor) {
@@ -343,7 +421,9 @@ bool Board::step_left(const bool& with_floor) {
             current_figure->get_points()[i]->increment_x(-1);
         }
         for (unsigned i = 0; i < current_figure->get_points().size(); i++)
-        change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+            change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+        
+        shadow();
     }
 
     return is_free;
@@ -380,7 +460,9 @@ bool Board::step_right(const bool& with_floor) {
             current_figure->get_points()[i]->increment_x();
         }
         for (unsigned i = 0; i < current_figure->get_points().size(); i++)
-        change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+            change_point(*current_figure->get_points()[i], current_figure->get_color_code());
+
+        shadow();
     }
 
     return is_free;
@@ -433,6 +515,7 @@ void Board::rotate(bool right){
     }
 
     change_points_rotated(NONE);
+    shadow();
 }
 
 // Check for the full lines and erase them if they exist:
@@ -464,7 +547,7 @@ void Board::erase_lines(const unsigned& complexity) {
     for (int i = begin; i <= end; i++) {
         for (int j = 0; j < x_dimension; j++) {
             // if a current cell is occupied - do not touch a trigger:
-            if (map[j][i] >= 10)
+            if (map[j][i] >= STOP_FIGURE_FACTOR)
                 is_full = true;
             else {
                 // otherwise - set trigger as false and move to the next line:
@@ -550,13 +633,13 @@ void Board::erase_lines(const unsigned& complexity) {
 // Fix current figure's position on the board if we can't move further:
 void Board::fix_current_figure() {
     for (unsigned i = 0; i < current_figure->get_points().size(); i++)
-        change_point(*current_figure->get_points()[i], current_figure->get_color_code() * 10);     
+        change_point(*current_figure->get_points()[i], current_figure->get_color_code() * STOP_FIGURE_FACTOR);     
 }
 
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < x_dimension; j++)
-        if (map[j][FIGURE_GRID_HEIGHT] >= 10)
+        if (map[j][FIGURE_GRID_HEIGHT] >= STOP_FIGURE_FACTOR && map[j][FIGURE_GRID_HEIGHT] != SHADOW_COLOR_CODE)
              return true;
     
     return false;
