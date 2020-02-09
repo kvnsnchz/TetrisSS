@@ -17,8 +17,17 @@ enum figure_state {
 
 
 // figure grid size (for drawing next figures):
-# define FIGURE_GRID_WIDTH 4
-# define FIGURE_GRID_HEIGHT 2
+#define FIGURE_GRID_WIDTH 4
+#define FIGURE_GRID_HEIGHT 2
+
+#define FIGURE_O_COLOR_CODE 1
+#define FIGURE_I_COLOR_CODE 2
+#define FIGURE_T_COLOR_CODE 3
+#define FIGURE_L_COLOR_CODE 4
+#define FIGURE_J_COLOR_CODE 5
+#define FIGURE_Z_COLOR_CODE 6
+#define FIGURE_S_COLOR_CODE 7
+
 class Point {
     private:
         int x;

@@ -61,7 +61,7 @@ void Menu::game(const unsigned& complexity) {
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
         for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
-            if (!is_paused && descend_counter >= 30 / complexity) {
+            if ((!is_paused && descend_counter >= 30 / complexity) || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -437,7 +437,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     }
                 }
             
-                if (descend_counter >= 30 / complexity) {
+                if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
                     if(_figure_state == STOP_FIGURE)
                         count_change_figure--;
                     if(count_change_figure <= 0)

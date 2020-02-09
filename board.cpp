@@ -183,31 +183,31 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
                     grid[i][j].setFillColor(Color(121, 163, 249, 180));
                     break;
                 case 1:
-                case 10:
+                case 1 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(255, 216, 0, 255));
                     break;
                 case 2:
-                case 20:
+                case 2 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(28, 230, 199, 255));
                     break;
                 case 3:
-                case 30:
+                case 3 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(248, 131, 6, 255));
                     break;
                 case 4:
-                case 40:
+                case 4 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(248, 6, 248, 255));
                     break;
                 case 5:
-                case 50:
+                case 5 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(COLOR_DARK_VIOLET);
                     break;
                 case 6:
-                case 60:
+                case 6 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(220, 0, 20, 255));
                     break;
                 case 7:
-                case 70:
+                case 7 * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(46, 228, 25, 255));
                     break;
                 default:
@@ -464,7 +464,7 @@ void Board::erase_lines(const unsigned& complexity) {
     for (int i = begin; i <= end; i++) {
         for (int j = 0; j < x_dimension; j++) {
             // if a current cell is occupied - do not touch a trigger:
-            if (map[j][i] >= 10)
+            if (map[j][i] >= STOP_FIGURE_FACTOR)
                 is_full = true;
             else {
                 // otherwise - set trigger as false and move to the next line:
@@ -550,13 +550,13 @@ void Board::erase_lines(const unsigned& complexity) {
 // Fix current figure's position on the board if we can't move further:
 void Board::fix_current_figure() {
     for (unsigned i = 0; i < current_figure->get_points().size(); i++)
-        change_point(*current_figure->get_points()[i], current_figure->get_color_code() * 10);     
+        change_point(*current_figure->get_points()[i], current_figure->get_color_code() * STOP_FIGURE_FACTOR);     
 }
 
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < x_dimension; j++)
-        if (map[j][FIGURE_GRID_HEIGHT] >= 10)
+        if (map[j][FIGURE_GRID_HEIGHT] >= STOP_FIGURE_FACTOR)
              return true;
     
     return false;
