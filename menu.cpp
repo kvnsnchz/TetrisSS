@@ -1044,7 +1044,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 if (current_session->get_clients()[i].status == STATUS_PAUSED) {
                     game_board->get_descend_thread()->terminate();
                     // execute pause button:
-                    current_session->pause(true);
+                    // current_session->pause(true);
                     multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
                     game_board->get_descend_thread()->launch();
                 }
@@ -1052,7 +1052,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 if (current_client->get_server_data().clients[i].status == STATUS_PAUSED) {
                     game_board->get_descend_thread()->terminate();
                     // execute pause button:
-                    current_client->pause(true);
+                    // current_client->pause(true);
                     multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                     game_board->get_descend_thread()->launch();
                 }
@@ -1089,10 +1089,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                 // execute pause button:
                                 if (current_client == nullptr) {
                                     current_session->pause(true);
-                                    multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                    // multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
                                 } else if (current_session == nullptr) {
                                     current_client->pause(true);
-                                    multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                                    // multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                                 }
                                 game_board->get_descend_thread()->launch();
                                         
@@ -1145,10 +1145,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                         // execute pause button:
                                         if (current_client == nullptr) {
                                             current_session->pause(true);
-                                            multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                            // multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
                                         } else if (current_session == nullptr) {
                                             current_client->pause(true);
-                                            multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                                            // multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                                         }
                                         game_board->get_descend_thread()->launch();
 
@@ -1181,10 +1181,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             // execute pause button:
                             if (current_client == nullptr) {
                                 current_session->pause(true);
-                                multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                // multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
                             } else if (current_session == nullptr) {
                                 current_client->pause(true);
-                                multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                                // multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                             }
                             game_board->get_descend_thread()->launch();
 
@@ -1314,10 +1314,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
             if (current_client == nullptr)
                 other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, i + 1);
             else {
-                if (current_player_index >= i)  
-                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
-                else
+                if (current_player_index >= i)
                     other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, i + 1);
+                else
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
             }
         }
 
@@ -1342,7 +1342,6 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
     // initialize cell size according the current window size:
     Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
                     min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
-
 
     // initalize pause background:
     RectangleShape pause_background;

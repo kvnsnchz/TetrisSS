@@ -374,7 +374,7 @@ void Client::pause(bool is_pause) {
 
     //Client game pause:
     packet_send << (is_pause ? CLIENT_GAME_PAUSE : CLIENT_GAME_RESUME);
-    
+
     //Sending client game pause: 
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
     {
