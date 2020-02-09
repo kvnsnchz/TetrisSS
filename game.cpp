@@ -40,11 +40,11 @@ void Menu::game(const unsigned& complexity) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // button size:
-    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
     // initialize cell size according the current window size:
-    Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
-                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
+    Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
     // create the game board: 
     Board* game_board = new Board(window, complexity, cell_size);
@@ -130,12 +130,12 @@ void Menu::game(const unsigned& complexity) {
                                 game_board->get_descend_thread()->launch();
                                         
                                 // update cell size:
-                                cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                                 game_board->set_cell_size(cell_size);
 
                                 // update button size:
-                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                                 // update all the buttons and their positions:
                                 pause.setCharacterSize(5 * button_size / 6);
@@ -180,12 +180,12 @@ void Menu::game(const unsigned& complexity) {
                                         game_board->get_descend_thread()->launch();
 
                                         // update cell size:
-                                        cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                        cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                                         game_board->set_cell_size(cell_size);
 
                                         // update button size:
-                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
                                     
                                         // update all the buttons and their positions:
                                         pause.setCharacterSize(5 * button_size / 6);
@@ -210,12 +210,12 @@ void Menu::game(const unsigned& complexity) {
                             game_board->get_descend_thread()->launch();
 
                             // update cell size:
-                            cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                            cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                             game_board->set_cell_size(cell_size);
 
                             // update button size:
-                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                             // update all the buttons and their positions:
                             pause.setCharacterSize(5 * button_size / 6);
@@ -286,12 +286,12 @@ void Menu::game(const unsigned& complexity) {
                     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
                     // update cell size:
-                    cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                    cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                     game_board->set_cell_size(cell_size);
 
                     // update button size:
-                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                     // update all the buttons and their positions:
                     pause.setCharacterSize(5 * button_size / 6);
@@ -332,11 +332,11 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // own button size:
-    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
     // initialize own cell size according the current window size:
-    Vector2f own_cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
-                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
+    Vector2f own_cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
     // initialize other player's cell size:
     Vector2f other_cell_size(own_cell_size.x / 2, own_cell_size.y / 2);
@@ -493,12 +493,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                 game_board->get_descend_thread()->launch();
                                         
                                 // update cell size:
-                                own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                                 game_board->set_cell_size(own_cell_size);
 
                                 // update button size:
-                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                                 // update all the buttons and their positions:
                                 pause.setCharacterSize(5 * button_size / 6);
@@ -543,12 +543,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                         game_board->get_descend_thread()->launch();
 
                                         // update cell size:
-                                        own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                        own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                                         game_board->set_cell_size(own_cell_size);
 
                                         // update button size:
-                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
                                     
                                         // update all the buttons and their positions:
                                         pause.setCharacterSize(5 * button_size / 6);
@@ -573,12 +573,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             game_board->get_descend_thread()->launch();
 
                             // update cell size:
-                            own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                            own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                             game_board->set_cell_size(own_cell_size);
 
                             // update button size:
-                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                             // update all the buttons and their positions:
                             pause.setCharacterSize(5 * button_size / 6);
@@ -649,8 +649,8 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
                     // update own cell size:
-                    own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                    own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                     game_board->set_cell_size(own_cell_size);
 
                     // update other players' cell size:
@@ -660,7 +660,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                         other_game_boards[i]->set_cell_size(other_cell_size);
 
                     // update button size:
-                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0);
+                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                     // update all the buttons and their positions:
                     pause.setCharacterSize(5 * button_size / 6);
@@ -708,7 +708,7 @@ void Menu::game_over_menu(Board* game_board) {
     const unsigned number_of_buttons = 4;
     // button size:
     double button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
-        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 3, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0));
+        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 3, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
 
     // initalize the game over background:
     RectangleShape game_over_background;
@@ -907,7 +907,7 @@ void Menu::game_over_menu(Board* game_board) {
             
                     // update button size:
                     button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
-                        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 3, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0));
+                        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 3, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
 
                     // update view:
                     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
@@ -978,11 +978,11 @@ void Menu::pause_menu(Board* game_board) {
     const unsigned number_of_buttons = 4;
     // button size:
     double button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
-        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 2, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0));
+        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 2, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
 
     // initialize cell size according the current window size:
-    Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
-                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
+    Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
 
     // initalize pause background:
@@ -1197,14 +1197,14 @@ void Menu::pause_menu(Board* game_board) {
             
                     // update button size:
                     button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
-                        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 2, 3.75 * (0.27 * window.getSize().x - 5.0f) / 10.0));
+                        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 2, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
 
                     // update view:
                     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
                     // update cell size:
-                    cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                    cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                     game_board->set_cell_size(cell_size);
 
                     // update pause background:
