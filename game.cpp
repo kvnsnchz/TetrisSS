@@ -1775,7 +1775,7 @@ void Menu::multiplayer_menu() {
                                         create_session(nickname);
                                         blink_thread->launch();
                                         break;
-                                    } else {
+                                    } else if (event.key.code != Keyboard::Return) {
                                         // unfocus new_session button:
                                         new_session.setFillColor(COLOR_DARK_VIOLET);
                                         new_session.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -1793,7 +1793,7 @@ void Menu::multiplayer_menu() {
                                         find_servers(nickname);
                                         blink_thread->launch();
                                         break;
-                                    } else {
+                                    } else if (event.key.code != Keyboard::Return) {
                                         // unfocus find_server button:
                                         find_server.setFillColor(COLOR_DARK_VIOLET);
                                         find_server.setOutlineColor(COLOR_LIGHT_GREEN);
