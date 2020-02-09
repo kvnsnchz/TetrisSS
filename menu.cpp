@@ -1001,22 +1001,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
             }
 
-            // If someone's pressed pause:
-            for (unsigned i = 0; i < player_list->size(); i++) {
-                if (player_list->at(i).status == STATUS_PAUSED) {
-                    game_board->get_descend_thread()->terminate();
-                    // execute pause button:
-                    if (current_client == nullptr) {
-                        current_session->pause(true);
-                        multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
-                    } else if (current_session == nullptr) {
-                        current_client->pause(true);
-                        multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
-                    }
-                    game_board->get_descend_thread()->launch();
-                }
-            }
-        
             if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
@@ -1053,6 +1037,27 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // We are using descend counter to manage the figures' fall rate:
     while (window.isOpen()) {
         Event event;
+
+        // If someone's pressed pause:  
+        for (unsigned i = 0; i < number_of_players; i++) {
+            if (current_client == nullptr) {
+                if (current_session->get_clients()[i].status == STATUS_PAUSED) {
+                    game_board->get_descend_thread()->terminate();
+                    // execute pause button:
+                    current_session->pause(true);
+                    multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                    game_board->get_descend_thread()->launch();
+                }
+            } else if (current_session == nullptr) {
+                if (current_client->get_server_data().clients[i].status == STATUS_PAUSED) {
+                    game_board->get_descend_thread()->terminate();
+                    // execute pause button:
+                    current_client->pause(true);
+                    multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                    game_board->get_descend_thread()->launch();
+                }
+            }
+        }
 
         while (window.pollEvent(event)) {
             switch (event.type) {
@@ -1378,6 +1383,25 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
     while (window.isOpen()) {
         Event event;
 
+        // If someone's pressed pause:  
+        if (current_client == nullptr) {
+            for (unsigned i = 0; i < current_session->get_clients().size(); i++) {
+                if (current_session->get_clients()[i].status == STATUS_READY) {
+                    // execute pause button:
+                    current_session->pause(false);
+                    return;
+                }
+            }
+        } else if (current_session == nullptr) {
+            for (unsigned i = 0; i < current_client->get_server_data().clients.size(); i++) {
+                if (current_client->get_server_data().clients[i].status == STATUS_READY) {
+                    // execute pause button:
+                    current_client->pause(false);
+                    return;
+                }
+            }
+        }
+
         while (window.pollEvent(event)) {
             switch (event.type) {
                 // close window:  
@@ -1418,14 +1442,25 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                             // If appropriate mouse position was captured:
                             // 1) Resume game:
                             if (captured_button(window, resume)) {
-                                return;
-                            // 3) Go to main menu:
+                                if (current_client == nullptr) {
+                                    current_session->pause(false);
+                                    return;
+                                } else if (current_session == nullptr) {
+                                    current_client->pause(false);
+                                    return;
+                                }
+                            // 2) Go to multiplayer menu:
                             } else if (captured_button(window, disconnect)) {
-                                game_board->get_descend_thread()->terminate();
-                                main_menu();
-                            // 4) Exit:
+                                // if (current_client == nullptr) {
+                                //     current_session->disconnect_udp_socket();
+                                //     multiplayer_menu();
+                                // } else if (current_session == nullptr) {
+                                //     current_client->disconnect_udp_socket();
+                                //     multiplayer_menu();
+                                // }
+                                break;
+                            // 3) Exit:
                             } else if (captured_button(window, exit)) {
-                                game_board->get_descend_thread()->terminate();
                                 window.close();
                             }
                             break;
@@ -1454,9 +1489,16 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                                     break;
                                 case 1:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return) {
                                         // execute resume button:
-                                        return;
+                                        if (current_client == nullptr) {
+                                            current_session->pause(false);
+                                            return;
+                                        } else if (current_session == nullptr) {
+                                            current_client->pause(false);
+                                            return;
+                                        }
+                                    }
 
                                     // unfocus resume button:
                                     resume.setFillColor(COLOR_DARK_VIOLET);
@@ -1469,9 +1511,15 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                                 case 2:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        game_board->get_descend_thread()->terminate();
                                         // execute disconnect button:
-                                        main_menu();
+                                        // if (current_client == nullptr) {
+                                        //     current_session->disconnect_udp_socket();
+                                        //     multiplayer_menu();
+                                        // } else if (current_session == nullptr) {
+                                        //     current_client->disconnect_udp_socket();
+                                        //     multiplayer_menu();
+                                        // }
+                                        break;
                                     }
 
                                     // unfocus disconnect button:
@@ -1485,7 +1533,6 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                                 case 3:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        game_board->get_descend_thread()->terminate();
                                         // execute exit button:
                                         window.close();
                                     }
