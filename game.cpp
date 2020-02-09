@@ -1585,21 +1585,57 @@ void Menu::multiplayer_menu() {
         Vector2f(window.getSize().x / 2 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2), false);
 
+    // Initialize nickname_title button:
+    Text nickname_title = create_button(font, "Enter Nickname:", button_size,
+        Vector2f(window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), true, 4);
+    
+    // Initialize nickname display field:
+    Text nickname_display = create_button(font, "", button_size,
+        Vector2f(3 * window.getSize().x / 4,
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 4);
+
     // Initialize new_session button:
     Text new_session = create_button(font, "New Session", button_size,
         Vector2f(window.getSize().x / 2,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f));
     
     // Initialize find_server button:
     Text find_server = create_button(font, "Find Server", button_size,
         Vector2f(window.getSize().x / 2,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f));
       
     // Initialize back button:
     Text back = create_button(font, "Back", button_size,
         Vector2f(window.getSize().x / 2,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f));
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 10.0f));
    
+    // Initialize nickname itself and its capture indicator:
+    string nickname = "";
+    bool nickname_captured = false;
+
+    // Using a thread to display blinking text bar during the active text field:
+    Thread* blink_thread = new Thread([&] () {
+        for (unsigned enter_text_counter = 0; true; enter_text_counter++) {
+            // Display a text bar with some delay:
+            if (enter_text_counter >= 500) {
+                // Display entered session name:
+                if (nickname_captured) {
+                    if (nickname_display.getString().getSize() == nickname.length())
+                        nickname_display.setString(nickname + "|");
+                    else 
+                        nickname_display.setString(nickname);
+                }
+                
+                enter_text_counter = 0;
+
+                sf::sleep(seconds(0.2f));
+            }
+        }
+    });
+
+    blink_thread->launch();
+
     while (window.isOpen()) {
         Event event;
 
@@ -1612,6 +1648,8 @@ void Menu::multiplayer_menu() {
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
+                    nickname_title.setFillColor(COLOR_DARK_VIOLET);
+                    nickname_title.setOutlineColor(COLOR_LIGHT_GREEN);
                     new_session.setFillColor(COLOR_DARK_VIOLET);
                     new_session.setOutlineColor(COLOR_LIGHT_GREEN);
                     find_server.setFillColor(COLOR_DARK_VIOLET);
@@ -1620,39 +1658,76 @@ void Menu::multiplayer_menu() {
                     back.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
-                    if (captured_button(window, new_session)) {
+                    if (captured_button(window, nickname_title)) {
+                        // focus nickname_title button:
+                        nickname_title.setFillColor(COLOR_YELLOW);
+                        nickname_title.setOutlineColor(COLOR_DARK_BLUE);
+                        focused_button_counter = 1;
+                    } else if (captured_button(window, new_session)) {
                         // focus new_session button:
                         new_session.setFillColor(COLOR_YELLOW);
                         new_session.setOutlineColor(COLOR_DARK_BLUE);
-                        focused_button_counter = 1;
+                        focused_button_counter = 2;
                     } else if (captured_button(window, find_server)) {
                         // focus find_server button:
                         find_server.setFillColor(COLOR_YELLOW);
                         find_server.setOutlineColor(COLOR_DARK_BLUE);
-                        focused_button_counter = 2;  
+                        focused_button_counter = 3;  
                     } else if (captured_button(window, back)) {
                         // focus back button:
                         back.setFillColor(COLOR_YELLOW);
                         back.setOutlineColor(COLOR_DARK_BLUE);
-                        focused_button_counter = 3;
+                        focused_button_counter = 4;
                     }
                     break;
                 case Event::MouseButtonPressed:
                     switch (event.key.code) {
                         case Mouse::Left:
                             // If appropriate mouse position was captured:
-                            // 1) Go to new session menu:
-                            if (captured_button(window, new_session))
-                                create_session();
-                            // 2) Find a server:
-                            else if (captured_button(window, find_server))
-                                find_servers();
-                            // 3) Go back:
-                            else if (captured_button(window, back))
+                            // 1) Focus nickname textfield:
+                            if (captured_button(window, nickname_title)) {
+                                nickname_captured = true;
+                                focused_button_counter = 1;
+                            // 2) Go to new session menu:
+                            } else if (captured_button(window, new_session) && nickname != "") {
+                                blink_thread->terminate();
+                                create_session(nickname);
+                                blink_thread->launch();
+                            // 3) Find a server:
+                            } else if (captured_button(window, find_server) && nickname != "") {
+                                blink_thread->terminate();
+                                find_servers(nickname);
+                                blink_thread->launch();
+                            // 4) Go back:
+                            } else if (captured_button(window, back)) {
+                                blink_thread->terminate();
                                 main_menu();
+                            }
                             break;
                         default:
                             break;
+                    }
+                    break;
+                // If we want to type a text:
+                case Event::TextEntered:
+                    if (event.text.unicode < 128 && event.text.unicode != 13 
+                        && event.text.unicode != 8 && event.text.unicode != 9) {
+                        if (nickname_captured && nickname.length() <= MAX_NICKNAME_LENGTH) {
+                            // Add a new symbol at the end of a session name's string
+                            // (maximal length of which - 12 characters):
+                            nickname += static_cast<char>(event.text.unicode);
+                            nickname_display.setString(nickname);
+
+                            // Resize session name:
+                            nickname_title.setCharacterSize(5 * button_size / 6);
+                            nickname_title.setOutlineThickness(button_size / 6);
+                            nickname_title.setPosition((window.getSize().x - nickname_title.getGlobalBounds().width) / 4, 
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                                
+                            nickname_display.setCharacterSize(5 * button_size / 6);
+                            nickname_display.setPosition(3 * (window.getSize().x - nickname_display.getGlobalBounds().width) / 4, 
+                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                        }
                     }
                     break;
                 case Event::KeyPressed:
@@ -1668,56 +1743,104 @@ void Menu::multiplayer_menu() {
                                     // in this case, Enter won't do nothing:
                                     if (event.key.code == Keyboard::Return)
                                         break;
+                                        
+                                    nickname_captured = true;
 
-                                    // focus new_session button:
-                                    new_session.setFillColor(COLOR_YELLOW);
-                                    new_session.setOutlineColor(COLOR_DARK_BLUE);
+                                    // focus nickname title button:
+                                    nickname_title.setFillColor(COLOR_YELLOW);
+                                    nickname_title.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
-                                        // execute new_session button:
-                                        create_session();
+                                        break;
 
-                                    // unfocus new_session button:
-                                    new_session.setFillColor(COLOR_DARK_VIOLET);
-                                    new_session.setOutlineColor(COLOR_LIGHT_GREEN);
-                                    // focus find_server button:
-                                    find_server.setFillColor(COLOR_YELLOW);
-                                    find_server.setOutlineColor(COLOR_DARK_BLUE);
+                                    nickname_display.setString(nickname);
+                                    nickname_captured = false; 
+
+                                    // unfocus nickname_title button:
+                                    nickname_title.setFillColor(COLOR_DARK_VIOLET);
+                                    nickname_title.setOutlineColor(COLOR_LIGHT_GREEN);
+                                    // focus new session button:
+                                    new_session.setFillColor(COLOR_YELLOW);
+                                    new_session.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
                                 case 2:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
-                                        // execute find_server button:
-                                        find_servers();
-
-                                    // unfocus find_server button:
-                                    find_server.setFillColor(COLOR_DARK_VIOLET);
-                                    find_server.setOutlineColor(COLOR_LIGHT_GREEN);
-                                    // focus back button:
-                                    back.setFillColor(COLOR_YELLOW);
-                                    back.setOutlineColor(COLOR_DARK_BLUE);
-                                    focused_button_counter++;
+                                    if (event.key.code == Keyboard::Return && nickname != "") {
+                                        // execute new_session button:
+                                        blink_thread->terminate();
+                                        create_session(nickname);
+                                        blink_thread->launch();
+                                        break;
+                                    } else {
+                                        // unfocus new_session button:
+                                        new_session.setFillColor(COLOR_DARK_VIOLET);
+                                        new_session.setOutlineColor(COLOR_LIGHT_GREEN);
+                                        // focus find_server button:
+                                        find_server.setFillColor(COLOR_YELLOW);
+                                        find_server.setOutlineColor(COLOR_DARK_BLUE);
+                                        focused_button_counter++;
+                                    }
                                     break;
                                 case 3:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return && nickname != "") {
+                                        // execute find_server button:
+                                        blink_thread->terminate();
+                                        find_servers(nickname);
+                                        blink_thread->launch();
+                                        break;
+                                    } else {
+                                        // unfocus find_server button:
+                                        find_server.setFillColor(COLOR_DARK_VIOLET);
+                                        find_server.setOutlineColor(COLOR_LIGHT_GREEN);
+                                        // focus back button:
+                                        back.setFillColor(COLOR_YELLOW);
+                                        back.setOutlineColor(COLOR_DARK_BLUE);
+                                        focused_button_counter++;
+                                    }
+                                    break;
+                                case 4:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        blink_thread->terminate();
                                         // execute back button:
                                         main_menu();
+                                    }
+                                    
+                                    nickname_captured = true; 
 
                                     // unfocus back button:
                                     back.setFillColor(COLOR_DARK_VIOLET);
                                     back.setOutlineColor(COLOR_LIGHT_GREEN);
-                                    // focus new_session button:
-                                    new_session.setFillColor(COLOR_YELLOW);
-                                    new_session.setOutlineColor(COLOR_DARK_BLUE);
+                                    // focus nickname_title button:
+                                    nickname_title.setFillColor(COLOR_YELLOW);
+                                    nickname_title.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter = 1;
                                     break;
                                 default:
                                     break;
+                            }
+                            break;
+                        // If we have pushed Backspace:
+                        case Keyboard::BackSpace:
+                            if (nickname_captured && nickname.length() > 0) {
+                                // Erase the last symbol from the session name string:
+                                nickname.erase(nickname.length() - 1);
+                                nickname_display.setString(nickname);
+
+                                // Resize session name:
+                                nickname_title.setCharacterSize(5 * button_size / 6);
+                                nickname_title.setOutlineThickness(button_size / 6);
+                                nickname_title.setPosition((window.getSize().x - nickname_title.getGlobalBounds().width) / 4, 
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                                
+                                nickname_display.setCharacterSize(5 * button_size / 6);
+                                nickname_display.setPosition(3 * (window.getSize().x - nickname_display.getGlobalBounds().width) / 4, 
+                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
                             }
                             break;
                         default:
@@ -1742,20 +1865,29 @@ void Menu::multiplayer_menu() {
                     multiplayer_title.setPosition((window.getSize().x - multiplayer_title.getGlobalBounds().width) / 2 - 10.0f, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
 
+                    nickname_title.setCharacterSize(5 * button_size / 6);
+                    nickname_title.setOutlineThickness(button_size / 6);
+                    nickname_title.setPosition((window.getSize().x - nickname_title.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                        
+                    nickname_display.setCharacterSize(5 * button_size / 6);
+                    nickname_display.setPosition(3 * (window.getSize().x - nickname_display.getGlobalBounds().width) / 4, 
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+
                     new_session.setCharacterSize(5 * button_size / 6);
                     new_session.setOutlineThickness(button_size / 6);
                     new_session.setPosition((window.getSize().x - new_session.getGlobalBounds().width) / 2, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
                     
                     find_server.setCharacterSize(5 * button_size / 6);
                     find_server.setOutlineThickness(button_size / 6);
                     find_server.setPosition((window.getSize().x - find_server.getGlobalBounds().width) / 2, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f);
                     
                     back.setCharacterSize(5 * button_size / 6);
                     back.setOutlineThickness(button_size / 6);
                     back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 2, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 10.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 10.0f);
                     break;
                 default:
                     break;
@@ -1770,6 +1902,8 @@ void Menu::multiplayer_menu() {
 
         // Draw a menu:
         window.draw(multiplayer_title);
+        window.draw(nickname_title);
+        window.draw(nickname_display);
         window.draw(new_session);
         window.draw(find_server);
         window.draw(back);
@@ -1777,7 +1911,7 @@ void Menu::multiplayer_menu() {
     }
 };
 
-void Menu::create_session() {
+void Menu::create_session(const string& nickname) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1786,32 +1920,18 @@ void Menu::create_session() {
     double button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 12), 
         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
     
-    // Initialize the session name:
-    string session_name = "";
     // Initialize the number of maximum players: 
     unsigned max_number_of_players = 2;
     // Initialize the game complexity:
     unsigned complexity = 0;
 
-    // Session name capture boolean identificator:
-    bool session_name_captured = false; 
     // Max players capture boolean identificator:
     bool max_number_of_players_captured = false;
 
     // Initialize create session menu title:
-    Text create_session_title = create_button(font, "Session Settings", button_size,
+    Text create_session_title = create_button(font, "Session " + nickname + " Settings", button_size,
         Vector2f(window.getSize().x / 2 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2), false);
-
-    // Initialize session_name_title button:
-    Text session_name_title = create_button(font, "Session Name:", button_size,
-        Vector2f(window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), true, 4);
-    
-    // Initialize session name field:
-    Text session_name_display = create_button(font, "", button_size,
-        Vector2f(3 * window.getSize().x / 4,
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 4);
     
     // Initialize max_number_of_players_title button:
     Text max_number_of_players_title = create_button(font, "Max Players:", button_size,
@@ -1858,14 +1978,8 @@ void Menu::create_session() {
         for (unsigned enter_text_counter = 0; true; enter_text_counter++) {
             // Display a text bar with some delay:
             if (enter_text_counter >= 500) {
-                // Display entered session name:
-                if (session_name_captured) {
-                    if (session_name_display.getString().getSize() == session_name.length())
-                        session_name_display.setString(session_name + "|");
-                    else 
-                        session_name_display.setString(session_name);
                 // Display entered max players number:
-                } else if (max_number_of_players_captured) {
+                if (max_number_of_players_captured) {
                     if (max_number_of_players_display.getString().getSize() == 1)
                         max_number_of_players_display.setString(to_string(max_number_of_players) + "|");
                     else
@@ -1881,7 +1995,6 @@ void Menu::create_session() {
 
     blink_thread->launch();
 
-    // We are using enter text counter to manage the display of the entered text:
     while (window.isOpen()) {
         Event event;
 
@@ -1894,8 +2007,6 @@ void Menu::create_session() {
                 // when we are moving mouse:
                 case Event::MouseMoved:
                     // unfocus all the buttons:
-                    session_name_title.setFillColor(COLOR_DARK_VIOLET);
-                    session_name_title.setOutlineColor(COLOR_LIGHT_GREEN);
                     max_number_of_players_title.setFillColor(COLOR_DARK_VIOLET);
                     max_number_of_players_title.setOutlineColor(COLOR_LIGHT_GREEN);
                     if (complexity != 1) {
@@ -1916,16 +2027,11 @@ void Menu::create_session() {
                     create.setOutlineColor(COLOR_LIGHT_GREEN);
 
                     // If appropriate mouse position was captured:
-                    if (captured_button(window, session_name_title)) {
-                        // focus session_name_title button:
-                        session_name_title.setFillColor(COLOR_YELLOW);
-                        session_name_title.setOutlineColor(COLOR_DARK_BLUE);
-                        focused_button_counter = 1;
-                    } else if (captured_button(window, max_number_of_players_title)) {
+                    if (captured_button(window, max_number_of_players_title)) {
                         // focus max_number_of_players_title button:
                         max_number_of_players_title.setFillColor(COLOR_YELLOW);
                         max_number_of_players_title.setOutlineColor(COLOR_DARK_BLUE); 
-                        focused_button_counter = 2;
+                        focused_button_counter = 1;
                     } else if (captured_button(window, back)) {
                         // focus back button:
                         back.setFillColor(COLOR_YELLOW);
@@ -1952,22 +2058,7 @@ void Menu::create_session() {
                 case Event::TextEntered:
                     if (event.text.unicode < 128 && event.text.unicode != 13 
                         && event.text.unicode != 8 && event.text.unicode != 9) {
-                        if (session_name_captured && session_name.length() <= MAX_SESSION_NAME_LENGTH) {
-                            // Add a new symbol at the end of a session name's string
-                            // (maximal length of which - 12 characters):
-                            session_name += static_cast<char>(event.text.unicode);
-                            session_name_display.setString(session_name);
-
-                            // Resize session name:
-                            session_name_title.setCharacterSize(5 * button_size / 6);
-                            session_name_title.setOutlineThickness(button_size / 6);
-                            session_name_title.setPosition((window.getSize().x - session_name_title.getGlobalBounds().width) / 4, 
-                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
-                                
-                            session_name_display.setCharacterSize(5 * button_size / 6);
-                            session_name_display.setPosition(3 * (window.getSize().x - session_name_display.getGlobalBounds().width) / 4, 
-                                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
-                        } else if (max_number_of_players_captured && event.text.unicode >= 50 && event.text.unicode <= 52) {
+                        if (max_number_of_players_captured && event.text.unicode >= 50 && event.text.unicode <= 52) {
                             // Set a new value of max players number (between 2 and 4):
                             max_number_of_players = event.text.unicode - 48;
                             max_number_of_players_display.setString(to_string(max_number_of_players));
@@ -1988,49 +2079,37 @@ void Menu::create_session() {
                     switch (event.key.code) {
                         case Mouse::Left:
                             // If appropriate mouse position was captured:
-                            // 1) Enter a new session name:
-                            if (captured_button(window, session_name_title)) {
-                                session_name_captured = true;
-                                
-                                max_number_of_players_display.setString(to_string(max_number_of_players));
-                                max_number_of_players_captured = false;
-
-                                focused_button_counter = 1;
-                            // 2) Enter a max players number:
-                            } else if (captured_button(window, max_number_of_players_title)) {
-                                session_name_display.setString(session_name);
-                                session_name_captured = false;
-
+                            // 1) Enter a max players number:
+                            if (captured_button(window, max_number_of_players_title)) {
                                 max_number_of_players_captured = true;
 
-                                focused_button_counter = 2;
-                            // 3) Choose an easy mode:
+                                focused_button_counter = 1;
+                            // 2) Choose an easy mode:
                             } else if (captured_button(window, mechanics)) {
                                 // focus mechanics button:
                                 mechanics.setFillColor(COLOR_YELLOW);
                                 mechanics.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 1;
-                            // 4) Choose a normal mode:
+                            // 3) Choose a normal mode:
                             } else if (captured_button(window, STIC)) {
                                 // focus STIC button:
                                 STIC.setFillColor(COLOR_YELLOW);
                                 STIC.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 2;
-                            // 5) Choose a hard mode:
+                            // 4) Choose a hard mode:
                             } else if (captured_button(window, applied_maths)) {
                                 // focus applied Maths button:
                                 applied_maths.setFillColor(COLOR_YELLOW);
                                 applied_maths.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 3;
-                            // 6) Go back:
+                            // 5) Go back:
                             } else if (captured_button(window, back)) {
                                 blink_thread->terminate();
                                 multiplayer_menu();
-                            // 7) Create a new session (if all required information is entered):
-                            } else if (captured_button(window, create) && session_name != ""
-                                && complexity != 0 && max_number_of_players != 0) {
+                            // 6) Create a new session (if all required information is entered):
+                            } else if (captured_button(window, create) && complexity != 0 && max_number_of_players != 0) {
                                 blink_thread->terminate();
-                                Server* current_session = new Server(false, session_name, max_number_of_players, complexity);
+                                Server* current_session = new Server(false, nickname, max_number_of_players, complexity);
                                 session_menu(current_session, nullptr);
                                 blink_thread->launch();
                             }
@@ -2053,35 +2132,18 @@ void Menu::create_session() {
                                     if (event.key.code == Keyboard::Return)
                                         break;
 
-                                    // capture session name field:
-                                    session_name_captured = true;
-
-                                    // focus session_name_title button:
-                                    session_name_title.setFillColor(COLOR_YELLOW);
-                                    session_name_title.setOutlineColor(COLOR_DARK_BLUE);
-                                    focused_button_counter++;
-                                    break;
-                                case 1:
-                                    // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
-                                        // execute session_name_title button:
-                                        break;
-
-                                    // uncapture session name field:
-                                    session_name_display.setString(session_name);
-                                    session_name_captured = false;
-                                    // capture max players number field:
                                     max_number_of_players_captured = true;
 
-                                    // unfocus session_name_title button:
-                                    session_name_title.setFillColor(COLOR_DARK_VIOLET);
-                                    session_name_title.setOutlineColor(COLOR_LIGHT_GREEN);
                                     // focus max_number_of_players_title button:
                                     max_number_of_players_title.setFillColor(COLOR_YELLOW);
                                     max_number_of_players_title.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
-                                case 2:
+                                case 1:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
                                     // uncapture max players number field:
                                     max_number_of_players_display.setString(to_string(max_number_of_players));
                                     max_number_of_players_captured = false;
@@ -2094,7 +2156,7 @@ void Menu::create_session() {
                                     mechanics.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
-                                case 3:
+                                case 2:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
@@ -2119,7 +2181,7 @@ void Menu::create_session() {
                                         focused_button_counter++;
                                     }
                                     break;
-                                case 4:
+                                case 3:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
@@ -2144,7 +2206,7 @@ void Menu::create_session() {
                                         focused_button_counter++;
                                     }
                                     break;
-                                case 5:
+                                case 4:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
@@ -2169,7 +2231,7 @@ void Menu::create_session() {
                                         focused_button_counter++;
                                     }
                                     break;
-                                case 6:
+                                case 5:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         blink_thread->terminate();
@@ -2185,24 +2247,23 @@ void Menu::create_session() {
                                     create.setOutlineColor(COLOR_DARK_BLUE);
                                     focused_button_counter++;
                                     break;
-                                case 7:
+                                case 6:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return && session_name != ""
-                                        && complexity != 0 && max_number_of_players != 0) {
+                                    if (event.key.code == Keyboard::Return && complexity != 0 && max_number_of_players != 0) {
                                         blink_thread->terminate();
-                                        Server* current_session = new Server(false, session_name, max_number_of_players, complexity);
+                                        Server* current_session = new Server(false, nickname, max_number_of_players, complexity);
                                         session_menu(current_session, nullptr);
                                         blink_thread->launch();
                                     } else {
-                                        // capture session name field:
-                                        session_name_captured = true;
+                                        // capture max players number field:
+                                        max_number_of_players_captured = true;
 
                                         // unfocus create button:
                                         create.setFillColor(COLOR_DARK_VIOLET);
                                         create.setOutlineColor(COLOR_LIGHT_GREEN);
-                                        // focus session_name_title button:
-                                        session_name_title.setFillColor(COLOR_YELLOW);
-                                        session_name_title.setOutlineColor(COLOR_DARK_BLUE);
+                                        // focus max_number_of_players_title button:
+                                        max_number_of_players_title.setFillColor(COLOR_YELLOW);
+                                        max_number_of_players_title.setOutlineColor(COLOR_DARK_BLUE);
                                         focused_button_counter = 1;
                                     }
                                     break;
@@ -2212,21 +2273,7 @@ void Menu::create_session() {
                             break;
                         // If we have pushed Backspace:
                         case Keyboard::BackSpace:
-                            if (session_name_captured && session_name.length() > 0) {
-                                // Erase the last symbol from the session name string:
-                                session_name.erase(session_name.length() - 1);
-                                session_name_display.setString(session_name);
-
-                                // Resize session name:
-                                session_name_title.setCharacterSize(5 * button_size / 6);
-                                session_name_title.setOutlineThickness(button_size / 6);
-                                session_name_title.setPosition((window.getSize().x - session_name_title.getGlobalBounds().width) / 4, 
-                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
-                                
-                                session_name_display.setCharacterSize(5 * button_size / 6);
-                                session_name_display.setPosition(3 * (window.getSize().x - session_name_display.getGlobalBounds().width) / 4, 
-                                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
-                            } else if (max_number_of_players_captured && max_number_of_players != 0) {
+                            if (max_number_of_players_captured && max_number_of_players != 0) {
                                 // Reset max players number to 0:
                                 max_number_of_players = 0;
                                 max_number_of_players_display.setString(to_string(max_number_of_players));
@@ -2265,52 +2312,43 @@ void Menu::create_session() {
                     create_session_title.setPosition((window.getSize().x - create_session_title.getGlobalBounds().width) / 2 - 10.0f, 
                             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2);
 
-                    session_name_title.setCharacterSize(5 * button_size / 6);
-                    session_name_title.setOutlineThickness(button_size / 6);
-                    session_name_title.setPosition((window.getSize().x - session_name_title.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
-                    
-                    session_name_display.setCharacterSize(5 * button_size / 6);
-                    session_name_display.setPosition(3 * (window.getSize().x - session_name_display.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
-
                     max_number_of_players_title.setCharacterSize(5 * button_size / 6);
                     max_number_of_players_title.setOutlineThickness(button_size / 6);
                     max_number_of_players_title.setPosition((window.getSize().x - max_number_of_players_title.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f);
                     
                     max_number_of_players_display.setCharacterSize(5 * button_size / 6);
                     max_number_of_players_display.setPosition(3 * (window.getSize().x - max_number_of_players_display.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2  + (button_size + 15.0f) * 2 + 5.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2  + button_size + 20.0f + 5.0f);
 
                     complexity_title.setCharacterSize(5 * button_size / 6);
                     complexity_title.setPosition((window.getSize().x - complexity_title.getGlobalBounds().width) / 2 - 10.0f, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 2 + 5.0f);
 
                     mechanics.setCharacterSize(5 * button_size / 6);
                     mechanics.setOutlineThickness(button_size / 6);
                     mechanics.setPosition((window.getSize().x - mechanics.getGlobalBounds().width) / 2, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 5.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 3 + 5.0f);
                     
                     STIC.setCharacterSize(5 * button_size / 6);
                     STIC.setOutlineThickness(button_size / 6);
                     STIC.setPosition((window.getSize().x - STIC.getGlobalBounds().width) / 2, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 5.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 5.0f);
                     
                     applied_maths.setCharacterSize(5 * button_size / 6);
                     applied_maths.setOutlineThickness(button_size / 6);
                     applied_maths.setPosition((window.getSize().x - applied_maths.getGlobalBounds().width) / 2, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 6.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 6.0f);
 
                     back.setCharacterSize(5 * button_size / 6);
                     back.setOutlineThickness(button_size / 6);
                     back.setPosition((window.getSize().x - back.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f);
                     
                     create.setCharacterSize(5 * button_size / 6);
                     create.setOutlineThickness(button_size / 6);
                     create.setPosition(3 * (window.getSize().x - create.getGlobalBounds().width) / 4, 
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f);
                     break;
                 default:
                     break;
@@ -2325,8 +2363,6 @@ void Menu::create_session() {
 
         // Draw a menu:
         window.draw(create_session_title);
-        window.draw(session_name_title);
-        window.draw(session_name_display);
         window.draw(max_number_of_players_title);
         window.draw(max_number_of_players_display);
         window.draw(complexity_title);
@@ -2512,7 +2548,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     request_status status;
                                     current_client->disconnect_server(status);
                                     current_client->disconnect_udp_socket();
-                                    find_servers();
+                                    find_servers(current_client->get_player_nickname());
                                     return;
                                 }
                                 break;
@@ -2535,6 +2571,8 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     player_list->at(current_player_index).status = true;
                                     player_list_titles[2 * current_player_index + 1].setString("Ready");
                                 }
+                                player_list_titles[2 * current_player_index + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * current_player_index + 1].getGlobalBounds().width) / 4,
+                                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (current_player_index + 2) + 5.0f);
                             // 3) Start new multiplayer game:
                             } else if (button_multiplier == 3 && captured_button(window, start) && current_session->start()) {
                                 listen_thread->terminate();
@@ -2576,7 +2614,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                             request_status status;
                                             current_client->disconnect_server(status);
                                             current_client->disconnect_udp_socket();
-                                            find_servers();
+                                            find_servers(current_client->get_player_nickname());
                                             return;
                                         }
                                         break;
@@ -2611,6 +2649,8 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                             player_list->at(current_player_index).status = true;
                                             player_list_titles[2 * current_player_index + 1].setString("Ready");
                                         }
+                                        player_list_titles[2 * current_player_index + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * current_player_index + 1].getGlobalBounds().width) / 4,
+                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (current_player_index + 2) + 5.0f);
                                     } else {
                                         // unfocus ready button:
                                         ready.setFillColor(COLOR_DARK_VIOLET);
@@ -2734,7 +2774,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
 };
 
 // Find servers function:
-void Menu::find_servers() {
+void Menu::find_servers(const string& nickname) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
 
@@ -2749,7 +2789,7 @@ void Menu::find_servers() {
     request_status search_status = UNASSIGNED;
 
     // Create a client:
-    Client* current_client = new Client();
+    Client* current_client = new Client(false, nickname);
 
     // Looking for servers:
     Thread* search_thread = new Thread([&] () { current_client->search_servers(search_status); });
@@ -2769,11 +2809,16 @@ void Menu::find_servers() {
             cout << "Sorry, wait image not found!" << endl;
     }
 
+    // initalize the wait background:
+    RectangleShape wait_background;
+    wait_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
+    wait_background.setFillColor(Color(255, 255, 255, 100));
+
     // create a wait sprite itself:
     Sprite wait;
     wait.setTexture(texture);
-    wait.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.5);
-    wait.setColor(Color(255, 255, 255, 100));    
+    wait.setColor(Color(255, 255, 255, 100));
+    wait.setPosition((window.getSize().x - wait.getGlobalBounds().width) / 2, (window.getSize().y - wait.getGlobalBounds().height) / 2);
 
     // Number of buttons:
     unsigned number_of_buttons = 8;
@@ -3099,6 +3144,8 @@ void Menu::find_servers() {
                     button_size = min(min(60.0f, 3.5f * (window.getSize().x - 10.0f) / 18), 
                         (window.getSize().y - 50.0f - 15.0f * (number_of_buttons - 1)) / number_of_buttons);
 
+                    wait.setPosition((window.getSize().x - wait.getGlobalBounds().width) / 2, (window.getSize().y - wait.getGlobalBounds().height) / 2);
+
                     // update view:
                     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
@@ -3167,8 +3214,11 @@ void Menu::find_servers() {
         window.draw(back);
         window.draw(refresh);
         window.draw(connect);
-        if (status == NOT_READY)
+        if (status == NOT_READY) {
+            window.draw(wait_background);
             window.draw(wait);
+            sf::sleep(seconds(1));
+        }
             
         window.display();
     }

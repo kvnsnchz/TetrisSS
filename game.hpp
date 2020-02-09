@@ -6,7 +6,7 @@
 #include "client.hpp"
 
 #define DEF_COU_CHA_FIG 1 
-#define MAX_SESSION_NAME_LENGTH 12
+#define MAX_NICKNAME_LENGTH 12
 
 // new button initialization function (for code reduction):
 Text create_button(Font& font, const string title, const double& button_size,
@@ -46,13 +46,13 @@ class Menu {
         void multiplayer_menu();
 
         // Set up and create a new session as a server:
-        void create_session();
+        void create_session(const string& nickname);
 
         // Manage just created session as a server:
         void session_menu(Server* current_session, Client* current_client);
 
         // Find servers function:
-        void find_servers();
+        void find_servers(const string& nickname);
 
         void complexity_menu();
 
