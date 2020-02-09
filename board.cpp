@@ -172,7 +172,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
             if (board_index > 0)
-                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 1) * 10.0f,
+                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 2) * 10.0f,
                     (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
             else
                 grid[i][j].setPosition(i * (cell_size.x + 1) + 5.0f,
@@ -231,7 +231,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
         next_figure_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 4.0f, 15.0f);
         next_figure_title.setCharacterSize(font_size);
         next_figure_title.setStyle(Text::Bold);
-        next_figure_title.setFillColor(COLOR_DARK_VIOLET);
+        next_figure_title.setFillColor(COLOR_LIGHT_GREEN);
         window.draw(next_figure_title);
 
         // next figure itself (its grid):
@@ -246,7 +246,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setFont(font);
     score_title.setCharacterSize(font_size);
     score_title.setStyle(Text::Bold);
-    score_title.setFillColor(COLOR_DARK_VIOLET);
+    score_title.setFillColor(COLOR_LIGHT_GREEN);
     if (board_index == 0) {
         score_title.setString("My Score: \n" + to_string(score));
         score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
