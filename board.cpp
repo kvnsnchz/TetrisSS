@@ -182,32 +182,32 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
                 case 0:
                     grid[i][j].setFillColor(Color(121, 163, 249, 180));
                     break;
-                case 1:
-                case 1 * STOP_FIGURE_FACTOR:
+                case FIGURE_O_COLOR_CODE:
+                case FIGURE_O_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(255, 216, 0, 255));
                     break;
-                case 2:
-                case 2 * STOP_FIGURE_FACTOR:
+                case FIGURE_I_COLOR_CODE:
+                case FIGURE_I_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(28, 230, 199, 255));
                     break;
-                case 3:
-                case 3 * STOP_FIGURE_FACTOR:
+                case FIGURE_T_COLOR_CODE:
+                case FIGURE_T_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(248, 131, 6, 255));
                     break;
-                case 4:
-                case 4 * STOP_FIGURE_FACTOR:
+                case FIGURE_L_COLOR_CODE:
+                case FIGURE_L_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(248, 6, 248, 255));
                     break;
-                case 5:
-                case 5 * STOP_FIGURE_FACTOR:
+                case FIGURE_J_COLOR_CODE:
+                case FIGURE_J_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(COLOR_DARK_VIOLET);
                     break;
-                case 6:
-                case 6 * STOP_FIGURE_FACTOR:
+                case FIGURE_Z_COLOR_CODE:
+                case FIGURE_Z_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(220, 0, 20, 255));
                     break;
-                case 7:
-                case 7 * STOP_FIGURE_FACTOR:
+                case FIGURE_S_COLOR_CODE:
+                case FIGURE_S_COLOR_CODE * STOP_FIGURE_FACTOR:
                     grid[i][j].setFillColor(Color(46, 228, 25, 255));
                     break;
                 default:

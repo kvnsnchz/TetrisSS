@@ -86,7 +86,7 @@ class Figure_Simple_Rotation: public Figure {
 // Square figure definition:
 class Figure_O: public Figure {
     public:
-        Figure_O(const unsigned& x_dim, const Vector2f& cell_size): Figure(1) {
+        Figure_O(const unsigned& x_dim, const Vector2f& cell_size): Figure(FIGURE_O_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
@@ -96,7 +96,7 @@ class Figure_O: public Figure {
 // Stick figure definition:
 class Figure_I: public Figure_Simple_Rotation {
     public:
-        Figure_I(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(2) {
+        Figure_I(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(FIGURE_I_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
@@ -106,7 +106,7 @@ class Figure_I: public Figure_Simple_Rotation {
 // T figure definition:
 class Figure_T: public Figure {
     public:
-        Figure_T(const unsigned& x_dim, const Vector2f& cell_size):Figure(3) {
+        Figure_T(const unsigned& x_dim, const Vector2f& cell_size):Figure(FIGURE_T_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
@@ -116,7 +116,7 @@ class Figure_T: public Figure {
 // L figure definition:
 class Figure_L: public Figure {
     public:
-        Figure_L(const unsigned& x_dim, const Vector2f& cell_size):Figure(4) {
+        Figure_L(const unsigned& x_dim, const Vector2f& cell_size):Figure(FIGURE_L_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
@@ -126,7 +126,7 @@ class Figure_L: public Figure {
 // J figure definition:
 class Figure_J: public Figure {
     public:
-        Figure_J(const unsigned& x_dim, const Vector2f& cell_size):Figure(5) {
+        Figure_J(const unsigned& x_dim, const Vector2f& cell_size):Figure(FIGURE_J_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
@@ -136,7 +136,7 @@ class Figure_J: public Figure {
 // Z figure definition:
 class Figure_Z: public Figure_Simple_Rotation {
     public:
-        Figure_Z(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(6) {
+        Figure_Z(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(FIGURE_Z_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
@@ -146,7 +146,7 @@ class Figure_Z: public Figure_Simple_Rotation {
 // S figure definition:
 class Figure_S: public Figure_Simple_Rotation {
     public:
-        Figure_S(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(7) {
+        Figure_S(const unsigned& x_dim, const Vector2f& cell_size):Figure_Simple_Rotation(FIGURE_S_COLOR_CODE) {
             initialize(x_dim, cell_size);
         };
         
