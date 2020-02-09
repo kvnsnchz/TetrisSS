@@ -2105,7 +2105,7 @@ void Menu::create_session(const string& nickname) {
                             // 5) Go back:
                             } else if (captured_button(window, back)) {
                                 blink_thread->terminate();
-                                multiplayer_menu();
+                                return;
                             // 6) Create a new session (if all required information is entered):
                             } else if (captured_button(window, create) && complexity != 0 && max_number_of_players != 0) {
                                 blink_thread->terminate();
@@ -2236,7 +2236,7 @@ void Menu::create_session(const string& nickname) {
                                     if (event.key.code == Keyboard::Return) {
                                         blink_thread->terminate();
                                         // execute back button:
-                                        multiplayer_menu();
+                                        return;
                                     }
 
                                     // unfocus back button:
@@ -2571,8 +2571,6 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     player_list->at(current_player_index).status = STATUS_READY;
                                     player_list_titles[2 * current_player_index + 1].setString("Ready");
                                 }
-                                player_list_titles[2 * current_player_index + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * current_player_index + 1].getGlobalBounds().width) / 4,
-                                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (current_player_index + 2) + 5.0f);
                             // 3) Start new multiplayer game:
                             } else if (button_multiplier == 3 && captured_button(window, start) && current_session->start()) {
                                 listen_thread->terminate();
@@ -2649,8 +2647,6 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                             player_list->at(current_player_index).status = STATUS_READY;
                                             player_list_titles[2 * current_player_index + 1].setString("Ready");
                                         }
-                                        player_list_titles[2 * current_player_index + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * current_player_index + 1].getGlobalBounds().width) / 4,
-                                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (current_player_index + 2) + 5.0f);
                                     } else {
                                         // unfocus ready button:
                                         ready.setFillColor(COLOR_DARK_VIOLET);
@@ -2975,7 +2971,7 @@ void Menu::find_servers(const string& nickname) {
                                 update_thread->terminate();
 
                                 current_client->disconnect_udp_socket();
-                                multiplayer_menu();
+                                return;
                             // current_client->get_servers().size() + 2) Refresh list of servers:
                             } else if (captured_button(window, refresh) && status != NOT_READY) {
                                 search_thread->terminate();
@@ -3031,7 +3027,7 @@ void Menu::find_servers(const string& nickname) {
                                     update_thread->terminate();
 
                                     current_client->disconnect_udp_socket();
-                                    multiplayer_menu();
+                                    return;
                                 }
 
                                 // unfocus back button:
@@ -3217,7 +3213,6 @@ void Menu::find_servers(const string& nickname) {
         if (status == NOT_READY) {
             window.draw(wait_background);
             window.draw(wait);
-            sf::sleep(seconds(1));
         }
             
         window.display();
