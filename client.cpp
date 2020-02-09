@@ -340,11 +340,14 @@ void Client::listen_game(request_status& status){
             {
                 case SERVER_GAME_UPDATE:
                     for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
+                        Uint32 status;
+                        packet_recv >> status;
+                        _server_data.clients[i].status = (client_status)status;
                         packet_recv >> _server_data.clients[i].score;
                         
                         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
                             for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
-                                Int32 value;
+                                Uint32 value;
                                 packet_recv >> value;
                                 _server_data.clients[i].map[j][k] = (unsigned)value;
                             }

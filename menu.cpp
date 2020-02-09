@@ -1323,6 +1323,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
 // Multiplayer pause menu:
 void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client) {
+    
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1372,6 +1373,7 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
             0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 2));
 
     while (window.isOpen()) {
+
         Event event;
         // If someone's pressed pause:
         bool is_pause = false;  
