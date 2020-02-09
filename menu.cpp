@@ -1003,7 +1003,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
             // If someone's pressed pause:
             for (unsigned i = 0; i < player_list->size(); i++) {
-                if (player_list->at(i).status == CLIENT_GAME_PAUSE) {
+                if (player_list->at(i).status == STATUS_PAUSED) {
                     game_board->get_descend_thread()->terminate();
                     // execute pause button:
                     if (current_client == nullptr) {
