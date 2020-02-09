@@ -126,6 +126,10 @@ Figure* Board::get_next_figure() const {
     return next_figure;
 };
 
+Thread* Board::get_descend_thread() const {
+    return descend_thread;
+};
+
 void Board::set_map(const unsigned new_map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT]) {
     for (unsigned i = 0; i < BOARD_GRID_WIDTH; i++)
         for (unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; j++)
@@ -154,6 +158,10 @@ void Board::set_current_figure(Figure* figure) {
 
 void Board::set_next_figure(Figure* figure) {
     next_figure = figure;
+};
+
+void Board::set_descend_thread(Thread* new_thread) {
+    descend_thread = new_thread;
 };
 
 // print game board:

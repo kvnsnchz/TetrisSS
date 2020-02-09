@@ -36,6 +36,8 @@ class Board {
         Figure* current_figure;
         // The figure which will be added on the game board after the fall of the current feafure:
         Figure* next_figure;
+        // Using a thread to fall down:
+        Thread* descend_thread;
 
         friend ostream& operator <<(ostream& stream, const Board& board);
 
@@ -59,6 +61,7 @@ class Board {
         int get_y_dim() const;
         long get_score() const;
         Figure* get_next_figure() const;
+        Thread* get_descend_thread() const;
 
         void set_map(const unsigned new_map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT]);
         void set_complexity(const unsigned& new_complexity);
@@ -66,6 +69,7 @@ class Board {
         void set_score(const long& new_score);
         void set_current_figure(Figure* figure);
         void set_next_figure(Figure* figure);
+        void set_descend_thread(Thread*);
 
         // draw game board:
         void print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index = 0, const unsigned& board_index = 0);
