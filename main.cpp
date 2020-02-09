@@ -1,6 +1,6 @@
 #include <vector>
 #include <SFML/System/Thread.hpp>
-#include "game.hpp"
+#include "menu.hpp"
 
 using namespace std;
 
