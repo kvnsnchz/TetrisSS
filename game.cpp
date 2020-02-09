@@ -2820,7 +2820,8 @@ void Menu::find_servers() {
     Text connect = create_button(font, "Connect", button_size,
         Vector2f(5 * window.getSize().x / 6 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
-            
+
+    sf::Mutex mutex;     
     Thread* update_thread = new Thread([&] () {
         while (true) {
             if (search_status == CHANGED) {
@@ -2840,9 +2841,11 @@ void Menu::find_servers() {
                         Vector2f(5 * window.getSize().x / 6,
                         (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
                 }
-
+                mutex.lock();
                 search_status = NOT_CHANGED;
+                mutex.unlock();
             }
+            sf::sleep(seconds(0.2f));
         }
     });
 

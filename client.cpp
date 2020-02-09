@@ -26,6 +26,7 @@ void Client::disconnect_udp_socket(){
 
 //Search for available game servers:
 void Client::search_servers(request_status& status) {
+    servers.clear();
     //Filling send buffer:
     Packet packet_send;
     //Server information request:
@@ -56,7 +57,6 @@ void Client::search_servers(request_status& status) {
             _datatype = (datatype) datatype_value;
             //Check if the message is a response of server information:
             if(_datatype == SERVER_INFO_RESPONSE) {
-                status = CHANGED;
                 
                 //Adding server information to server list:
                 vector<server_data>::iterator it = find(servers.begin(), servers.end(), server_data{
@@ -69,6 +69,8 @@ void Client::search_servers(request_status& status) {
                     packet_recv >> _server_data;
                     servers.emplace_back(_server_data);
                     
+                    status = CHANGED;
+
                     cout << "Server: " << servers.back().name << " address = " << servers.back().address << " clients_quantity = " << servers.back().clients_quantity << endl;
                 
                 }

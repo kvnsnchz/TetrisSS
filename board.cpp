@@ -639,7 +639,7 @@ void Board::fix_current_figure() {
 // end of game condition:
 bool Board::game_over() {
     for (int j = 0; j < x_dimension; j++)
-        if (map[j][FIGURE_GRID_HEIGHT] >= STOP_FIGURE_FACTOR)
+        if (map[j][FIGURE_GRID_HEIGHT] >= STOP_FIGURE_FACTOR && map[j][FIGURE_GRID_HEIGHT] != SHADOW_COLOR_CODE)
              return true;
     
     return false;
