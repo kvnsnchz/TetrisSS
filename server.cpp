@@ -54,11 +54,11 @@ void Server::disconnect(){
 
 //Server ready or not ready to play
 void Server::ready(bool is_ready){
-    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{local_ip_address, false});
+    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{local_ip_address, STATUS_NOT_READY});
     if(it == clients.end())
         return;
         
-    (*it).status = is_ready;
+    (*it).status = is_ready ? STATUS_READY : STATUS_NOT_READY;
     //Filling send buffer:
     Packet packet_send;
 
@@ -146,7 +146,7 @@ void Server::listen_clients(request_status& status) {
                 }
                 else{
                     //Adding the new client to the client list:
-                    client_data _client_data{sender, false};
+                    client_data _client_data{sender, STATUS_NOT_READY};
                     if(find(clients.begin(), clients.end(), _client_data) == clients.end())
                         clients.emplace_back(_client_data);
                     //Buffer filling with success message
@@ -188,7 +188,7 @@ void Server::listen_clients(request_status& status) {
             //Check if the message is a request of disconnection:
             case CLIENT_DISCONNECTION:
             {
-                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, STATUS_NOT_READY});
                 if(it != clients.end()){
                     //Buffer filling with delete client position
                     packet_send << DELETE_CLIENT_INFO;
@@ -209,10 +209,10 @@ void Server::listen_clients(request_status& status) {
             //Check if the message is as ready client message:
             case CLIENT_READY:
             {    //Buffer filling with success message
-                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, STATUS_NOT_READY});
                 if(it == clients.end())
                     break;
-                (*it).status = true;
+                (*it).status = STATUS_READY;
                 packet_send << UPDATE_CLIENT_INFO;
                 packet_send << (Uint32)(it - clients.begin());
                 packet_send << (*it);
@@ -234,10 +234,10 @@ void Server::listen_clients(request_status& status) {
             }
             case CLIENT_NOT_READY:
                 //Buffer filling with success message
-                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, STATUS_NOT_READY});
                 if(it == clients.end())
                     break;
-                (*it).status = false;
+                (*it).status = STATUS_NOT_READY;
                 packet_send << UPDATE_CLIENT_INFO;
                 packet_send << (Uint32)(it - clients.begin());
                 packet_send << (*it);
@@ -318,7 +318,7 @@ void Server::listen_game(request_status& status){
             switch ((unsigned)_datatype)
             {
                 case CLIENT_GAME_UPDATE:
-                    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, false});
+                    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, STATUS_NOT_READY});
                     if(it == clients.end())
                         break;
 

@@ -202,13 +202,13 @@ void Client::listen_server(request_status& status){
             {
             case CLIENT_READY_SUCCESS:
             {    
-                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
+                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), STATUS_NOT_READY});
                 if(it == _server_data.clients.end()){
                     status = READY_ERROR;
                     break;
                 }
                     
-                (*it).status = true;
+                (*it).status = STATUS_READY;
             
                 cout << "Ready " << endl;
                 status = READY_SUCCESS;
@@ -217,13 +217,13 @@ void Client::listen_server(request_status& status){
             }
             case CLIENT_NOT_READY_SUCCESS:
             {    
-                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), false});
+                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), STATUS_NOT_READY});
                 if(it == _server_data.clients.end()){
                     status = NOT_READY_ERROR;
                     break;
                 }
                     
-                (*it).status = false;
+                (*it).status = STATUS_NOT_READY;
             
                 cout << "Ready " << endl;
                 status = NOT_READY_SUCCESS;

@@ -2440,7 +2440,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
         player_list_titles.emplace_back(create_button(font, string ("Player " + to_string(i + 1)), button_size,
             Vector2f(window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
-        player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+        player_list_titles.emplace_back(create_button(font, player_list->at(i).status == STATUS_READY ? "Ready" : "Not Ready", button_size,
             Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
     }
@@ -2483,7 +2483,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                 player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
                     Vector2f(window.getSize().x / 4,
                     (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
-                player_list_titles.emplace_back(create_button(font, player_list->at(i).status ? "Ready" : "Not Ready", button_size,
+                player_list_titles.emplace_back(create_button(font, player_list->at(i).status == STATUS_READY ? "Ready" : "Not Ready", button_size,
                     Vector2f(3 * window.getSize().x / 4,
                     (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
             }
@@ -2554,13 +2554,13 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                 break;
                             // 2) Get ready or not:
                             } else if (captured_button(window, ready)) { 
-                                if (player_list->at(current_player_index).status) {
+                                if (player_list->at(current_player_index).status == STATUS_READY) {
                                     ready.setString("Ready");
                                     if (current_client == nullptr)
                                         current_session->ready(false);
                                     else if (current_session == nullptr)
                                         current_client->ready(false);
-                                    player_list->at(current_player_index).status = false;
+                                    player_list->at(current_player_index).status = STATUS_NOT_READY;
                                     player_list_titles[2 * current_player_index + 1].setString("Not Ready");
                                 } else {
                                     ready.setString("Not Ready");
@@ -2568,7 +2568,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                         current_session->ready(true);
                                     else if (current_session == nullptr)
                                         current_client->ready(true);
-                                    player_list->at(current_player_index).status = true;
+                                    player_list->at(current_player_index).status = STATUS_READY;
                                     player_list_titles[2 * current_player_index + 1].setString("Ready");
                                 }
                                 player_list_titles[2 * current_player_index + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * current_player_index + 1].getGlobalBounds().width) / 4,
@@ -2632,13 +2632,13 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // execute ready button:
-                                        if (player_list->at(current_player_index).status) {
+                                        if (player_list->at(current_player_index).status == STATUS_READY) {
                                             ready.setString("Ready");
                                             if (current_client == nullptr)
                                                 current_session->ready(false);
                                             else if (current_session == nullptr)
                                                 current_client->ready(false);
-                                            player_list->at(current_player_index).status = false;
+                                            player_list->at(current_player_index).status = STATUS_NOT_READY;
                                             player_list_titles[2 * current_player_index + 1].setString("Not Ready");
                                         } else {
                                             ready.setString("Not Ready");
@@ -2646,7 +2646,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                                 current_session->ready(true);
                                             else if (current_session == nullptr)
                                                 current_client->ready(true);
-                                            player_list->at(current_player_index).status = true;
+                                            player_list->at(current_player_index).status = STATUS_READY;
                                             player_list_titles[2 * current_player_index + 1].setString("Ready");
                                         }
                                         player_list_titles[2 * current_player_index + 1].setPosition(3 * (window.getSize().x - player_list_titles[2 * current_player_index + 1].getGlobalBounds().width) / 4,

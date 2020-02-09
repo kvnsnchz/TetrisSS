@@ -44,9 +44,16 @@ enum request_status {
     GAME_START,
 };
 
+enum client_status {
+    STATUS_READY,
+    STATUS_NOT_READY,
+    STATUS_PAUSED,
+    STATUS_GAME_OVER,
+};
+
 struct client_data {
     IpAddress address;
-    bool status;
+    client_status status;
     Uint64 score;
     unsigned map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT];
     bool operator == (client_data other_client){
