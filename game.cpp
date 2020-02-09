@@ -258,8 +258,10 @@ void Menu::game(const unsigned& complexity) {
                                 game_board->step_down();
                             break;
                         case Keyboard::Space:
-                            if(_figure_state != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE){
                                 game_board->hard_drop();
+                                _figure_state = CHANGE_FIGURE;
+                            }
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
@@ -633,8 +635,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                 game_board->step_down();
                             break;
                         case Keyboard::Space:
-                            if(_figure_state != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE){
                                 game_board->hard_drop();
+                                _figure_state = CHANGE_FIGURE;
+                            }
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
