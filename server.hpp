@@ -21,7 +21,7 @@ private:
 public:
     Server(): Player(), max_clients(MAX_CLIENTS), level(0) {
         local_ip_address = IpAddress::getLocalAddress();
-        clients.emplace_back(client_data{local_ip_address, false});
+        clients.emplace_back(client_data{local_ip_address, STATUS_NOT_READY});
         connect_udp_socket();
     };
 
@@ -29,7 +29,7 @@ public:
         Player(new_player_status, server_nickname), max_clients(max_cli), level(lvl) 
     {
         local_ip_address = IpAddress::getLocalAddress();
-        clients.emplace_back(client_data{local_ip_address, false});
+        clients.emplace_back(client_data{local_ip_address, STATUS_NOT_READY});
         connect_udp_socket();
     };
     
