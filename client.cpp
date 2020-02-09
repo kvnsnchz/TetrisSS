@@ -234,7 +234,8 @@ void Client::listen_server(request_status& status){
                 _server_data.clients.clear();
                 Uint32 clients_quantity;
                 packet_recv >> clients_quantity;
-
+                _server_data.clients_quantity = clients_quantity;
+                
                 for(unsigned i = 0; i < clients_quantity; i ++){
                     client_data _client_data;
                     packet_recv >> _client_data;
