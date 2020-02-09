@@ -385,7 +385,7 @@ void Server::game_over() {
 
 void Server::restart_game() {
     for(unsigned i = 0; i < clients.size(); i++){
-        clients[i].status = STATUS_READY;
+        clients[i].status = STATUS_NOT_READY;
     }
 }
 
