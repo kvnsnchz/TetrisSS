@@ -78,7 +78,7 @@ void Server::ready(bool is_ready){
 bool Server::start() {
     // Check everyone's readiness:
     for (unsigned i = 0; i < clients.size(); i++) {
-        if (!clients[i].status) {
+        if (clients[i].status != STATUS_READY) {
             cout << "Can't start a game, some players aren't ready!!!" << endl;
             return false;
         }
