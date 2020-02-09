@@ -55,38 +55,44 @@ void Menu::game(const unsigned& complexity) {
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
-    // Thread descend_thread([&] () {
-    //     for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
-    //         if (descend_counter >= 24000 / complexity) {
-    //             if(_figure_state == STOP_FIGURE)
-    //                 count_change_figure--;
-    //             if(count_change_figure <= 0)
-    //                 _figure_state = CHANGE_FIGURE;
-    //             if(_figure_state == DESCEND_FIGURE)
-    //                 _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-    //             // if we can't move down no more:
-    //             if (_figure_state == CHANGE_FIGURE) {
+    // Boolean variable to stop descend thread during the pause:
+    bool is_paused = false;
 
-    //                 count_change_figure = DEF_COU_CHA_FIG;
-    //                 _figure_state = DESCEND_FIGURE;
-    //                 // check for the full lines:
-    //                 game_board->fix_current_figure();
-    //                 game_board->erase_lines(complexity);
+    // Using a thread to fall down:
+    game_board->set_descend_thread(new Thread([&] () {
+        for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
+            if (!is_paused && descend_counter >= 30 / complexity) {
+                if(_figure_state == STOP_FIGURE)
+                    count_change_figure--;
+                if(count_change_figure <= 0)
+                    _figure_state = CHANGE_FIGURE;
+                if(_figure_state == DESCEND_FIGURE)
+                    _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+                // if we can't move down no more:
+                if (_figure_state == CHANGE_FIGURE) {
 
-    //                 // putting next figure into a current figure:
-    //                 game_board->set_current_figure(game_board->get_next_figure());
-    //                 // adding new current figure on the board:
-    //                 game_board->add_figure();
-    //                 // creating the next figure:
-    //                 game_board->set_next_figure(game_board->create_figure());
-    //             }
+                    count_change_figure = DEF_COU_CHA_FIG;
+                    _figure_state = DESCEND_FIGURE;
+                    // check for the full lines:
+                    game_board->fix_current_figure();
+                    game_board->erase_lines(complexity);
 
-    //             descend_counter = 0;
-    //         }
-    //     }
-    // });
+                    // putting next figure into a current figure:
+                    game_board->set_current_figure(game_board->get_next_figure());
+                    // adding new current figure on the board:
+                    game_board->add_figure();
+                    // creating the next figure:
+                    game_board->set_next_figure(game_board->create_figure());
+                }
 
-    // descend_thread.launch();
+                descend_counter = 0;
+            }
+
+            sf::sleep(seconds(0.015f));
+        }
+    }));
+
+    game_board->get_descend_thread()->launch();
 
     // We are using descend counter to manage the figures' fall rate:
     for (int descend_counter = 0; window.isOpen(); descend_counter++) {
@@ -119,7 +125,9 @@ void Menu::game(const unsigned& complexity) {
                             // 1) pause game:
                             if (captured_button(window, pause)) {
                                 // execute pause button:
+                                is_paused = true;
                                 pause_menu(game_board);
+                                is_paused = false;
                                         
                                 // update cell size:
                                 cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -167,7 +175,9 @@ void Menu::game(const unsigned& complexity) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // execute pause button:
+                                        is_paused = true;
                                         pause_menu(game_board);
+                                        is_paused = false;
 
                                         // update cell size:
                                         cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -195,7 +205,9 @@ void Menu::game(const unsigned& complexity) {
                         // if Escape is pushed: 
                         case Keyboard::Escape:
                             // execute pause button:
+                            is_paused = true;
                             pause_menu(game_board);
+                            is_paused = false;
 
                             // update cell size:
                             cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -299,38 +311,11 @@ void Menu::game(const unsigned& complexity) {
         game_board->print_board(window, font, 5 * button_size / 6);
         // draw pause button:
         window.draw(pause);
-        
-        // set delay according to the complexity:
-        if ((float) descend_counter >= 300.0f / complexity) {
-             
-            if(_figure_state == STOP_FIGURE)
-                count_change_figure--;
-            if(count_change_figure <= 0)
-                _figure_state = CHANGE_FIGURE;
-            if(_figure_state == DESCEND_FIGURE)
-                _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-            // if we can't move down no more:
-            if (_figure_state == CHANGE_FIGURE) {
 
-                count_change_figure = DEF_COU_CHA_FIG;
-                _figure_state = DESCEND_FIGURE;
-                // check for the full lines:
-                game_board->fix_current_figure();
-                game_board->erase_lines(complexity);
-
-                // if we have reached game over condition:
-                if (game_board->game_over())
-                    game_over_menu(game_board);
-
-                // putting next figure into a current figure:
-                game_board->set_current_figure(game_board->get_next_figure());
-                // adding new current figure on the board:
-                game_board->add_figure();
-                // creating the next figure:
-                game_board->set_next_figure(game_board->create_figure());
-            }
-
-            descend_counter = 0;
+        // if we have reached game over condition:
+        if (game_board->game_over()) {
+            game_board->get_descend_thread()->terminate();
+            game_over_menu(game_board);
         }
 
         // display what we have just drawn:
@@ -413,32 +398,76 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     int count_change_figure = DEF_COU_CHA_FIG;
 
     // Initialize the thread for boards update:
-    Thread* update_thread = new Thread([&] () {
-        while (true) {
-            player_list->clear();
-            if (current_client == nullptr) {
-                current_session->send_clients_board_data(*game_board);
-                player_list = new vector<client_data>(current_session->get_clients());
-            } else if (current_session == nullptr) {
-                current_client->send_board_data(*game_board);
-                player_list = new vector<client_data>(current_client->get_server_data().clients);
-            }
-
-            for (unsigned i = 0; i < number_of_players - 1; i++) {
-                if (i >= current_player_index) {
-                    other_game_boards[i]->set_map(player_list->at(i + 1).map);
-                    other_game_boards[i]->set_score(player_list->at(i + 1).score);
-                } else {
-                    other_game_boards[i]->set_map(player_list->at(i).map);
-                    other_game_boards[i]->set_score(player_list->at(i).score);
-                }
-            }
+    // Thread* update_thread = new Thread([&] () {
+    //     while (true) {
+            
     
-            sf::sleep(seconds(0.1f));
-        }
-    });
+    //         sf::sleep(seconds(0.1f));
+    //     }
+    // });
 
-    update_thread->launch();
+    // update_thread->launch();
+
+    // Boolean variable to stop descend thread during the pause:
+    bool is_paused = false;
+
+    // Using a thread to fall down:
+    game_board->set_descend_thread(new Thread([&] () {
+        for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
+            if (!is_paused) {
+                // Update other boards:
+                player_list->clear();
+                if (current_client == nullptr) {
+                    current_session->send_clients_board_data(*game_board);
+                    player_list = new vector<client_data>(current_session->get_clients());
+                } else if (current_session == nullptr) {
+                    current_client->send_board_data(*game_board);
+                    player_list = new vector<client_data>(current_client->get_server_data().clients);
+                }
+
+                for (unsigned i = 0; i < number_of_players - 1; i++) {
+                    if (i >= current_player_index) {
+                        other_game_boards[i]->set_map(player_list->at(i + 1).map);
+                        other_game_boards[i]->set_score(player_list->at(i + 1).score);
+                    } else {
+                        other_game_boards[i]->set_map(player_list->at(i).map);
+                        other_game_boards[i]->set_score(player_list->at(i).score);
+                    }
+                }
+            
+                if (descend_counter >= 30 / complexity) {
+                    if(_figure_state == STOP_FIGURE)
+                        count_change_figure--;
+                    if(count_change_figure <= 0)
+                        _figure_state = CHANGE_FIGURE;
+                    if(_figure_state == DESCEND_FIGURE)
+                        _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+                    // if we can't move down no more:
+                    if (_figure_state == CHANGE_FIGURE) {
+
+                        count_change_figure = DEF_COU_CHA_FIG;
+                        _figure_state = DESCEND_FIGURE;
+                        // check for the full lines:
+                        game_board->fix_current_figure();
+                        game_board->erase_lines(complexity);
+
+                        // putting next figure into a current figure:
+                        game_board->set_current_figure(game_board->get_next_figure());
+                        // adding new current figure on the board:
+                        game_board->add_figure();
+                        // creating the next figure:
+                        game_board->set_next_figure(game_board->create_figure());
+                    }
+
+                    descend_counter = 0;
+                }
+
+            sf::sleep(seconds(0.015f));
+            }
+        }
+    }));
+
+    game_board->get_descend_thread()->launch();
 
     // We are using descend counter to manage the figures' fall rate:
     for (int descend_counter = 0; window.isOpen(); descend_counter++) {
@@ -470,8 +499,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             // If appropriate mouse position was captured:
                             // 1) pause game:
                             if (captured_button(window, pause)) {
+                                is_paused = true;
                                 // execute pause button:
                                 pause_menu(game_board);
+                                is_paused = false;
                                         
                                 // update cell size:
                                 own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -519,7 +550,9 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // execute pause button:
+                                        is_paused = true;
                                         pause_menu(game_board);
+                                        is_paused = false;
 
                                         // update cell size:
                                         own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -547,7 +580,9 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                         // if Escape is pushed: 
                         case Keyboard::Escape:
                             // execute pause button:
+                            is_paused = true;
                             pause_menu(game_board);
+                            is_paused = false;
 
                             // update cell size:
                             own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -658,41 +693,11 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         // draw pause button:
         window.draw(pause);
         
-        // (float) descend_counter / (500000 * window.getSize().x * window.getSize().y) >= 0.0000003f / complexity;
-        // set delay according to the complexity:
-        if ((float) descend_counter >= 300.0f / complexity) {
-             
-            if(_figure_state == STOP_FIGURE)
-                count_change_figure--;
-            if(count_change_figure <= 0)
-                _figure_state = CHANGE_FIGURE;
-            if(_figure_state == DESCEND_FIGURE)
-                _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-            // if we can't move down no more:
-            if (_figure_state == CHANGE_FIGURE) {
-
-                count_change_figure = DEF_COU_CHA_FIG;
-                _figure_state = DESCEND_FIGURE;
-                // check for the full lines:
-                game_board->fix_current_figure();
-                game_board->erase_lines(complexity);
-
-                // if we have reached game over condition:
-                if (game_board->game_over()) {
-                    update_thread->terminate();
-                    listen_thread->terminate();
-                    game_over_menu(game_board);
-                }
-
-                // putting next figure into a current figure:
-                game_board->set_current_figure(game_board->get_next_figure());
-                // adding new current figure on the board:
-                game_board->add_figure();
-                // creating the next figure:
-                game_board->set_next_figure(game_board->create_figure());
-            }
-
-            descend_counter = 0;
+        // if we have reached game over condition:
+        if (game_board->game_over()) {
+            game_board->get_descend_thread()->terminate();
+            listen_thread->terminate();
+            game_over_menu(game_board);
         }
 
         for (unsigned i = 0; i < number_of_players - 1; i++)
@@ -1083,14 +1088,18 @@ void Menu::pause_menu(Board* game_board) {
                             if (captured_button(window, resume))
                                 return;
                             // 2) Restart game:
-                            else if (captured_button(window, restart))
+                            else if (captured_button(window, restart)) {
+                                game_board->get_descend_thread()->terminate();
                                 game(game_board->get_complexity());
                             // 3) Go to main menu:
-                            else if (captured_button(window, to_main_menu))
+                            } else if (captured_button(window, to_main_menu)) {
+                                game_board->get_descend_thread()->terminate();
                                 main_menu();
                             // 4) Exit:
-                            else if (captured_button(window, exit))
+                            } else if (captured_button(window, exit)) {
+                                game_board->get_descend_thread()->terminate();
                                 window.close();
+                            }
                             break;
                         default:
                             break;
@@ -1131,9 +1140,11 @@ void Menu::pause_menu(Board* game_board) {
                                     break;
                                 case 2:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
                                         // execute restart button:
                                         game(game_board->get_complexity());
+                                    }
 
                                     // unfocus restart button:
                                     restart.setFillColor(COLOR_DARK_VIOLET);
@@ -1145,9 +1156,11 @@ void Menu::pause_menu(Board* game_board) {
                                     break;
                                 case 3:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
                                         // execute to_main_menu button:
                                         main_menu();
+                                    }
 
                                     // unfocus to_main_menu button:
                                     to_main_menu.setFillColor(COLOR_DARK_VIOLET);
@@ -1159,9 +1172,11 @@ void Menu::pause_menu(Board* game_board) {
                                     break;
                                 case 4:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
                                         // execute exit button:
                                         window.close();
+                                    }
 
                                     // unfocus exit button:
                                     exit.setFillColor(COLOR_DARK_VIOLET);
