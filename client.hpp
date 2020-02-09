@@ -1,7 +1,6 @@
 #ifndef clientHPP
 #define clientHPP
 
-#include "sockets_constants.hpp"
 #include "board.hpp"
 #include "player.hpp"
 
