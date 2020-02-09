@@ -279,7 +279,7 @@ void Server::send_clients_board_data(Board& board) {
         if(clients[i].address == local_ip_address)
             clients[i].score = board.get_score();
 
-        packet_send << clients[i].status;
+        packet_send << (Uint32) clients[i].status;
         packet_send << clients[i].score;
 
         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){

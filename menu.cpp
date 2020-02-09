@@ -1142,7 +1142,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                         if (current_client == nullptr) {
                                             current_session->pause(true);
                                         } else if (current_session == nullptr) {
-                                            current_client->pause(true);
+                                            current_client->pause(true);s
                                         }
                                         game_board->get_descend_thread()->launch();
 
@@ -1613,7 +1613,7 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
         game_board->print_board(window, font, 5 * button_size / 6);
 
         for (unsigned i = 0; i < other_boards.size(); i++)
-            other_boards[i]->print_board(window, font, 5 * button_size / 6);
+            other_boards[i]->print_board(window, font, 5 * button_size / 6, "", i + 1);
 
         // draw pause background:
         window.draw(pause_background);
