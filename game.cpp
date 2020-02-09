@@ -12,11 +12,12 @@ Text create_button(Font& font, const string title, const double& button_size,
     new_button.setStyle(Text::Bold);
     new_button.setString(title);
     
-    new_button.setFillColor(COLOR_DARK_VIOLET);
     if (outline) {
         new_button.setOutlineThickness(button_size / 6);
         new_button.setOutlineColor(COLOR_LIGHT_GREEN);
-    }
+        new_button.setFillColor(COLOR_DARK_VIOLET);
+    } else
+        new_button.setFillColor(COLOR_LIGHT_GREEN);
     if (center_coefficient != 0)
         position.x -= new_button.getGlobalBounds().width / center_coefficient;
     new_button.setPosition(position);
@@ -254,20 +255,20 @@ void Menu::game(const unsigned& complexity) {
                         // while we want to fall faster:
                         case Keyboard::S:
                         case Keyboard::Down:
-                            if(_figure_state != STOP_FIGURE)
+                            if (_figure_state != STOP_FIGURE)
                                 game_board->step_down();
                             break;
                         case Keyboard::Space:
-                            if(_figure_state != STOP_FIGURE)
+                            if (_figure_state != STOP_FIGURE)
                                 game_board->hard_drop();
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
-                            if(_figure_state != STOP_FIGURE)
+                            if (_figure_state != STOP_FIGURE)
                                 game_board->rotate(false);
                             break;
                         case Keyboard::H:
-                            if(_figure_state != STOP_FIGURE)
+                            if (_figure_state != STOP_FIGURE)
                                 game_board->rotate(true);
                             break;
                         default:

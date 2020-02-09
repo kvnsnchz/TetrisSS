@@ -329,7 +329,7 @@ void Client::listen_game(request_status& status){
 
             packet_recv >> datatype_value;
             _datatype = (datatype) datatype_value;
-            
+
             switch ((unsigned)_datatype)
             {
                 case SERVER_GAME_UPDATE:
