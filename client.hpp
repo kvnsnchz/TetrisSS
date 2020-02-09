@@ -54,6 +54,8 @@ public:
     void listen_game(request_status& status);
     //Sending pause
     void pause(bool);
+    //Sending game over
+    void game_over();
 };
 
 #endif

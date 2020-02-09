@@ -34,7 +34,8 @@ class Player {
         virtual void ready(bool) = 0;
         virtual void listen_game(request_status& status) = 0;
         virtual void pause(bool) = 0;
-
+        virtual void game_over() = 0;
+        
         ~Player() {};
 };
 

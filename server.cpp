@@ -351,6 +351,12 @@ void Server::listen_game(request_status& status){
                         clients[i].status = STATUS_READY;
                     }
                     break;
+                case CLIENT_GAME_OVER:
+                    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
+
+                    if(it != clients.end())
+                        (*it).status = STATUS_GAME_OVER;
+                    break;
             }
         }
     }
@@ -367,7 +373,19 @@ void Server::pause(bool is_pause) {
         for(unsigned i = 0; i < clients.size(); i++){
             clients[i].status = STATUS_READY;
         }
+    }   
+}
+
+void Server::game_over() {
+    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{local_ip_address, "", STATUS_NOT_READY});
+
+    if(it != clients.end())
+        (*it).status = STATUS_GAME_OVER;
+}
+
+void Server::restart_game() {
+    for(unsigned i = 0; i < clients.size(); i++){
+        clients[i].status = STATUS_READY;
     }
-    
 }
 

@@ -370,3 +370,17 @@ void Client::pause(bool is_pause) {
         cout << "Client: Send error" << endl;
     }
 }
+
+void Client::game_over() {
+    //Filling send buffer:
+    Packet packet_send;
+
+    //Client game over:
+    packet_send << CLIENT_GAME_OVER;
+    
+    //Sending client game over: 
+    if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
+    {
+        cout << "Client: Send error" << endl;
+    }
+}
