@@ -76,6 +76,7 @@ class Board {
         bool step_left(const bool& with_floor = false);
         bool step_right(const bool& with_floor = false);
         void rotate(bool right);
+        void shadow();
         // Check for the full lines and erase them if they are:
         void erase_lines(const unsigned& complexity);
         // Fix current figure's position on the board if we can't move further:
