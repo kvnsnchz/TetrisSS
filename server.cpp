@@ -139,13 +139,14 @@ void Server::listen_clients(request_status& status) {
                 break;
             //Check if the message is a request of connection:
             case SERVER_CONN_REQUEST:
+            {    
+                string client_nickname = "";
                 //Check if I can receive more clients:
                 if(clients.size() == max_clients){
                     //Buffer filling with error message:
                     packet_send << SERVER_CONN_RESPONSE_ERROR;
                 }
                 else{
-                    string client_nickname;
                     packet_recv >> client_nickname;
                     //Adding the new client to the client list:
                     client_data _client_data{sender, client_nickname, STATUS_NOT_READY};
@@ -180,13 +181,14 @@ void Server::listen_clients(request_status& status) {
                                 cout << "Server: Send error" << endl;
                     }
                     status = CHANGED;
-                    cout << "New client " << sender << endl;
+                    cout << "New client " << client_nickname << endl;
                     break;
                 }
 
                 cout << "Error new client " << sender << endl;
                 
                 break;
+            }
             //Check if the message is a request of disconnection:
             case CLIENT_DISCONNECTION:
             {

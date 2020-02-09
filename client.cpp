@@ -95,7 +95,7 @@ void Client::connect_server(const unsigned pos, request_status& status) {
     Packet packet_send;
     //Server connection request:
     packet_send << SERVER_CONN_REQUEST;
-    packet_send >> player_nickname;
+    packet_send << player_nickname;
     //Sending server connection request: 
     if (socket.send(packet_send, servers[pos].address, SERVER_PORT) != sf::Socket::Done)
     {

@@ -1265,7 +1265,11 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         window.draw(background);
 
         // draw a board:
-        game_board->print_board(window, font, 5 * button_size / 6);
+        if (current_client == nullptr)
+            game_board->print_board(window, font, 5 * button_size / 6, current_session->get_player_nickname());
+        else
+            game_board->print_board(window, font, 5 * button_size / 6, current_client->get_player_nickname());
+            
         // draw pause button:
         window.draw(pause);
         
@@ -1277,10 +1281,14 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         }
 
         for (unsigned i = 0; i < number_of_players - 1; i++) {
-            if (current_player_index >= i)
-                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i).nickname, i + 1);
-            else
-                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i).nickname, i + 1);
+            if (current_client == nullptr)
+                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, i + 1);
+            else {
+                if (current_player_index >= i)  
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
+                else
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, i + 1);
+            }
         }
 
         // display what we have just drawn:
@@ -3150,36 +3158,30 @@ void Menu::find_servers(const string& nickname) {
     Text connect = create_button(font, "Connect", button_size,
         Vector2f(5 * window.getSize().x / 6 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
-
-    sf::Mutex mutex;     
-    Thread* update_thread = new Thread([&] () {
-        while (true) {
-            if (search_status == CHANGED) {
-                server_info.clear();
-
-                // Fullfill the list of servers:
-                for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
-                    server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
-                        Vector2f(window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
-                        Vector2f(3 * window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/" + to_string(current_client->get_servers()[i].max_clients), button_size,
-                        Vector2f(5 * window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-                }
-                mutex.lock();
-                search_status = NOT_CHANGED;
-                mutex.unlock();
-            }
-            sf::sleep(seconds(0.2f));
-        }
-    });
-
-    update_thread->launch();
+   
+   
+   // update_thread->launch();
 
     while(window.isOpen()) {
+        if (search_status == CHANGED) {
+            server_info.clear();
+
+            // Fullfill the list of servers:
+            for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
+                server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
+                    Vector2f(window.getSize().x / 6,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+                server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
+                    Vector2f(3 * window.getSize().x / 6,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+                server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/" + to_string(current_client->get_servers()[i].max_clients), button_size,
+                    Vector2f(5 * window.getSize().x / 6,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+            }
+
+            search_status = NOT_CHANGED;
+        }
+
         Event event;
 
         while (window.pollEvent(event)) {
@@ -3255,7 +3257,6 @@ void Menu::find_servers(const string& nickname) {
                             // current_client->get_servers().size() + 1) Go back:
                             if (captured_button(window, back) && status != NOT_READY) {
                                 search_thread->terminate();
-                                update_thread->terminate();
 
                                 current_client->disconnect_udp_socket();
                                 return;
@@ -3311,7 +3312,6 @@ void Menu::find_servers(const string& nickname) {
                                 if (event.key.code == Keyboard::Return) {
                                     // execute back button:
                                     search_thread->terminate();
-                                    update_thread->terminate();
 
                                     current_client->disconnect_udp_socket();
                                     return;
