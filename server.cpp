@@ -39,7 +39,7 @@ void Server::disconnect(){
     //Filling send buffer:
     Packet packet_send;
     //Server disconnection request:
-    packet_send << CLIENT_DISCONNECTION;
+    packet_send << SERVER_DISCONNECTION;
     
     //Sending server disconnection: 
     for(unsigned i = 0; i < clients.size(); i ++){
@@ -352,11 +352,35 @@ void Server::listen_game(request_status& status){
                     }
                     break;
                 case CLIENT_GAME_OVER:
+                {  
                     vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
 
                     if(it != clients.end())
                         (*it).status = STATUS_GAME_OVER;
                     break;
+                }
+                //Check if the message is a request of disconnection:
+                case CLIENT_DISCONNECTION:
+                {   
+                    Packet packet_send;
+                    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
+                    if(it != clients.end()){
+                        //Buffer filling with delete client position
+                        packet_send << DELETE_CLIENT_INFO;
+                        packet_send << (Uint32) (it - clients.begin());
+
+                        //Removing the client of the client list:
+                        clients.erase(it);
+                        cout << "Delete client " << sender << endl;
+                        status = CHANGED;
+                    
+                        for(unsigned i = 0; i < clients.size(); i++){
+                            if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                                cout << "Server: Send error" << endl;
+                        }
+                    }
+                    break;
+                }
             }
         }
     }

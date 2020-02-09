@@ -352,6 +352,17 @@ void Client::listen_game(request_status& status){
                     }
                     status = CHANGED;
                     break;
+                case DELETE_CLIENT_INFO:
+                    unsigned pos_client;
+                    packet_recv >> pos_client;
+                    _server_data.clients.erase(_server_data.clients.begin() + pos_client);
+                    _server_data.clients_quantity--;
+                    status = CHANGED;
+                    break;
+                case SERVER_DISCONNECTION:
+                    _server_data.address = IpAddress::None;
+                    status = SERVER_DISCONNECTED;
+                    return;
             }
         }
     }
