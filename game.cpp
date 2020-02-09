@@ -56,13 +56,12 @@ void Menu::game(const unsigned& complexity) {
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
-    // Boolean variable to stop descend thread during the pause:
-    bool is_paused = false;
+    unsigned descend_counter = 0;
 
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
-        for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
-            if (!is_paused && descend_counter >= 30 / complexity) {
+        for ( ; window.isOpen(); descend_counter++) {
+            if (descend_counter >= 30 / complexity) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -96,7 +95,7 @@ void Menu::game(const unsigned& complexity) {
     game_board->get_descend_thread()->launch();
 
     // We are using descend counter to manage the figures' fall rate:
-    for (int descend_counter = 0; window.isOpen(); descend_counter++) {
+    while (window.isOpen()) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -125,10 +124,10 @@ void Menu::game(const unsigned& complexity) {
                             // If appropriate mouse position was captured:
                             // 1) pause game:
                             if (captured_button(window, pause)) {
+                                game_board->get_descend_thread()->terminate();
                                 // execute pause button:
-                                is_paused = true;
                                 pause_menu(game_board);
-                                is_paused = false;
+                                game_board->get_descend_thread()->launch();
                                         
                                 // update cell size:
                                 cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -175,10 +174,10 @@ void Menu::game(const unsigned& complexity) {
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
                                         // execute pause button:
-                                        is_paused = true;
                                         pause_menu(game_board);
-                                        is_paused = false;
+                                        game_board->get_descend_thread()->launch();
 
                                         // update cell size:
                                         cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -205,10 +204,10 @@ void Menu::game(const unsigned& complexity) {
                             break;
                         // if Escape is pushed: 
                         case Keyboard::Escape:
+                            game_board->get_descend_thread()->terminate();
                             // execute pause button:
-                            is_paused = true;
                             pause_menu(game_board);
-                            is_paused = false;
+                            game_board->get_descend_thread()->launch();
 
                             // update cell size:
                             cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -259,8 +258,10 @@ void Menu::game(const unsigned& complexity) {
                                 game_board->step_down();
                             break;
                         case Keyboard::Space:
-                            if (_figure_state != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE){
                                 game_board->hard_drop();
+                                _figure_state = CHANGE_FIGURE;
+                            }
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
@@ -361,7 +362,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     unsigned complexity = 0;
     if (current_client == nullptr) {
         player_list = new vector<client_data>(current_session->get_clients());
-        server_name = current_session->get_server_name();
+        server_name = current_session->get_player_nickname();
         complexity = current_session->get_level();
     } else if (current_session == nullptr) {
         player_list = new vector<client_data>(current_client->get_server_data().clients);
@@ -398,80 +399,66 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
-    // Initialize the thread for boards update:
-    // Thread* update_thread = new Thread([&] () {
-    //     while (true) {
-            
-    
-    //         sf::sleep(seconds(0.1f));
-    //     }
-    // });
-
-    // update_thread->launch();
-
-    // Boolean variable to stop descend thread during the pause:
-    bool is_paused = false;
+    unsigned descend_counter = 0;
 
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
-        for (unsigned descend_counter = 0; window.isOpen(); descend_counter++) {
-            if (!is_paused) {
-                // Update other boards:
-                player_list->clear();
-                if (current_client == nullptr) {
-                    current_session->send_clients_board_data(*game_board);
-                    player_list = new vector<client_data>(current_session->get_clients());
-                } else if (current_session == nullptr) {
-                    current_client->send_board_data(*game_board);
-                    player_list = new vector<client_data>(current_client->get_server_data().clients);
+        for ( ; window.isOpen(); descend_counter++) {
+            // Update other boards:
+            player_list->clear();
+            if (current_client == nullptr) {
+                current_session->send_clients_board_data(*game_board);
+                player_list = new vector<client_data>(current_session->get_clients());
+            } else if (current_session == nullptr) {
+                current_client->send_board_data(*game_board);
+                player_list = new vector<client_data>(current_client->get_server_data().clients);
+            }
+
+            for (unsigned i = 0; i < number_of_players - 1; i++) {
+                if (i >= current_player_index) {
+                    other_game_boards[i]->set_map(player_list->at(i + 1).map);
+                    other_game_boards[i]->set_score(player_list->at(i + 1).score);
+                } else {
+                    other_game_boards[i]->set_map(player_list->at(i).map);
+                    other_game_boards[i]->set_score(player_list->at(i).score);
+                }
+            }
+        
+            if (descend_counter >= 30 / complexity) {
+                if(_figure_state == STOP_FIGURE)
+                    count_change_figure--;
+                if(count_change_figure <= 0)
+                    _figure_state = CHANGE_FIGURE;
+                if(_figure_state == DESCEND_FIGURE)
+                    _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+                // if we can't move down no more:
+                if (_figure_state == CHANGE_FIGURE) {
+
+                    count_change_figure = DEF_COU_CHA_FIG;
+                    _figure_state = DESCEND_FIGURE;
+                    // check for the full lines:
+                    game_board->fix_current_figure();
+                    game_board->erase_lines(complexity);
+
+                    // putting next figure into a current figure:
+                    game_board->set_current_figure(game_board->get_next_figure());
+                    // adding new current figure on the board:
+                    game_board->add_figure();
+                    // creating the next figure:
+                    game_board->set_next_figure(game_board->create_figure());
                 }
 
-                for (unsigned i = 0; i < number_of_players - 1; i++) {
-                    if (i >= current_player_index) {
-                        other_game_boards[i]->set_map(player_list->at(i + 1).map);
-                        other_game_boards[i]->set_score(player_list->at(i + 1).score);
-                    } else {
-                        other_game_boards[i]->set_map(player_list->at(i).map);
-                        other_game_boards[i]->set_score(player_list->at(i).score);
-                    }
-                }
-            
-                if (descend_counter >= 30 / complexity) {
-                    if(_figure_state == STOP_FIGURE)
-                        count_change_figure--;
-                    if(count_change_figure <= 0)
-                        _figure_state = CHANGE_FIGURE;
-                    if(_figure_state == DESCEND_FIGURE)
-                        _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-                    // if we can't move down no more:
-                    if (_figure_state == CHANGE_FIGURE) {
-
-                        count_change_figure = DEF_COU_CHA_FIG;
-                        _figure_state = DESCEND_FIGURE;
-                        // check for the full lines:
-                        game_board->fix_current_figure();
-                        game_board->erase_lines(complexity);
-
-                        // putting next figure into a current figure:
-                        game_board->set_current_figure(game_board->get_next_figure());
-                        // adding new current figure on the board:
-                        game_board->add_figure();
-                        // creating the next figure:
-                        game_board->set_next_figure(game_board->create_figure());
-                    }
-
-                    descend_counter = 0;
-                }
+                descend_counter = 0;
+            }
 
             sf::sleep(seconds(0.015f));
-            }
         }
     }));
 
     game_board->get_descend_thread()->launch();
 
     // We are using descend counter to manage the figures' fall rate:
-    for (int descend_counter = 0; window.isOpen(); descend_counter++) {
+    while (window.isOpen()) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -500,10 +487,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             // If appropriate mouse position was captured:
                             // 1) pause game:
                             if (captured_button(window, pause)) {
-                                is_paused = true;
+                                game_board->get_descend_thread()->terminate();
                                 // execute pause button:
                                 pause_menu(game_board);
-                                is_paused = false;
+                                game_board->get_descend_thread()->launch();
                                         
                                 // update cell size:
                                 own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -550,10 +537,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                 case 1:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
                                         // execute pause button:
-                                        is_paused = true;
                                         pause_menu(game_board);
-                                        is_paused = false;
+                                        game_board->get_descend_thread()->launch();
 
                                         // update cell size:
                                         own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -580,10 +567,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             break;
                         // if Escape is pushed: 
                         case Keyboard::Escape:
+                            game_board->get_descend_thread()->terminate();
                             // execute pause button:
-                            is_paused = true;
                             pause_menu(game_board);
-                            is_paused = false;
+                            game_board->get_descend_thread()->launch();
 
                             // update cell size:
                             own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / 10), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
@@ -634,8 +621,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                 game_board->step_down();
                             break;
                         case Keyboard::Space:
-                            if(_figure_state != STOP_FIGURE)
+                            if(_figure_state != STOP_FIGURE){
                                 game_board->hard_drop();
+                                _figure_state = CHANGE_FIGURE;
+                            }
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
@@ -1864,8 +1853,36 @@ void Menu::create_session() {
         Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 4);
 
+    // Using a thread to display blinking text bar during the active text field:
+    Thread* blink_thread = new Thread([&] () {
+        for (unsigned enter_text_counter = 0; true; enter_text_counter++) {
+            // Display a text bar with some delay:
+            if (enter_text_counter >= 500) {
+                // Display entered session name:
+                if (session_name_captured) {
+                    if (session_name_display.getString().getSize() == session_name.length())
+                        session_name_display.setString(session_name + "|");
+                    else 
+                        session_name_display.setString(session_name);
+                // Display entered max players number:
+                } else if (max_number_of_players_captured) {
+                    if (max_number_of_players_display.getString().getSize() == 1)
+                        max_number_of_players_display.setString(to_string(max_number_of_players) + "|");
+                    else
+                        max_number_of_players_display.setString(to_string(max_number_of_players));
+                }
+                
+                enter_text_counter = 0;
+
+                sf::sleep(seconds(0.2f));
+            }
+        }
+    });
+
+    blink_thread->launch();
+
     // We are using enter text counter to manage the display of the entered text:
-    for (unsigned enter_text_counter = 0; window.isOpen(); enter_text_counter++) {
+    while (window.isOpen()) {
         Event event;
 
         while (window.pollEvent(event)) {
@@ -2006,13 +2023,16 @@ void Menu::create_session() {
                                 applied_maths.setOutlineColor(COLOR_DARK_BLUE);
                                 complexity = 3;
                             // 6) Go back:
-                            } else if (captured_button(window, back))
+                            } else if (captured_button(window, back)) {
+                                blink_thread->terminate();
                                 multiplayer_menu();
                             // 7) Create a new session (if all required information is entered):
-                            else if (captured_button(window, create) && session_name != ""
-                                && complexity != 0 && max_number_of_players != 0) { 
+                            } else if (captured_button(window, create) && session_name != ""
+                                && complexity != 0 && max_number_of_players != 0) {
+                                blink_thread->terminate();
                                 Server* current_session = new Server(false, session_name, max_number_of_players, complexity);
                                 session_menu(current_session, nullptr);
+                                blink_thread->launch();
                             }
                             break;
                         default:
@@ -2151,9 +2171,11 @@ void Menu::create_session() {
                                     break;
                                 case 6:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return) {
+                                        blink_thread->terminate();
                                         // execute back button:
                                         multiplayer_menu();
+                                    }
 
                                     // unfocus back button:
                                     back.setFillColor(COLOR_DARK_VIOLET);
@@ -2167,9 +2189,10 @@ void Menu::create_session() {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return && session_name != ""
                                         && complexity != 0 && max_number_of_players != 0) {
-                                        // execute create button:
+                                        blink_thread->terminate();
                                         Server* current_session = new Server(false, session_name, max_number_of_players, complexity);
                                         session_menu(current_session, nullptr);
+                                        blink_thread->launch();
                                     } else {
                                         // capture session name field:
                                         session_name_captured = true;
@@ -2300,25 +2323,6 @@ void Menu::create_session() {
         // Draw background:
         window.draw(background);
 
-        // Display a test after a delay:
-        if (enter_text_counter >= 500) {
-            // Display entered session name:
-            if (session_name_captured) {
-                if (session_name_display.getString().getSize() == session_name.length())
-                    session_name_display.setString(session_name + "|");
-                else 
-                    session_name_display.setString(session_name);
-            // Display entered max players number:
-            } else if (max_number_of_players_captured) {
-                if (max_number_of_players_display.getString().getSize() == 1)
-                    max_number_of_players_display.setString(to_string(max_number_of_players) + "|");
-                else
-                    max_number_of_players_display.setString(to_string(max_number_of_players));
-            }
-            
-            enter_text_counter = 0;
-        }
-
         // Draw a menu:
         window.draw(create_session_title);
         window.draw(session_name_title);
@@ -2365,7 +2369,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
     string server_name = "";
     if (current_client == nullptr) {
         player_list = new vector<client_data>(current_session->get_clients());
-        server_name = current_session->get_server_name();
+        server_name = current_session->get_player_nickname();
     } else if (current_session == nullptr) {
         player_list = new vector<client_data>(current_client->get_server_data().clients);
         server_name = current_client->get_server_data().name;
@@ -2739,11 +2743,16 @@ void Menu::find_servers() {
     complexities[1] = "STIC";
     complexities[2] = "Applied Maths";
 
+    // Connection request status:
+    request_status status = UNASSIGNED;
+    // Serch servers status:
+    request_status search_status = UNASSIGNED;
+
     // Create a client:
     Client* current_client = new Client();
 
     // Looking for servers:
-    Thread* search_thread = new Thread([&] () { current_client->search_servers(); });
+    Thread* search_thread = new Thread([&] () { current_client->search_servers(search_status); });
 
     search_thread->launch();
 
@@ -2774,9 +2783,6 @@ void Menu::find_servers() {
     
     // Currently chosen server:
     int chosen_server = -1;
-
-    // Request status:
-    request_status status = UNASSIGNED;
 
     // Initialize server list title:
     Text server_list_title = create_button(font, "Server List", button_size,
@@ -2814,21 +2820,35 @@ void Menu::find_servers() {
     Text connect = create_button(font, "Connect", button_size,
         Vector2f(5 * window.getSize().x / 6 - 10.0f,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 6 + 10.0f), true, 6);
+            
+    Thread* update_thread = new Thread([&] () {
+        while (true) {
+            if (search_status == CHANGED) {
+                cout << "Yes" << endl;
+
+                server_info.clear();
+
+                // Fullfill the list of servers:
+                for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
+                    server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
+                        Vector2f(window.getSize().x / 6,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
+                        Vector2f(3 * window.getSize().x / 6,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/" + to_string(current_client->get_servers()[server_info.size() / 3].max_clients), button_size,
+                        Vector2f(5 * window.getSize().x / 6,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                }
+
+                search_status = NOT_CHANGED;
+            }
+        }
+    });
+
+    update_thread->launch();
 
     while(window.isOpen()) {
-        // Fullfill the list of servers:
-        for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
-            server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
-                Vector2f(window.getSize().x / 6,
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-            server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
-                Vector2f(3 * window.getSize().x / 6,
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-            server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/" + to_string(current_client->get_servers()[server_info.size() / 3].max_clients), button_size,
-                Vector2f(5 * window.getSize().x / 6,
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-        }
-
         Event event;
 
         while (window.pollEvent(event)) {
@@ -2904,13 +2924,13 @@ void Menu::find_servers() {
                             // current_client->get_servers().size() + 1) Go back:
                             if (captured_button(window, back) && status != NOT_READY) {
                                 search_thread->terminate();
+                                update_thread->terminate();
+
                                 current_client->disconnect_udp_socket();
                                 multiplayer_menu();
                             // current_client->get_servers().size() + 2) Refresh list of servers:
-                            } else if (captured_button(window, refresh) && status != NOT_READY ) {
+                            } else if (captured_button(window, refresh) && status != NOT_READY) {
                                 search_thread->terminate();
-
-                                search_thread = new Thread([&] () { current_client->search_servers(); });
 
                                 search_thread->launch();
                             // current_client->get_servers().size() + 3) Get connect or not:
@@ -2918,7 +2938,7 @@ void Menu::find_servers() {
                                 search_thread->terminate();
 
                                 connect_thread = new Thread([&] () { current_client->connect_server(chosen_server, status); });
-                                
+                            
                                 connect_thread->launch();
                             };
                             break;
@@ -2960,6 +2980,8 @@ void Menu::find_servers() {
                                 if (event.key.code == Keyboard::Return) {
                                     // execute back button:
                                     search_thread->terminate();
+                                    update_thread->terminate();
+
                                     current_client->disconnect_udp_socket();
                                     multiplayer_menu();
                                 }
@@ -2977,8 +2999,6 @@ void Menu::find_servers() {
                                 if (event.key.code == Keyboard::Return) {
                                     // execute refresh button:
                                     search_thread->terminate();
-
-                                    search_thread = new Thread([&] () { current_client->search_servers(); });
 
                                     search_thread->launch();
                                     break;
@@ -3125,10 +3145,8 @@ void Menu::find_servers() {
             }
         }
 
-        if (status == SUCCESS) {
-            cout << current_client->get_server_data().clients.size() << endl;
+        if (status == SUCCESS)
             session_menu(nullptr, current_client);
-        }
 
         // Clear window:
         window.clear();
