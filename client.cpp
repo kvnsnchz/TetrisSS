@@ -232,7 +232,10 @@ void Client::listen_server(request_status& status){
             //Check if the message is of new client info:
             case NEW_CLIENT_INFO:
                 _server_data.clients.clear();
-                for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
+                Uint32 clients_quantity;
+                packet_recv >> clients_quantity;
+
+                for(unsigned i = 0; i < clients_quantity; i ++){
                     client_data _client_data;
                     packet_recv >> _client_data;
                     _server_data.clients.emplace_back(_client_data);

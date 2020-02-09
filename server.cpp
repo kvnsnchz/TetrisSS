@@ -166,7 +166,8 @@ void Server::listen_clients(request_status& status) {
                     packet_send << _server_data;
 
                     gen_packet_send << NEW_CLIENT_INFO;
-                   
+                    gen_packet_send << (Uint32)clients.size();
+                    
                     for(unsigned i = 0; i < clients.size(); i ++){
                         packet_send << clients[i];
 
