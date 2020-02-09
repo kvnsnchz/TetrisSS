@@ -5,7 +5,7 @@
 #include "server.hpp"
 #include "client.hpp"
 
-#define DEF_COU_CHA_FIG 2 
+#define DEF_COU_CHA_FIG 1 
 #define MAX_SESSION_NAME_LENGTH 12
 
 // new button initialization function (for code reduction):
