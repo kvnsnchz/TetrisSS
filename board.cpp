@@ -249,13 +249,13 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setFillColor(COLOR_LIGHT_GREEN);
     if (board_index == 0) {
         if (nickname == "")
-            score_title.setString("My Score: \n" + to_string(score));
+            score_title.setString("My Score:\n" + to_string(score));
         else
-            score_title.setString(nickname + "'s Score: \n" + to_string(score));
+            score_title.setString(nickname + "\nScore:\n" + to_string(score));
         score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
             next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     } else {
-        score_title.setString(nickname + "'s Score: \n" + to_string(score));
+        score_title.setString(nickname + "\nScore:\n" + to_string(score));
         score_title.setPosition(grid[0][y_dimension - 1].getPosition().x + (grid[x_dimension - 1][y_dimension - 1].getPosition().x + 20.0f - grid[0][y_dimension - 1].getPosition().x - score_title.getGlobalBounds().width) / 2,
             (y_dimension - FIGURE_GRID_HEIGHT) * (cell_size.y + 1) + 4.0f);
     }
