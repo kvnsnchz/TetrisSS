@@ -279,7 +279,7 @@ void Server::send_clients_board_data(Board& board) {
         if(clients[i].address == local_ip_address)
             clients[i].score = board.get_score();
 
-        packet_send << clients[i].status;
+        packet_send << (Uint32)clients[i].status;
         packet_send << clients[i].score;
 
         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
@@ -303,7 +303,7 @@ void Server::send_clients_board_data(Board& board) {
 }
 
 //Listen clients during the game
-void Server::listen_game(request_status& status){
+void Server::listen_game(Board& game_board, request_status& status){
     status = NOT_CHANGED;
     socket.setBlocking(false);
     
@@ -342,16 +342,18 @@ void Server::listen_game(request_status& status){
                 case CLIENT_GAME_PAUSE:
                 {
                     vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
-                    cout << "GAME PAUSE" << endl;
+                    
                     if(it != clients.end())
                         (*it).status = STATUS_PAUSED;
-                    cout << "Client " << (*it).nickname << endl;
+
+                    send_clients_board_data(game_board);
                     break;
                 }
                 case CLIENT_GAME_RESUME:
                     for(unsigned i = 0; i < clients.size(); i++){
                         clients[i].status = STATUS_READY;
                     }
+                    send_clients_board_data(game_board);
                     break;
                 case CLIENT_GAME_OVER:
                 {  
