@@ -2830,15 +2830,15 @@ void Menu::find_servers() {
 
                 // Fullfill the list of servers:
                 for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
-                    server_info.emplace_back(create_button(font, current_client->get_servers()[server_info.size() / 3].name, button_size,
+                    server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
                         Vector2f(window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[server_info.size() / 3].level - 1], button_size,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
                         Vector2f(3 * window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
-                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[server_info.size() / 3].clients_quantity) + "/" + to_string(current_client->get_servers()[server_info.size() / 3].max_clients), button_size,
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/" + to_string(current_client->get_servers()[i].max_clients), button_size,
                         Vector2f(5 * window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (server_info.size() / 3 + 2) + 5.0f), true, 6));
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
                 }
 
                 search_status = NOT_CHANGED;
