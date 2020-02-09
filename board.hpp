@@ -76,6 +76,7 @@ class Board {
 
         void change_point(const Point& point, const int& new_value = 0, const bool& from_rotation = false);
         bool step_down();
+        void hard_drop();
         bool step_left(const bool& with_floor = false);
         bool step_right(const bool& with_floor = false);
         void rotate(bool right);

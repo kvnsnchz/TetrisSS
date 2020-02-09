@@ -294,9 +294,9 @@ bool Board::step_down() {
         if (is_empty(Point(current_figure->get_points()[i]->get_x(), current_figure->get_points()[i]->get_y() + 1)) != NONE) {
             is_free = false;
             break;
-        };
-    };
-;
+        }
+    }
+
     if (is_free) {
         for (unsigned i = 0; i < current_figure->get_points().size(); i++) {
             change_point(*current_figure->get_points()[i]);
@@ -309,6 +309,10 @@ bool Board::step_down() {
         
     return is_free;
 };
+
+void Board::hard_drop() {
+    while(step_down()){}
+}
 
 bool Board::step_left(const bool& with_floor) {
     bool is_free = true;
