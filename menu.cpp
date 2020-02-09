@@ -1066,7 +1066,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                             if (captured_button(window, pause)) {
                                 game_board->get_descend_thread()->terminate();
                                 // execute pause button:
-                                multiplayer_pause_menu(game_board, other_game_boards);
+                                if (current_client == nullptr)
+                                    multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                else if (current_session == nullptr)
+                                    multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                                 game_board->get_descend_thread()->launch();
                                         
                                 // update cell size:
@@ -1116,7 +1119,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                     if (event.key.code == Keyboard::Return) {
                                         game_board->get_descend_thread()->terminate();
                                         // execute pause button:
-                                        multiplayer_pause_menu(game_board, other_game_boards);
+                                        if (current_client == nullptr)
+                                            multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                        else if (current_session == nullptr)
+                                            multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                                         game_board->get_descend_thread()->launch();
 
                                         // update cell size:
@@ -1146,7 +1152,10 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                         case Keyboard::Escape:
                             game_board->get_descend_thread()->terminate();
                             // execute pause button:
-                            multiplayer_pause_menu(game_board, other_game_boards);
+                            if (current_client == nullptr)
+                                multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                            else if (current_session == nullptr)
+                                multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
                             game_board->get_descend_thread()->launch();
 
                             // update cell size:
@@ -1267,8 +1276,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
             game_over_menu(game_board);
         }
 
-        for (unsigned i = 0; i < number_of_players - 1; i++)
-            other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_player_index, i + 1);
+        for (unsigned i = 0; i < number_of_players - 1; i++) {
+            if (current_player_index >= i)
+                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i).nickname, i + 1);
+            else
+                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i).nickname, i + 1);
+        }
 
         // display what we have just drawn:
         window.display();
@@ -1279,7 +1292,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 };
 
 // Multiplayer pause menu:
-void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards) {
+void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -3142,8 +3155,6 @@ void Menu::find_servers(const string& nickname) {
     Thread* update_thread = new Thread([&] () {
         while (true) {
             if (search_status == CHANGED) {
-                cout << "Yes" << endl;
-
                 server_info.clear();
 
                 // Fullfill the list of servers:

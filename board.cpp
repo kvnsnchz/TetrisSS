@@ -166,7 +166,7 @@ void Board::set_descend_thread(Thread* new_thread) {
 };
 
 // print game board:
-void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const unsigned& player_index, const unsigned& board_index) {
+void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const string& nickname, const unsigned& board_index) {
     for(int i = 0; i < x_dimension; i++) {
         for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             // Update cell size and position:
@@ -248,14 +248,14 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setStyle(Text::Bold);
     score_title.setFillColor(COLOR_LIGHT_GREEN);
     if (board_index == 0) {
-        score_title.setString("My Score: \n" + to_string(score));
+        if (nickname == "")
+            score_title.setString("My Score: \n" + to_string(score));
+        else
+            score_title.setString(nickname + "'s Score: \n" + to_string(score));
         score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
             next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     } else {
-        if (player_index + 1 >= board_index)
-            score_title.setString("Player " + to_string(board_index + 1) + "\nScore: \n" + to_string(score));
-        else
-            score_title.setString("Player " + to_string(board_index) + "\nScore: \n" + to_string(score));
+        score_title.setString(nickname + "'s Score: \n" + to_string(score));
         score_title.setPosition(grid[0][y_dimension - 1].getPosition().x + (grid[x_dimension - 1][y_dimension - 1].getPosition().x + 20.0f - grid[0][y_dimension - 1].getPosition().x - score_title.getGlobalBounds().width) / 2,
             (y_dimension - FIGURE_GRID_HEIGHT) * (cell_size.y + 1) + 4.0f);
     }
