@@ -356,3 +356,17 @@ void Client::listen_game(request_status& status){
         }
     }
 }
+
+void Client::pause(bool is_pause) {
+    //Filling send buffer:
+    Packet packet_send;
+
+    //Client game pause:
+    packet_send << (is_pause ? CLIENT_GAME_PAUSE : CLIENT_GAME_RESUME);
+    
+    //Sending client game pause: 
+    if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
+    {
+        cout << "Client: Send error" << endl;
+    }
+}

@@ -59,6 +59,8 @@ public:
     void send_clients_board_data(Board& board);
     //Listen clients during the game
     void listen_game(request_status& status);
+    //Sending pause
+    void pause(bool);
 };
 
 #endif

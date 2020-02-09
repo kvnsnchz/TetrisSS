@@ -33,6 +33,8 @@ class Player {
         virtual void disconnect_udp_socket() = 0;
         virtual void ready(bool) = 0;
         virtual void listen_game(request_status& status) = 0;
+        virtual void pause(bool) = 0;
+
         ~Player() {};
 };
 

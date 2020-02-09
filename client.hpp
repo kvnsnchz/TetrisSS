@@ -52,6 +52,8 @@ public:
     void send_board_data(Board&);
     //Listen the server during the game
     void listen_game(request_status& status);
+    //Sending pause
+    void pause(bool);
 };
 
 #endif

@@ -322,6 +322,7 @@ void Server::listen_game(request_status& status){
             switch ((unsigned)_datatype)
             {
                 case CLIENT_GAME_UPDATE:
+                {    
                     vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
                     if(it == clients.end())
                         break;
@@ -336,7 +337,37 @@ void Server::listen_game(request_status& status){
                         }
                     }
                     break;
+                }
+                case CLIENT_GAME_PAUSE:
+                {
+                    vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{sender, "", STATUS_NOT_READY});
+
+                    if(it != clients.end())
+                        (*it).status = STATUS_PAUSED;
+                    break;
+                }
+                case CLIENT_GAME_RESUME:
+                    for(unsigned i = 0; i < clients.size(); i++){
+                        clients[i].status = STATUS_READY;
+                    }
+                    break;
             }
         }
     }
 }
+
+void Server::pause(bool is_pause) {
+    if(is_pause){
+        vector<client_data>::iterator it = find(clients.begin(), clients.end(), client_data{local_ip_address, "", STATUS_NOT_READY});
+
+        if(it != clients.end())
+            (*it).status = STATUS_PAUSED;
+    }
+    else{
+        for(unsigned i = 0; i < clients.size(); i++){
+            clients[i].status = STATUS_READY;
+        }
+    }
+    
+}
+

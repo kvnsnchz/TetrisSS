@@ -27,6 +27,8 @@ enum datatype {
     SERVER_GAME_START,
     CLIENT_GAME_UPDATE,
     SERVER_GAME_UPDATE,
+    CLIENT_GAME_PAUSE,
+    CLIENT_GAME_RESUME,
 };
 
 enum request_status {
