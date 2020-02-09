@@ -1,9 +1,6 @@
 #ifndef serverHPP
 #define serverHPP
 
-#include <iostream>
-#include <thread>
-#include <boost/algorithm/string.hpp>
 #include "sockets_constants.hpp"
 #include "player.hpp"
 
@@ -14,7 +11,6 @@ using namespace ports_number;
 class Server: public Player
 {
 private:
-    string server_name;
     Uint32 max_clients;
     Uint32 level;
 
@@ -23,14 +19,14 @@ private:
     UdpSocket socket;
     IpAddress local_ip_address;
 public:
-    Server(): Player(), server_name(""), max_clients(MAX_CLIENTS), level(0) {
+    Server(): Player(), max_clients(MAX_CLIENTS), level(0) {
         local_ip_address = IpAddress::getLocalAddress();
         clients.emplace_back(client_data{local_ip_address, false});
         connect_udp_socket();
     };
 
-    Server(const bool& new_player_status, string s_name, Uint32 max_cli, Uint32 lvl): 
-        Player(new_player_status), server_name(s_name), max_clients(max_cli), level(lvl) 
+    Server(const bool& new_player_status, const string& server_nickname, Uint32 max_cli, Uint32 lvl): 
+        Player(new_player_status, server_nickname), max_clients(max_cli), level(lvl) 
     {
         local_ip_address = IpAddress::getLocalAddress();
         clients.emplace_back(client_data{local_ip_address, false});
@@ -41,12 +37,9 @@ public:
         disconnect_udp_socket();
     };
 
-    void set_server_name(const string&);
     void set_max_clients(const Uint32&);
     void set_level(const Uint32&);
-    void set_player_status(const bool& new_player_status);
 
-    string get_server_name() const;
     vector<client_data> get_clients() const;
     Uint32 get_max_clients() const;
     Uint32 get_level() const;

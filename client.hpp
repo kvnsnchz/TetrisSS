@@ -1,11 +1,6 @@
 #ifndef clientHPP
 #define clientHPP
 
-#include <iostream>
-#include <thread>
-#include <cstring>
-#include <chrono>
-#include <boost/algorithm/string.hpp>
 #include "sockets_constants.hpp"
 #include "board.hpp"
 #include "player.hpp"
@@ -29,7 +24,7 @@ public:
         connect_udp_socket();
     };
     
-    Client(const bool& new_player_status): Player(new_player_status) {
+    Client(const bool& client_status, const string& client_nickname): Player(client_status, client_nickname) {
         connect_udp_socket();
     };
 
@@ -45,7 +40,7 @@ public:
     //Disconnect to Socket UDP
     void disconnect_udp_socket();
     //Search for available game servers:
-    void search_servers();
+    void search_servers(request_status& status);
     //Connect to a specific game server from the available list:
     void connect_server(const unsigned pos, request_status& status);
     //Disconnect from the game server:

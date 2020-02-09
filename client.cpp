@@ -25,7 +25,7 @@ void Client::disconnect_udp_socket(){
 }
 
 //Search for available game servers:
-void Client::search_servers(){
+void Client::search_servers(request_status& status) {
     //Filling send buffer:
     Packet packet_send;
     //Server information request:
@@ -33,8 +33,7 @@ void Client::search_servers(){
     socket.setBlocking(true);
 
     //Sending broadcast message for search available servers: 
-    if (socket.send(packet_send, IpAddress::Broadcast, SERVER_PORT) != sf::Socket::Done)
-    {
+    if (socket.send(packet_send, IpAddress::Broadcast, SERVER_PORT) != sf::Socket::Done) {
         cout << "Client: Send error" << endl;
         return;
     }
@@ -44,20 +43,21 @@ void Client::search_servers(){
     //Setting non blocking socket:
     socket.setBlocking(false);
     
-    do{
+    do {
         Packet packet_recv;
         IpAddress sender;
         unsigned short port;
         //Check if there is a message:
-        if (socket.receive(packet_recv, sender, port) == Socket::Done)
-        {
+        if (socket.receive(packet_recv, sender, port) == Socket::Done) {
             datatype _datatype;
             Uint32 datatype_value;
             //Get the buffer information:
             packet_recv >> datatype_value;
             _datatype = (datatype) datatype_value;
             //Check if the message is a response of server information:
-            if(_datatype == SERVER_INFO_RESPONSE){
+            if(_datatype == SERVER_INFO_RESPONSE) {
+                status = CHANGED;
+                
                 //Adding server information to server list:
                 vector<server_data>::iterator it = find(servers.begin(), servers.end(), server_data{
                     sender, "", 0, 0, 0, vector<client_data>()
@@ -77,11 +77,10 @@ void Client::search_servers(){
         elapsed_seconds = chrono::system_clock::now() - start;
         //Waiting for servers information for MAX_SEARCH_TIME
     } while(elapsed_seconds.count() <= MAX_SEARCH_TIME);
-    
 }
 
 //Connect to a specific game server from the available list:
-void Client::connect_server(const unsigned pos, request_status& status){
+void Client::connect_server(const unsigned pos, request_status& status) {
     //Checking that the selected server is in the list:
 
     if(pos > servers.size()){
@@ -334,7 +333,7 @@ void Client::listen_game(request_status& status){
 
             packet_recv >> datatype_value;
             _datatype = (datatype) datatype_value;
-            
+
             switch ((unsigned)_datatype)
             {
                 case SERVER_GAME_UPDATE:

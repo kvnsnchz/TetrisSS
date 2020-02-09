@@ -2,20 +2,12 @@
 
 #include "server.hpp"
 
-void Server::set_server_name(const string& server_name) {
-    this->server_name = server_name;
-}
-
 void Server::set_max_clients(const Uint32& max_clients) {
     this->max_clients = max_clients;
 }
 
 void Server::set_level(const Uint32& level) {
     this->level = level;
-}
-
-string Server::get_server_name() const{
-    return server_name;
 }
 
 vector<client_data> Server::get_clients() const{
@@ -133,7 +125,7 @@ void Server::listen_clients(request_status& status) {
                 if(clients.size() <= max_clients){
                     //Filling send buffer:
                     server_data _server_data{
-                        local_ip_address, server_name, (Uint32)clients.size(), level, max_clients, vector<client_data>()
+                        local_ip_address, player_nickname, (Uint32)clients.size(), level, max_clients, vector<client_data>()
                     };
 
                     packet_send << SERVER_INFO_RESPONSE;
@@ -159,7 +151,7 @@ void Server::listen_clients(request_status& status) {
                         clients.emplace_back(_client_data);
                     //Buffer filling with success message
                     server_data _server_data{
-                        local_ip_address, server_name, (Uint32)clients.size(), level, max_clients, vector<client_data>()
+                        local_ip_address, player_nickname, (Uint32)clients.size(), level, max_clients, vector<client_data>()
                     };
 
                     packet_send << SERVER_CONN_RESPONSE_SUCCESS;
