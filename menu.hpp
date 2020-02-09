@@ -1,5 +1,5 @@
-#ifndef gameHPP
-#define gameHPP
+#ifndef menuHPP
+#define menuHPP
 
 #include <unistd.h>
 #include "server.hpp"
@@ -34,16 +34,21 @@ class Menu {
         // Function to play:
         void game(const unsigned& complexity);
 
+        void game_over_menu(Board* game_board);
+
+        // Pause menu:
+        void pause_menu(Board* game_board);
+
         // Multiplayer game function:
         void multiplayer_game(Server* current_session, Client* current_client);
 
-        void game_over_menu(Board* game_board);
-
-        void pause_menu(Board* game_board);
-
         void main_menu(const bool& initialization = false);
 
+        // Menu for multiplayer:
         void multiplayer_menu();
+
+        // Multiplayer pause menu:
+        void multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client);
 
         // Set up and create a new session as a server:
         void create_session(const string& nickname);

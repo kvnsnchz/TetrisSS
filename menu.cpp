@@ -1,6 +1,6 @@
-#define gameCPP
+#define menuCPP
 
-#include "game.hpp"
+#include "menu.hpp"
 
 // new button initialization function (for code reduction):
 Text create_button(Font& font, const string title, const double& button_size,
@@ -326,380 +326,6 @@ void Menu::game(const unsigned& complexity) {
 
     delete game_board;
 }
-
-// Multiplayer game function:
-void Menu::multiplayer_game(Server* current_session, Client* current_client) {
-    // counter of the currently chosen button:
-    unsigned focused_button_counter = 0;
-    // own button size:
-    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-    // initialize own cell size according the current window size:
-    Vector2f own_cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
-                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
-
-    // initialize other player's cell size:
-    Vector2f other_cell_size(own_cell_size.x / 2, own_cell_size.y / 2);
-
-    request_status status = NOT_CHANGED;
-    // Initialize client-server communication:
-    Thread* listen_thread = nullptr;    
-    if (current_client == nullptr) {
-        // Look for the clients:
-        listen_thread = new Thread([&] () { current_session->listen_game(status); });
-
-        listen_thread->launch();
-    } else if (current_session == nullptr) {
-        // Look for the clients:
-        listen_thread = new Thread([&] () { current_client->listen_game(status); });
-
-        listen_thread->launch();
-    }
-
-    // Create a list of clients and initialize server name and complexity:
-    vector<client_data> *player_list = nullptr;
-    string server_name = "";
-    unsigned complexity = 0;
-    if (current_client == nullptr) {
-        player_list = new vector<client_data>(current_session->get_clients());
-        server_name = current_session->get_player_nickname();
-        complexity = current_session->get_level();
-    } else if (current_session == nullptr) {
-        player_list = new vector<client_data>(current_client->get_server_data().clients);
-        server_name = current_client->get_server_data().name;
-        complexity = current_client->get_server_data().level;
-    }
-
-    // Initialize the number of players in the current session:
-    unsigned number_of_players = player_list->size();
-
-    window.setSize(Vector2u ((own_cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players,
-        (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
-
-    // Initialize the index of current player:
-    unsigned current_player_index = 0;
-    for (unsigned i = 0; i < player_list->size(); i++)
-        if (player_list->at(i).address == IpAddress::getLocalAddress()) {
-            current_player_index = i;
-            break;   
-        }
-
-    // create the game board: 
-    Board* game_board = new Board(window, complexity, own_cell_size);
-
-    // create game boards of the other players:
-    vector<Board*> other_game_boards;
-    for (unsigned i = 0; i < number_of_players - 1; i++)
-        other_game_boards.emplace_back(new Board(window, complexity, other_cell_size));
-
-    // Initialize pause button:
-    Text pause = create_button(font, "Pause", button_size,
-        Vector2f((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
-
-    figure_state _figure_state = DESCEND_FIGURE;
-    int count_change_figure = DEF_COU_CHA_FIG;
-
-    unsigned descend_counter = 0;
-
-    // Using a thread to fall down:
-    game_board->set_descend_thread(new Thread([&] () {
-        for ( ; window.isOpen(); descend_counter++) {
-            // Update other boards:
-            player_list->clear();
-            if (current_client == nullptr) {
-                current_session->send_clients_board_data(*game_board);
-                player_list = new vector<client_data>(current_session->get_clients());
-            } else if (current_session == nullptr) {
-                current_client->send_board_data(*game_board);
-                player_list = new vector<client_data>(current_client->get_server_data().clients);
-            }
-
-            for (unsigned i = 0; i < number_of_players - 1; i++) {
-                if (i >= current_player_index) {
-                    other_game_boards[i]->set_map(player_list->at(i + 1).map);
-                    other_game_boards[i]->set_score(player_list->at(i + 1).score);
-                } else {
-                    other_game_boards[i]->set_map(player_list->at(i).map);
-                    other_game_boards[i]->set_score(player_list->at(i).score);
-                }
-            }
-        
-            if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
-                if(_figure_state == STOP_FIGURE)
-                    count_change_figure--;
-                if(count_change_figure <= 0)
-                    _figure_state = CHANGE_FIGURE;
-                if(_figure_state == DESCEND_FIGURE)
-                    _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
-                // if we can't move down no more:
-                if (_figure_state == CHANGE_FIGURE) {
-
-                    count_change_figure = DEF_COU_CHA_FIG;
-                    _figure_state = DESCEND_FIGURE;
-                    // check for the full lines:
-                    game_board->fix_current_figure();
-                    game_board->erase_lines(complexity);
-
-                    // putting next figure into a current figure:
-                    game_board->set_current_figure(game_board->get_next_figure());
-                    // adding new current figure on the board:
-                    game_board->add_figure();
-                    // creating the next figure:
-                    game_board->set_next_figure(game_board->create_figure());
-                }
-
-                descend_counter = 0;
-            }
-
-            sf::sleep(seconds(0.015f));
-        }
-    }));
-
-    game_board->get_descend_thread()->launch();
-
-    // We are using descend counter to manage the figures' fall rate:
-    while (window.isOpen()) {
-        Event event;
-
-        while (window.pollEvent(event)) {
-            switch (event.type) {
-                // close window:  
-                case Event::Closed:
-                    window.close();
-                    break;
-                // when we are moving mouse:
-                case Event::MouseMoved:
-                    // unfocus all the buttons:
-                    pause.setFillColor(COLOR_DARK_VIOLET);
-                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
-
-                    // If appropriate mouse position was captured:
-                    if (captured_button(window, pause)) {
-                        // focus pause button:
-                        pause.setFillColor(COLOR_YELLOW);
-                        pause.setOutlineColor(COLOR_DARK_BLUE);
-                        focused_button_counter = 1;
-                    }
-                    break;
-                case Event::MouseButtonPressed:
-                    switch (event.key.code) {
-                        case Mouse::Left:
-                            // If appropriate mouse position was captured:
-                            // 1) pause game:
-                            if (captured_button(window, pause)) {
-                                game_board->get_descend_thread()->terminate();
-                                // execute pause button:
-                                pause_menu(game_board);
-                                game_board->get_descend_thread()->launch();
-                                        
-                                // update cell size:
-                                own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                game_board->set_cell_size(own_cell_size);
-
-                                // update button size:
-                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-                                // update all the buttons and their positions:
-                                pause.setCharacterSize(5 * button_size / 6);
-                                pause.setOutlineThickness(button_size / 6);
-                                pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
-                        
-                                // unfocus pause button:
-                                pause.setFillColor(COLOR_DARK_VIOLET);
-                                pause.setOutlineColor(COLOR_LIGHT_GREEN);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                // if we pressed some button:
-                case Event::KeyPressed:
-                    switch (event.key.code) {
-                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
-                        case Keyboard::Tab:
-                        case Keyboard::Return:
-                            // focus or push the button according to 
-                            // the current focused_button_counter value:
-                            switch (focused_button_counter) {
-                                // if it is the first press of Tab:
-                                case 0:
-                                    // in this case, Enter won't do nothing:
-                                    if (event.key.code == Keyboard::Return)
-                                        break;
-
-                                    // focus pause button:
-                                    pause.setFillColor(COLOR_YELLOW);
-                                    pause.setOutlineColor(COLOR_DARK_BLUE);
-                                    focused_button_counter++;
-                                    break;
-                                case 1:
-                                    // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return) {
-                                        game_board->get_descend_thread()->terminate();
-                                        // execute pause button:
-                                        pause_menu(game_board);
-                                        game_board->get_descend_thread()->launch();
-
-                                        // update cell size:
-                                        own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                        own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                                        game_board->set_cell_size(own_cell_size);
-
-                                        // update button size:
-                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-                                    
-                                        // update all the buttons and their positions:
-                                        pause.setCharacterSize(5 * button_size / 6);
-                                        pause.setOutlineThickness(button_size / 6);
-                                        pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
-                                    }
-
-                                    // unfocus pause button:
-                                    pause.setFillColor(COLOR_DARK_VIOLET);
-                                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
-                                    focused_button_counter = 0;
-                                    break;
-                                default:
-                                    break;
-                            }
-                            break;
-                        // if Escape is pushed: 
-                        case Keyboard::Escape:
-                            game_board->get_descend_thread()->terminate();
-                            // execute pause button:
-                            pause_menu(game_board);
-                            game_board->get_descend_thread()->launch();
-
-                            // update cell size:
-                            own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                            own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                            game_board->set_cell_size(own_cell_size);
-
-                            // update button size:
-                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-                            // update all the buttons and their positions:
-                            pause.setCharacterSize(5 * button_size / 6);
-                            pause.setOutlineThickness(button_size / 6);
-                            pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
-                            break;
-                        // while we want to move a current figure to the right:
-                        case Keyboard::D:
-                        case Keyboard::Right:
-                            if(_figure_state == STOP_FIGURE){
-                                bool step_done = game_board->step_right(true);
-                                if(step_done)
-                                    count_change_figure++;
-                                else
-                                    count_change_figure = 0;
-                                break;
-                            }
-                            
-                            game_board->step_right(false);
-                            break;
-                        // while we want to move a current figure to the left:
-                        case Keyboard::A:
-                        case Keyboard::Q:
-                        case Keyboard::Left:
-                            if(_figure_state == STOP_FIGURE){
-                                bool step_done = game_board->step_left(true);
-                                if(step_done)
-                                    count_change_figure++;
-                                else
-                                   count_change_figure = 0;
-                                break;
-                            }
-
-                            game_board->step_left(false);
-                            break;
-                        // while we want to fall faster:
-                        case Keyboard::S:
-                        case Keyboard::Down:
-                            if(_figure_state != STOP_FIGURE)
-                                game_board->step_down();
-                            break;
-                        case Keyboard::Space:
-                            if(_figure_state != STOP_FIGURE){
-                                game_board->hard_drop();
-                                _figure_state = CHANGE_FIGURE;
-                            }
-                            break;
-                        case Keyboard::G:
-                        case Keyboard::Up:
-                            if(_figure_state != STOP_FIGURE)
-                                game_board->rotate(false);
-                            break;
-                        case Keyboard::H:
-                            if(_figure_state != STOP_FIGURE)
-                                game_board->rotate(true);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                // if we have changed window's size:
-                case Event::Resized:
-                    // set minimal window size:
-                    if ((window.getSize().y < 600) || (window.getSize().x < 400))
-                        window.setSize(Vector2u(400, 600));
-                    
-                    // update view:
-                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
-
-                    // update own cell size:
-                    own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                    own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
-                    game_board->set_cell_size(own_cell_size);
-
-                    // update other players' cell size:
-                    other_cell_size.x = own_cell_size.x / 2;
-                    other_cell_size.y = own_cell_size.y / 2;
-                    for (unsigned i = 0; i < number_of_players - 1; i++)
-                        other_game_boards[i]->set_cell_size(other_cell_size);
-
-                    // update button size:
-                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-                    // update all the buttons and their positions:
-                    pause.setCharacterSize(5 * button_size / 6);
-                    pause.setOutlineThickness(button_size / 6);
-                    pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        // clear game window:
-        window.clear();
-
-        // draw background:
-        window.draw(background);
-
-        // draw a board:
-        game_board->print_board(window, font, 5 * button_size / 6);
-        // draw pause button:
-        window.draw(pause);
-        
-        // if we have reached game over condition:
-        if (game_board->game_over()) {
-            game_board->get_descend_thread()->terminate();
-            listen_thread->terminate();
-            game_over_menu(game_board);
-        }
-
-        for (unsigned i = 0; i < number_of_players - 1; i++)
-            other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_player_index, i + 1);
-
-        // display what we have just drawn:
-        window.display();
-    }
-
-    delete game_board;
-    other_game_boards.clear();
-};
 
 void Menu::game_over_menu(Board* game_board) {
     // counter of the currently chosen button:
@@ -1266,6 +892,677 @@ void Menu::pause_menu(Board* game_board) {
         window.display();
     }
 }
+
+// Multiplayer game function:
+void Menu::multiplayer_game(Server* current_session, Client* current_client) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // own button size:
+    double button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
+
+    // initialize own cell size according the current window size:
+    Vector2f own_cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
+
+    // initialize other player's cell size:
+    Vector2f other_cell_size(own_cell_size.x / 2, own_cell_size.y / 2);
+
+    request_status status = NOT_CHANGED;
+    // Initialize client-server communication:
+    Thread* listen_thread = nullptr;    
+    if (current_client == nullptr) {
+        // Look for the clients:
+        listen_thread = new Thread([&] () { current_session->listen_game(status); });
+
+        listen_thread->launch();
+    } else if (current_session == nullptr) {
+        // Look for the clients:
+        listen_thread = new Thread([&] () { current_client->listen_game(status); });
+
+        listen_thread->launch();
+    }
+
+    // Create a list of clients and initialize server name and complexity:
+    vector<client_data> *player_list = nullptr;
+    string server_name = "";
+    unsigned complexity = 0;
+    if (current_client == nullptr) {
+        player_list = new vector<client_data>(current_session->get_clients());
+        server_name = current_session->get_player_nickname();
+        complexity = current_session->get_level();
+    } else if (current_session == nullptr) {
+        player_list = new vector<client_data>(current_client->get_server_data().clients);
+        server_name = current_client->get_server_data().name;
+        complexity = current_client->get_server_data().level;
+    }
+
+    // Initialize the number of players in the current session:
+    unsigned number_of_players = player_list->size();
+
+    window.setSize(Vector2u ((own_cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players,
+        (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
+
+    // Initialize the global game over identifier:
+    bool global_game_over = false;
+
+    // Initialize game over counter:
+    unsigned game_over_counter = 0;
+
+    // initalize the game over background:
+    RectangleShape game_over_background;
+    game_over_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
+    game_over_background.setFillColor(Color(255, 255, 255, 100));
+
+    // Initialize the index of current player:
+    unsigned current_player_index = 0;
+    for (unsigned i = 0; i < player_list->size(); i++)
+        if (player_list->at(i).address == IpAddress::getLocalAddress()) {
+            current_player_index = i;
+            break;   
+        }
+
+    // create the game board: 
+    Board* game_board = new Board(window, complexity, own_cell_size);
+
+    // create game boards of the other players:
+    vector<Board*> other_game_boards;
+    for (unsigned i = 0; i < number_of_players - 1; i++)
+        other_game_boards.emplace_back(new Board(window, complexity, other_cell_size));
+
+    // Initialize pause button:
+    Text pause = create_button(font, "Pause", button_size,
+        Vector2f((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
+
+    figure_state _figure_state = DESCEND_FIGURE;
+    int count_change_figure = DEF_COU_CHA_FIG;
+
+    unsigned descend_counter = 0;
+
+    // Using a thread to fall down:
+    game_board->set_descend_thread(new Thread([&] () {
+        for ( ; window.isOpen(); descend_counter++) {
+            // Update other boards:
+            player_list->clear();
+            if (current_client == nullptr) {
+                current_session->send_clients_board_data(*game_board);
+                player_list = new vector<client_data>(current_session->get_clients());
+            } else if (current_session == nullptr) {
+                current_client->send_board_data(*game_board);
+                player_list = new vector<client_data>(current_client->get_server_data().clients);
+            }
+
+            for (unsigned i = 0; i < number_of_players - 1; i++) {
+                if (i >= current_player_index) {
+                    other_game_boards[i]->set_map(player_list->at(i + 1).map);
+                    other_game_boards[i]->set_score(player_list->at(i + 1).score);
+                } else {
+                    other_game_boards[i]->set_map(player_list->at(i).map);
+                    other_game_boards[i]->set_score(player_list->at(i).score);
+                }
+            }
+        
+            if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
+                if(_figure_state == STOP_FIGURE)
+                    count_change_figure--;
+                if(count_change_figure <= 0)
+                    _figure_state = CHANGE_FIGURE;
+                if(_figure_state == DESCEND_FIGURE)
+                    _figure_state = game_board->step_down() ? DESCEND_FIGURE : STOP_FIGURE; 
+                // if we can't move down no more:
+                if (_figure_state == CHANGE_FIGURE) {
+
+                    count_change_figure = DEF_COU_CHA_FIG;
+                    _figure_state = DESCEND_FIGURE;
+                    // check for the full lines:
+                    game_board->fix_current_figure();
+                    game_board->erase_lines(complexity);
+
+                    // putting next figure into a current figure:
+                    game_board->set_current_figure(game_board->get_next_figure());
+                    // adding new current figure on the board:
+                    game_board->add_figure();
+                    // creating the next figure:
+                    game_board->set_next_figure(game_board->create_figure());
+                }
+
+                descend_counter = 0;
+            }
+
+            sf::sleep(seconds(0.015f));
+        }
+    }));
+
+    game_board->get_descend_thread()->launch();
+
+    // We are using descend counter to manage the figures' fall rate:
+    while (window.isOpen()) {
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    pause.setFillColor(COLOR_DARK_VIOLET);
+                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
+
+                    // If appropriate mouse position was captured:
+                    if (captured_button(window, pause)) {
+                        // focus pause button:
+                        pause.setFillColor(COLOR_YELLOW);
+                        pause.setOutlineColor(COLOR_DARK_BLUE);
+                        focused_button_counter = 1;
+                    }
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) pause game:
+                            if (captured_button(window, pause)) {
+                                game_board->get_descend_thread()->terminate();
+                                // execute pause button:
+                                if (current_client == nullptr)
+                                    multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                else if (current_session == nullptr)
+                                    multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                                game_board->get_descend_thread()->launch();
+                                        
+                                // update cell size:
+                                own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                game_board->set_cell_size(own_cell_size);
+
+                                // update button size:
+                                button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
+
+                                // update all the buttons and their positions:
+                                pause.setCharacterSize(5 * button_size / 6);
+                                pause.setOutlineThickness(button_size / 6);
+                                pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                        
+                                // unfocus pause button:
+                                pause.setFillColor(COLOR_DARK_VIOLET);
+                                pause.setOutlineColor(COLOR_LIGHT_GREEN);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // if we pressed some button:
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // focus pause button:
+                                    pause.setFillColor(COLOR_YELLOW);
+                                    pause.setOutlineColor(COLOR_DARK_BLUE);
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
+                                        // execute pause button:
+                                        if (current_client == nullptr)
+                                            multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                                        else if (current_session == nullptr)
+                                            multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                                        game_board->get_descend_thread()->launch();
+
+                                        // update cell size:
+                                        own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                                        game_board->set_cell_size(own_cell_size);
+
+                                        // update button size:
+                                        button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
+                                    
+                                        // update all the buttons and their positions:
+                                        pause.setCharacterSize(5 * button_size / 6);
+                                        pause.setOutlineThickness(button_size / 6);
+                                        pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                                    }
+
+                                    // unfocus pause button:
+                                    pause.setFillColor(COLOR_DARK_VIOLET);
+                                    pause.setOutlineColor(COLOR_LIGHT_GREEN);
+                                    focused_button_counter = 0;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        // if Escape is pushed: 
+                        case Keyboard::Escape:
+                            game_board->get_descend_thread()->terminate();
+                            // execute pause button:
+                            if (current_client == nullptr)
+                                multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                            else if (current_session == nullptr)
+                                multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                            game_board->get_descend_thread()->launch();
+
+                            // update cell size:
+                            own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                            game_board->set_cell_size(own_cell_size);
+
+                            // update button size:
+                            button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
+
+                            // update all the buttons and their positions:
+                            pause.setCharacterSize(5 * button_size / 6);
+                            pause.setOutlineThickness(button_size / 6);
+                            pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                            break;
+                        // while we want to move a current figure to the right:
+                        case Keyboard::D:
+                        case Keyboard::Right:
+                            if(_figure_state == STOP_FIGURE){
+                                bool step_done = game_board->step_right(true);
+                                if(step_done)
+                                    count_change_figure++;
+                                else
+                                    count_change_figure = 0;
+                                break;
+                            }
+                            
+                            game_board->step_right(false);
+                            break;
+                        // while we want to move a current figure to the left:
+                        case Keyboard::A:
+                        case Keyboard::Q:
+                        case Keyboard::Left:
+                            if(_figure_state == STOP_FIGURE){
+                                bool step_done = game_board->step_left(true);
+                                if(step_done)
+                                    count_change_figure++;
+                                else
+                                   count_change_figure = 0;
+                                break;
+                            }
+
+                            game_board->step_left(false);
+                            break;
+                        // while we want to fall faster:
+                        case Keyboard::S:
+                        case Keyboard::Down:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->step_down();
+                            break;
+                        case Keyboard::Space:
+                            if(_figure_state != STOP_FIGURE){
+                                game_board->hard_drop();
+                                _figure_state = CHANGE_FIGURE;
+                            }
+                            break;
+                        case Keyboard::G:
+                        case Keyboard::Up:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->rotate(false);
+                            break;
+                        case Keyboard::H:
+                            if(_figure_state != STOP_FIGURE)
+                                game_board->rotate(true);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if ((window.getSize().y < 600) || (window.getSize().x < 400))
+                        window.setSize(Vector2u(400, 600));
+                    
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update own cell size:
+                    own_cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    own_cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    game_board->set_cell_size(own_cell_size);
+
+                    // update other players' cell size:
+                    other_cell_size.x = own_cell_size.x / 2;
+                    other_cell_size.y = own_cell_size.y / 2;
+                    for (unsigned i = 0; i < number_of_players - 1; i++)
+                        other_game_boards[i]->set_cell_size(other_cell_size);
+
+                    // update button size:
+                    button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
+
+                    // update all the buttons and their positions:
+                    pause.setCharacterSize(5 * button_size / 6);
+                    pause.setOutlineThickness(button_size / 6);
+                    pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // clear game window:
+        window.clear();
+
+        // draw background:
+        window.draw(background);
+
+        // draw a board:
+        if (current_client == nullptr)
+            game_board->print_board(window, font, 5 * button_size / 6, current_session->get_player_nickname());
+        else
+            game_board->print_board(window, font, 5 * button_size / 6, current_client->get_player_nickname());
+            
+        // draw pause button:
+        window.draw(pause);
+        
+        // if we have reached game over condition:
+        if (game_board->game_over()) {
+            game_board->get_descend_thread()->terminate();
+            listen_thread->terminate();
+            game_over_menu(game_board);
+        }
+
+        for (unsigned i = 0; i < number_of_players - 1; i++) {
+            if (current_client == nullptr)
+                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, i + 1);
+            else {
+                if (current_player_index >= i)  
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
+                else
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, i + 1);
+            }
+        }
+
+        // display what we have just drawn:
+        window.display();
+    }
+
+    delete game_board;
+    other_game_boards.clear();
+};
+
+// Multiplayer pause menu:
+void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client) {
+    // counter of the currently chosen button:
+    unsigned focused_button_counter = 0;
+    // number of buttons:
+    const unsigned number_of_buttons = 3;
+    // button size:
+    double button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
+        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 2, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
+
+    // initialize cell size according the current window size:
+    Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
+                    min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
+
+
+    // initalize pause background:
+    RectangleShape pause_background;
+    pause_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
+    pause_background.setFillColor(Color(255, 255, 255, 100));
+
+    // set the pause image:
+    Texture texture;
+    try {
+        if (!texture.loadFromFile("images/pause.png")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, pause image not found!" << endl;
+    }
+
+    // create a pause sprite itself:
+    Sprite pause;
+    pause.setTexture(texture);
+    pause.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.5);
+    pause.setColor(Color(255, 255, 255, 100));
+
+    // Initialize resume button:
+    Text resume = create_button(font, "Resume", button_size,
+        Vector2f(window.getSize().x / 2,
+            0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15)));
+
+    // Initialize disconnect button:
+    Text disconnect = create_button(font, "Disconnect", button_size,
+        Vector2f(window.getSize().x / 2,
+            0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 1));
+
+    // Initialize exit button:
+    Text exit = create_button(font, "Exit", button_size,
+        Vector2f(window.getSize().x / 2,
+            0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 2));
+
+    while (window.isOpen()) {
+        Event event;
+
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+                // close window:  
+                case Event::Closed:
+                    window.close();
+                    break;
+                // when we are moving mouse:
+                case Event::MouseMoved:
+                    // unfocus all the buttons:
+                    resume.setFillColor(COLOR_DARK_VIOLET);
+                    resume.setOutlineColor(COLOR_LIGHT_GREEN);
+                    disconnect.setFillColor(COLOR_DARK_VIOLET);
+                    disconnect.setOutlineColor(COLOR_LIGHT_GREEN);
+                    exit.setFillColor(COLOR_DARK_VIOLET);
+                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
+
+                    // If appropriate mouse position was captured:
+                    if (captured_button(window, resume)) {
+                        // focus resume button:
+                        resume.setFillColor(COLOR_YELLOW);
+                        resume.setOutlineColor(COLOR_DARK_BLUE);
+                        focused_button_counter = 1;
+                    } else if (captured_button(window, disconnect)) {
+                        // focus disconnect button:
+                        disconnect.setFillColor(COLOR_YELLOW);
+                        disconnect.setOutlineColor(COLOR_DARK_BLUE);
+                        focused_button_counter = 2;
+                    } else if (captured_button(window, exit)) {
+                        // focus exit button:
+                        exit.setFillColor(COLOR_YELLOW);
+                        exit.setOutlineColor(COLOR_DARK_BLUE);
+                        focused_button_counter = 3;
+                    }
+                    break;
+                case Event::MouseButtonPressed:
+                    switch (event.key.code) {
+                        case Mouse::Left:
+                            // If appropriate mouse position was captured:
+                            // 1) Resume game:
+                            if (captured_button(window, resume)) {
+                                return;
+                            // 3) Go to main menu:
+                            } else if (captured_button(window, disconnect)) {
+                                game_board->get_descend_thread()->terminate();
+                                main_menu();
+                            // 4) Exit:
+                            } else if (captured_button(window, exit)) {
+                                game_board->get_descend_thread()->terminate();
+                                window.close();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case Event::KeyPressed:
+                    switch (event.key.code) {
+                        // if we want to focus (Tab) or push (Enter) some button using keyboard:
+                        case Keyboard::Tab:
+                        case Keyboard::Return:
+                            // focus or push the button according to 
+                            // the current focused_button_counter value:
+                            switch (focused_button_counter) {
+                                // if it is the first press of Tab:
+                                case 0:
+                                    // in this case, Enter won't do nothing:
+                                    if (event.key.code == Keyboard::Return)
+                                        break;
+
+                                    // focus resume button:
+                                    resume.setFillColor(COLOR_YELLOW);
+                                    resume.setOutlineColor(COLOR_DARK_BLUE);
+                                    focused_button_counter++;
+                                    break;
+                                case 1:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return)
+                                        // execute resume button:
+                                        return;
+
+                                    // unfocus resume button:
+                                    resume.setFillColor(COLOR_DARK_VIOLET);
+                                    resume.setOutlineColor(COLOR_LIGHT_GREEN);
+                                    // focus disconnect button:
+                                    disconnect.setFillColor(COLOR_YELLOW);
+                                    disconnect.setOutlineColor(COLOR_DARK_BLUE);
+                                    focused_button_counter++;
+                                    break;
+                                case 2:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
+                                        // execute disconnect button:
+                                        main_menu();
+                                    }
+
+                                    // unfocus disconnect button:
+                                    disconnect.setFillColor(COLOR_DARK_VIOLET);
+                                    disconnect.setOutlineColor(COLOR_LIGHT_GREEN);
+                                    // focus exit button:
+                                    exit.setFillColor(COLOR_YELLOW);
+                                    exit.setOutlineColor(COLOR_DARK_BLUE);
+                                    focused_button_counter++;
+                                    break;
+                                case 3:
+                                    // if we have pressed Enter:
+                                    if (event.key.code == Keyboard::Return) {
+                                        game_board->get_descend_thread()->terminate();
+                                        // execute exit button:
+                                        window.close();
+                                    }
+
+                                    // unfocus exit button:
+                                    exit.setFillColor(COLOR_DARK_VIOLET);
+                                    exit.setOutlineColor(COLOR_LIGHT_GREEN);
+                                    // focus resume button:
+                                    resume.setFillColor(COLOR_YELLOW);
+                                    resume.setOutlineColor(COLOR_DARK_BLUE);
+                                    focused_button_counter = 1;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            break;
+                        // if Escape is pushed: 
+                        case Keyboard::Escape:
+                            // execute pause button:
+                            return;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // if we have changed window's size:
+                case Event::Resized:
+                    // set minimal window size:
+                    if ((window.getSize().y < 600) || (window.getSize().x < 400))
+                        window.setSize(Vector2u(400, 600));
+            
+                    // update button size:
+                    button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
+                        min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 2, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
+
+                    // update view:
+                    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
+                    // update cell size:
+                    cell_size.x = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
+                    game_board->set_cell_size(cell_size);
+
+                    // update other players' cell size:
+                    for (unsigned i = 0; i < other_boards.size(); i++)
+                        other_boards[i]->set_cell_size(Vector2f (cell_size.x / 2, cell_size.y / 2));
+
+                    // update pause background:
+                    pause_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
+
+                    // update pause sprite: 
+                    pause.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.5);
+
+                    // update all the buttons and their positions:
+                    resume.setCharacterSize(5 * button_size / 6);
+                    resume.setOutlineThickness(button_size / 6);
+                    resume.setPosition((window.getSize().x - resume.getGlobalBounds().width) / 2, 
+                            0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15));
+                  
+                    disconnect.setCharacterSize(5 * button_size / 6);
+                    disconnect.setOutlineThickness(button_size / 6);
+                    disconnect.setPosition((window.getSize().x - disconnect.getGlobalBounds().width) / 2, 
+                            0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 1);
+                    
+                    exit.setCharacterSize(5 * button_size / 6);
+                    exit.setOutlineThickness(button_size / 6);
+                    exit.setPosition((window.getSize().x - exit.getGlobalBounds().width) / 2, 
+                            0.85 * (window.getSize().y - number_of_buttons * (button_size + 15) - 15) + (button_size + 15) * 2);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // clear game window:
+        window.clear();
+
+        // draw background:
+        window.draw(background);
+
+        // draw a board:
+        game_board->print_board(window, font, 5 * button_size / 6);
+
+        for (unsigned i = 0; i < other_boards.size(); i++)
+            other_boards[i]->print_board(window, font, 5 * button_size / 6);
+
+        // draw pause background:
+        window.draw(pause_background);
+        //draw pause sprite:
+        window.draw(pause);
+
+        // draw resume button:
+        window.draw(resume);
+        // draw main menu button:
+        window.draw(disconnect);
+        // draw exit button:
+        window.draw(exit);
+
+        // display what we have just drawn:
+        window.display();
+    }
+};
 
 void Menu::main_menu(const bool& initialization) {
     if (initialization)
@@ -2808,7 +3105,7 @@ void Menu::find_servers(const string& nickname) {
     // initalize the wait background:
     RectangleShape wait_background;
     wait_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
-    wait_background.setFillColor(Color(255, 255, 255, 100));
+    wait_background.setFillColor(Color(255, 255, 255, 200));
 
     // create a wait sprite itself:
     Sprite wait;
@@ -2866,27 +3163,23 @@ void Menu::find_servers(const string& nickname) {
    // update_thread->launch();
 
     while(window.isOpen()) {
-
         if (search_status == CHANGED) {
-                cout << "Yes" << endl;
+            server_info.clear();
 
-                server_info.clear();
+            // Fullfill the list of servers:
+            for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
+                server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
+                    Vector2f(window.getSize().x / 6,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+                server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
+                    Vector2f(3 * window.getSize().x / 6,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+                server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/" + to_string(current_client->get_servers()[i].max_clients), button_size,
+                    Vector2f(5 * window.getSize().x / 6,
+                    (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
+            }
 
-                // Fullfill the list of servers:
-                for (unsigned i = server_info.size() / 3; i < current_client->get_servers().size(); i++) {
-                    server_info.emplace_back(create_button(font, current_client->get_servers()[i].name, button_size,
-                        Vector2f(window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-                    server_info.emplace_back(create_button(font, complexities[(unsigned) current_client->get_servers()[i].level - 1], button_size,
-                        Vector2f(3 * window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-                    server_info.emplace_back(create_button(font, to_string(current_client->get_servers()[i].clients_quantity) + "/" + to_string(current_client->get_servers()[i].max_clients), button_size,
-                        Vector2f(5 * window.getSize().x / 6,
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), true, 6));
-                }
-
-                search_status = NOT_CHANGED;
-             //   cout << "Hola" << endl;
+            search_status = NOT_CHANGED;
         }
 
         Event event;
