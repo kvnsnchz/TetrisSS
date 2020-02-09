@@ -2431,6 +2431,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
     while(window.isOpen()) {
         // If we have some changes:
         if (status == CHANGED) {
+            player_list->clear();
             if (current_client == nullptr)
                 player_list = new vector<client_data>(current_session->get_clients());
             else if (current_session == nullptr)
