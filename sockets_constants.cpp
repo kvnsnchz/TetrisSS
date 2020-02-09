@@ -21,6 +21,7 @@ Packet& operator >>(sf::Packet& packet, server_data& _server_data)
 Packet& operator <<(sf::Packet& packet, client_data& _client_data)
 {
     return packet << _client_data.address.toString()
+        << _client_data.nickname
         << (Uint32) _client_data.status
         << _client_data.score;
 }
@@ -31,6 +32,7 @@ Packet& operator >>(sf::Packet& packet, client_data& _client_data)
     Uint32 status;
 
     packet >> client_address;
+    packet >> _client_data.nickname;
     packet >> status;
 
     _client_data.address = client_address;

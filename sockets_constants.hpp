@@ -53,6 +53,7 @@ enum client_status {
 
 struct client_data {
     IpAddress address;
+    string nickname;
     client_status status;
     Uint64 score;
     unsigned map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT];

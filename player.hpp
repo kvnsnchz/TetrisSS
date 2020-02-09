@@ -7,6 +7,7 @@
 #include <cstring>
 #include <boost/algorithm/string.hpp>
 #include <string>
+#include "sockets_constants.hpp"
 
 using namespace std;
 
@@ -28,6 +29,10 @@ class Player {
         void set_player_status(const bool& new_player_status);
         void set_player_nickname(const string& new_player_nickname);
 
+        virtual void connect_udp_socket() = 0;
+        virtual void disconnect_udp_socket() = 0;
+        virtual void ready(bool) = 0;
+        virtual void listen_game(request_status& status) = 0;
         ~Player() {};
 };
 

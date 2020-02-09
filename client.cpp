@@ -95,7 +95,7 @@ void Client::connect_server(const unsigned pos, request_status& status) {
     Packet packet_send;
     //Server connection request:
     packet_send << SERVER_CONN_REQUEST;
-    
+    packet_send >> player_nickname;
     //Sending server connection request: 
     if (socket.send(packet_send, servers[pos].address, SERVER_PORT) != sf::Socket::Done)
     {
@@ -202,7 +202,7 @@ void Client::listen_server(request_status& status){
             {
             case CLIENT_READY_SUCCESS:
             {    
-                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), STATUS_NOT_READY});
+                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), "", STATUS_NOT_READY});
                 if(it == _server_data.clients.end()){
                     status = READY_ERROR;
                     break;
@@ -217,7 +217,7 @@ void Client::listen_server(request_status& status){
             }
             case CLIENT_NOT_READY_SUCCESS:
             {    
-                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), STATUS_NOT_READY});
+                vector<client_data>::iterator it = find(_server_data.clients.begin(), _server_data.clients.end(), client_data{IpAddress::getLocalAddress(), "", STATUS_NOT_READY});
                 if(it == _server_data.clients.end()){
                     status = NOT_READY_ERROR;
                     break;

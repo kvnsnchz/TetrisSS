@@ -2437,7 +2437,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
     // Initialize player list:
     vector<Text> player_list_titles;
     for (unsigned i = 0; i < player_list->size(); i++) {
-        player_list_titles.emplace_back(create_button(font, string ("Player " + to_string(i + 1)), button_size,
+        player_list_titles.emplace_back(create_button(font, player_list->at(i).nickname, button_size,
             Vector2f(window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
         player_list_titles.emplace_back(create_button(font, player_list->at(i).status == STATUS_READY ? "Ready" : "Not Ready", button_size,
@@ -2480,7 +2480,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
             // Refresh player list:
             player_list_titles.clear();
             for (unsigned i = 0; i < player_list->size(); i++) {
-                player_list_titles.emplace_back(create_button(font, "Player " + to_string(i + 1), button_size,
+                player_list_titles.emplace_back(create_button(font, player_list->at(i).nickname, button_size,
                     Vector2f(window.getSize().x / 4,
                     (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * (i + 2) + 5.0f), false, 4));
                 player_list_titles.emplace_back(create_button(font, player_list->at(i).status == STATUS_READY ? "Ready" : "Not Ready", button_size,
