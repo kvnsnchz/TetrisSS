@@ -1342,9 +1342,9 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, i + 1);
                 else if (current_player_index >= i && current_client->get_server_data().clients[i].status == STATUS_GAME_OVER)
                     other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, true, i + 1);
-                else if (current_player_index < i && current_client->get_server_data().clients[i].status != STATUS_GAME_OVER)
+                else if (current_player_index < i && current_client->get_server_data().clients[i + 1].status != STATUS_GAME_OVER)
                     other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
-                else if (current_player_index < i && current_client->get_server_data().clients[i].status == STATUS_GAME_OVER)
+                else if (current_player_index < i && current_client->get_server_data().clients[i + 1].status == STATUS_GAME_OVER)
                     other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, true, i + 1);
             }
         }
