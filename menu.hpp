@@ -7,6 +7,7 @@
 
 #define DEF_COU_CHA_FIG 1 
 #define MAX_NICKNAME_LENGTH 12
+#define GLOBAL_GAME_OVER_TICKS 6
 
 // new button initialization function (for code reduction):
 Text create_button(Font& font, const string title, const double& button_size,

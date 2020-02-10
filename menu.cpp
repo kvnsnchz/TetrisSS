@@ -946,11 +946,27 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     window.setSize(Vector2u ((own_cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players,
         (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
 
+    // set the game over image:
+    Texture texture;
+    try {
+        if (!texture.loadFromFile("images/game_over.png")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, game over image not found!" << endl;
+    }
+
+    // create a game over sprite itself:
+    Sprite game_over;
+    game_over.setTexture(texture);
+    game_over.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y);
+    game_over.setColor(Color(255, 255, 255, 200));
+
     // Initialize the global game over identifier:
     bool global_game_over = false;
 
-    // Initialize game over counter:
-    unsigned game_over_counter = 0;
+    // Initialize global game counter:
+    unsigned global_game_over_counter = 0;
 
     // initalize the game over background:
     RectangleShape game_over_background;
@@ -964,7 +980,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
             current_player_index = i;
             break;   
         }
-
 
     // create game boards of the other players:
     vector<Board*> other_game_boards;
@@ -1003,7 +1018,16 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
             }
 
-            if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
+            // Check for the global game over:
+            global_game_over = true;
+            for (unsigned i = 0; i < number_of_players; i++)
+                if (player_list->at(i).status != STATUS_GAME_OVER) {
+                    global_game_over = false;
+                    break;
+                }
+
+            if (player_list->at(current_player_index).status != STATUS_GAME_OVER &&
+                (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE)) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -1289,30 +1313,59 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         window.draw(background);
 
         // draw a board:
-        if (current_client == nullptr)
+        if (current_client == nullptr && current_session->get_clients()[current_player_index].status != STATUS_GAME_OVER)
             game_board->print_board(window, font, 5 * button_size / 6, current_session->get_player_nickname());
-        else
+        else if (current_client == nullptr && current_session->get_clients()[current_player_index].status == STATUS_GAME_OVER)
+            game_board->print_board(window, font, 5 * button_size / 6, current_session->get_player_nickname(), true);
+        else if (current_session == nullptr && current_client->get_server_data().clients[current_player_index].status != STATUS_GAME_OVER)
             game_board->print_board(window, font, 5 * button_size / 6, current_client->get_player_nickname());
+        else if (current_session == nullptr && current_client->get_server_data().clients[current_player_index].status == STATUS_GAME_OVER)
+            game_board->print_board(window, font, 5 * button_size / 6, current_client->get_player_nickname(), true);
 
         // draw pause button:
         window.draw(pause);
         
         // if we have reached game over condition:
-        if (game_board->game_over()) {
-            game_board->get_descend_thread()->terminate();
-            listen_thread->terminate();
-            game_over_menu(game_board);
+        if (game_board->game_over() && current_client == nullptr)
+            current_session->game_over();
+        else if (game_board->game_over() && current_session == nullptr)
+            current_client->game_over();
+
+        // Display 
+        for (unsigned i = 0; i < number_of_players - 1; i++) {
+            if (current_client == nullptr && current_session->get_clients()[i + 1].status != STATUS_GAME_OVER)
+                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, i + 1);
+            else if (current_client == nullptr && current_session->get_clients()[i + 1].status != STATUS_GAME_OVER)
+                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, true, i + 1);
+            else {
+                if (current_player_index >= i && current_client->get_server_data().clients[i].status != STATUS_GAME_OVER)
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, i + 1);
+                else if (current_player_index >= i && current_client->get_server_data().clients[i].status == STATUS_GAME_OVER)
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, true, i + 1);
+                else if (current_player_index < i && current_client->get_server_data().clients[i].status != STATUS_GAME_OVER)
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
+                else if (current_player_index < i && current_client->get_server_data().clients[i].status == STATUS_GAME_OVER)
+                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, true, i + 1);
+            }
         }
 
-        for (unsigned i = 0; i < number_of_players - 1; i++) {
-            if (current_client == nullptr)
-                other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, i + 1);
-            else {
-                if (current_player_index >= i)
-                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, i + 1);
-                else
-                    other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, i + 1);
-            }
+        // initialize global game over:
+        if (global_game_over) {
+            if (global_game_over_counter % 2 == 0)
+                window.draw(game_over);
+
+            sf::sleep(seconds(1));
+            global_game_over_counter++;
+
+            if (global_game_over_counter > GLOBAL_GAME_OVER_TICKS) {
+                listen_thread->terminate();
+                game_board->get_descend_thread()->terminate();
+
+                if (current_client == nullptr)
+                    session_menu(current_session, nullptr);
+                else if (current_session == nullptr)
+                    session_menu(nullptr, current_client);
+            }  
         }
 
         // display what we have just drawn:

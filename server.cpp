@@ -268,9 +268,9 @@ void Server::listen_clients(request_status& status) {
     }
 }
 
-//Sending clients board data
+// Sending clients board data
 void Server::send_clients_board_data(Board& board) {
-    //Filling send buffer:
+    // Filling send buffer:
     Packet packet_send;
     
     packet_send << SERVER_GAME_UPDATE;
