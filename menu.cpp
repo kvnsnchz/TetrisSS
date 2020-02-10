@@ -1032,7 +1032,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     break;
                 }
 
-            if (game_board->game_over() &&
+            if (!game_board->game_over() &&
                 (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE)) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
