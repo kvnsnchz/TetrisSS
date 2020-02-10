@@ -1018,6 +1018,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
             }
 
+             // if we have reached game over condition:
+            if (game_board->game_over() && current_client == nullptr)
+                current_session->game_over();
+            else if (game_board->game_over() && current_session == nullptr)
+                current_client->game_over();
+
             // Check for the global game over:
             global_game_over = true;
             for (unsigned i = 0; i < number_of_players; i++)
@@ -1026,7 +1032,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     break;
                 }
 
-            if (player_list->at(current_player_index).status != STATUS_GAME_OVER &&
+            if (game_board->game_over() &&
                 (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE)) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
@@ -1324,18 +1330,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
         // draw pause button:
         window.draw(pause);
-        
-        // if we have reached game over condition:
-        if (game_board->game_over() && current_client == nullptr)
-            current_session->game_over();
-        else if (game_board->game_over() && current_session == nullptr)
-            current_client->game_over();
 
-        // Display 
+        // Display the boards of other players:
         for (unsigned i = 0; i < number_of_players - 1; i++) {
             if (current_client == nullptr && current_session->get_clients()[i + 1].status != STATUS_GAME_OVER)
                 other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, false, i + 1);
-            else if (current_client == nullptr && current_session->get_clients()[i + 1].status != STATUS_GAME_OVER)
+            else if (current_client == nullptr && current_session->get_clients()[i + 1].status == STATUS_GAME_OVER)
                 other_game_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, true, i + 1);
             else if (current_session == nullptr) {
                 if (current_player_index >= i && current_client->get_server_data().clients[i].status != STATUS_GAME_OVER)
