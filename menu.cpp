@@ -1680,21 +1680,31 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
         window.draw(background);
 
         // draw a board:
-        if (current_session->get_clients()[current_player_index].status != STATUS_GAME_OVER)
-            game_board->print_board(window, font, 5 * button_size / 6, player_list->at(current_player_index).nickname);
-        else if (current_session->get_clients()[current_player_index].status == STATUS_GAME_OVER)
-            game_board->print_board(window, font, 5 * button_size / 6, player_list->at(current_player_index).nickname, true);
-        
+        if (current_client == nullptr && current_session->get_clients()[current_player_index].status != STATUS_GAME_OVER)
+            game_board->print_board(window, font, 5 * button_size / 6, current_session->get_player_nickname());
+        else if (current_client == nullptr && current_session->get_clients()[current_player_index].status == STATUS_GAME_OVER)
+            game_board->print_board(window, font, 5 * button_size / 6, current_session->get_player_nickname(), true);
+        else if (current_session == nullptr && current_client->get_server_data().clients[current_player_index].status != STATUS_GAME_OVER)
+            game_board->print_board(window, font, 5 * button_size / 6, current_client->get_player_nickname());
+        else if (current_session == nullptr && current_client->get_server_data().clients[current_player_index].status == STATUS_GAME_OVER)
+            game_board->print_board(window, font, 5 * button_size / 6, current_client->get_player_nickname(), true);
+
         // Display the boards of other players:
         for (unsigned i = 0; i < player_list->size() - 1; i++) {
-            if (current_player_index >= i && player_list->at(i).status != STATUS_GAME_OVER)
-                other_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i).nickname, false, i + 1);
-            else if (current_player_index >= i && player_list->at(i).status == STATUS_GAME_OVER)
-                other_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i).nickname, true, i + 1);
-            else if (current_player_index < i && player_list->at(i + 1).status != STATUS_GAME_OVER)
-                other_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i + 1).nickname, false, i + 1);
-            else if (current_player_index < i && player_list->at(i + 1).status == STATUS_GAME_OVER)
-                other_boards[i]->print_board(window, font, 5 * button_size / 6, player_list->at(i + 1).nickname, true, i + 1);
+            if (current_client == nullptr && current_session->get_clients()[i + 1].status != STATUS_GAME_OVER)
+                other_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, false, i + 1);
+            else if (current_client == nullptr && current_session->get_clients()[i + 1].status == STATUS_GAME_OVER)
+                other_boards[i]->print_board(window, font, 5 * button_size / 6, current_session->get_clients()[i + 1].nickname, true, i + 1);
+            else if (current_session == nullptr) {
+                if (current_player_index >= i && current_client->get_server_data().clients[i].status != STATUS_GAME_OVER)
+                    other_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, false, i + 1);
+                else if (current_player_index >= i && current_client->get_server_data().clients[i].status == STATUS_GAME_OVER)
+                    other_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i].nickname, true, i + 1);
+                else if (current_player_index < i && current_client->get_server_data().clients[i + 1].status != STATUS_GAME_OVER)
+                    other_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, false, i + 1);
+                else if (current_player_index < i && current_client->get_server_data().clients[i + 1].status == STATUS_GAME_OVER)
+                    other_boards[i]->print_board(window, font, 5 * button_size / 6, current_client->get_server_data().clients[i + 1].nickname, true, i + 1);
+            }
         }
 
         // draw pause background:
