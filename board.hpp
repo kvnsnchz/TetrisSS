@@ -89,7 +89,7 @@ class Board {
         void rotate(bool right);
         void shadow();
         // Check for the full lines and erase them if they are:
-        void erase_lines(const unsigned& complexity);
+        unsigned erase_lines(const unsigned& complexity);
         // Fix current figure's position on the board if we can't move further:
         void fix_current_figure();
         // adding game over condition function:

@@ -36,7 +36,7 @@ bool captured_button(RenderWindow& window, Text& button) {
         return false;                               
 };
 
-void Menu::game(const unsigned& complexity) {
+void Menu::game(unsigned complexity) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // button size:
@@ -57,11 +57,12 @@ void Menu::game(const unsigned& complexity) {
     int count_change_figure = DEF_COU_CHA_FIG;
 
     unsigned descend_counter = 0;
+    unsigned deleted_lines = 0;
 
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
         for ( ; window.isOpen(); descend_counter++) {
-            if (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE) {
+            if (descend_counter >= LEVEL_MAX / complexity || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -75,8 +76,12 @@ void Menu::game(const unsigned& complexity) {
                     _figure_state = DESCEND_FIGURE;
                     // check for the full lines:
                     game_board->fix_current_figure();
-                    game_board->erase_lines(complexity);
+                    deleted_lines += game_board->erase_lines(complexity);
 
+                    if(deleted_lines >= LINES_TO_LEVEL_UP && complexity < LEVEL_MAX){
+                        deleted_lines -= LINES_TO_LEVEL_UP;
+                        complexity++;
+                    }
                     // putting next figure into a current figure:
                     game_board->set_current_figure(game_board->get_next_figure());
                     // adding new current figure on the board:
@@ -910,6 +915,8 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Create a list of clients and initialize server name and complexity:
     vector<client_data> *player_list = nullptr;
     unsigned complexity = 0;
+    unsigned deleted_lines = 0;
+
     if (current_client == nullptr) {
         player_list = new vector<client_data>(current_session->get_clients());
         complexity = current_session->get_level();
@@ -1029,7 +1036,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
 
             if (!game_board->game_over() &&
-                (descend_counter >= 30 / complexity || _figure_state == CHANGE_FIGURE)) {
+                (descend_counter >= LEVEL_MAX / complexity || _figure_state == CHANGE_FIGURE)) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -1043,8 +1050,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     _figure_state = DESCEND_FIGURE;
                     // check for the full lines:
                     game_board->fix_current_figure();
-                    game_board->erase_lines(complexity);
+                    deleted_lines += game_board->erase_lines(complexity);
 
+                    if(deleted_lines >= LINES_TO_LEVEL_UP && complexity < LEVEL_MAX){
+                        deleted_lines -= LINES_TO_LEVEL_UP;
+                        complexity++;
+                    }
                     // putting next figure into a current figure:
                     game_board->set_current_figure(game_board->get_next_figure());
                     // adding new current figure on the board:
@@ -2466,15 +2477,15 @@ void Menu::create_session(const string& nickname) {
                     // unfocus all the buttons:
                     max_number_of_players_title.setFillColor(COLOR_DARK_VIOLET);
                     max_number_of_players_title.setOutlineColor(COLOR_LIGHT_GREEN);
-                    if (complexity != 1) {
+                    if (complexity != LEVEL_MECHANICS) {
                         mechanics.setFillColor(COLOR_DARK_VIOLET);
                         mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
-                    if (complexity != 2) {
+                    if (complexity != LEVEL_STIC) {
                         STIC.setFillColor(COLOR_DARK_VIOLET);
                         STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
-                    if (complexity != 3) {
+                    if (complexity != LEVEL_APP_MATHS) {
                         applied_maths.setFillColor(COLOR_DARK_VIOLET);
                         applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
@@ -2546,19 +2557,19 @@ void Menu::create_session(const string& nickname) {
                                 // focus mechanics button:
                                 mechanics.setFillColor(COLOR_YELLOW);
                                 mechanics.setOutlineColor(COLOR_DARK_BLUE);
-                                complexity = 1;
+                                complexity = LEVEL_MECHANICS;
                             // 3) Choose a normal mode:
                             } else if (captured_button(window, STIC)) {
                                 // focus STIC button:
                                 STIC.setFillColor(COLOR_YELLOW);
                                 STIC.setOutlineColor(COLOR_DARK_BLUE);
-                                complexity = 2;
+                                complexity = LEVEL_STIC;
                             // 4) Choose a hard mode:
                             } else if (captured_button(window, applied_maths)) {
                                 // focus applied Maths button:
                                 applied_maths.setFillColor(COLOR_YELLOW);
                                 applied_maths.setOutlineColor(COLOR_DARK_BLUE);
-                                complexity = 3;
+                                complexity = LEVEL_APP_MATHS;
                             // 5) Go back:
                             } else if (captured_button(window, back)) {
                                 blink_thread->terminate();
@@ -2617,7 +2628,7 @@ void Menu::create_session(const string& nickname) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
-                                        complexity = 1;
+                                        complexity = LEVEL_MECHANICS;
 
                                         // unfocus STIC button:
                                         STIC.setFillColor(COLOR_DARK_VIOLET);
@@ -2626,7 +2637,7 @@ void Menu::create_session(const string& nickname) {
                                         applied_maths.setFillColor(COLOR_DARK_VIOLET);
                                         applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
-                                        if (complexity != 1) {
+                                        if (complexity != LEVEL_MECHANICS) {
                                             // unfocus mechanics button:
                                             mechanics.setFillColor(COLOR_DARK_VIOLET);
                                             mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -2642,7 +2653,7 @@ void Menu::create_session(const string& nickname) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
-                                        complexity = 2;
+                                        complexity = LEVEL_STIC;
 
                                         // unfocus mechanics button:
                                         mechanics.setFillColor(COLOR_DARK_VIOLET);
@@ -2651,7 +2662,7 @@ void Menu::create_session(const string& nickname) {
                                         applied_maths.setFillColor(COLOR_DARK_VIOLET);
                                         applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
-                                        if (complexity != 2) {
+                                        if (complexity != LEVEL_STIC) {
                                             // unfocus STIC button:
                                             STIC.setFillColor(COLOR_DARK_VIOLET);
                                             STIC.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -2667,7 +2678,7 @@ void Menu::create_session(const string& nickname) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
-                                        complexity = 3;
+                                        complexity = LEVEL_APP_MATHS;
 
                                         // unfocus mechanics button:
                                         mechanics.setFillColor(COLOR_DARK_VIOLET);
@@ -2676,7 +2687,7 @@ void Menu::create_session(const string& nickname) {
                                         STIC.setFillColor(COLOR_DARK_VIOLET);
                                         STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
-                                        if (complexity != 3) {
+                                        if (complexity != LEVEL_APP_MATHS) {
                                             // unfocus applied Maths button:
                                             applied_maths.setFillColor(COLOR_DARK_VIOLET);
                                             applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -3751,14 +3762,17 @@ void Menu::complexity_menu() {
                         case Mouse::Left:
                             // If appropriate mouse position was captured:
                             // 1) Starting to play in the easy mode:
-                            if (captured_button(window, mechanics))
-                                game(1);
+                            if (captured_button(window, mechanics)){
+                                game(LEVEL_MECHANICS);
+                            }
                             // 2) Starting to play in the normal mode:
-                            else if (captured_button(window, STIC))
-                                game(2);
+                            else if (captured_button(window, STIC)){
+                                game(LEVEL_STIC);
+                            }
                             // 3) Starting to play in the hard mode:
-                            else if (captured_button(window, applied_maths))
-                                game(3);
+                            else if (captured_button(window, applied_maths)){
+                                game(LEVEL_APP_MATHS);
+                            }
                             // 4) Go back:
                             else if (captured_button(window, back))
                                 main_menu();
@@ -3787,9 +3801,10 @@ void Menu::complexity_menu() {
                                     break;
                                 case 1:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return){
                                         // execute mechanics button:
-                                        game(1);
+                                        game(LEVEL_MECHANICS);
+                                    }
 
                                     // unfocus mechanics button:
                                     mechanics.setFillColor(COLOR_DARK_VIOLET);
@@ -3801,9 +3816,10 @@ void Menu::complexity_menu() {
                                     break;
                                 case 2:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return){
                                         // execute STIC button:
-                                        game(2);
+                                        game(LEVEL_STIC);
+                                    }
 
                                     // unfocus STIC button:
                                     STIC.setFillColor(COLOR_DARK_VIOLET);
@@ -3815,9 +3831,10 @@ void Menu::complexity_menu() {
                                     break;
                                 case 3:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return)
+                                    if (event.key.code == Keyboard::Return){
                                         // execute applied Maths button:
-                                        game(3);
+                                        game(LEVEL_APP_MATHS);
+                                    }
 
                                     // unfocus applied Maths button:
                                     applied_maths.setFillColor(COLOR_DARK_VIOLET);

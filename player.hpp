@@ -18,8 +18,10 @@ class Player {
         bool player_status;
         //Player's nickname:
         string player_nickname;
+        //complexity
+        unsigned complexity;
     public:
-        Player(): player_status(false), player_nickname("Player") {};
+        Player(): player_status(false), player_nickname("Player"), complexity(1) {};
         Player(const string& new_player_nickname): player_status(false), player_nickname(new_player_nickname) {};
         Player(const bool& new_player_status, const string& new_player_nickname): player_status(new_player_status), player_nickname(new_player_nickname) {};
 

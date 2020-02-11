@@ -526,7 +526,7 @@ void Board::rotate(bool right){
 }
 
 // Check for the full lines and erase them if they exist:
-void Board::erase_lines(const unsigned& complexity) {
+unsigned Board::erase_lines(const unsigned& complexity) {
     // initialize the indexes of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
     int begin = y_dimension + FIGURE_GRID_HEIGHT;
@@ -635,6 +635,8 @@ void Board::erase_lines(const unsigned& complexity) {
         default:
             break;
     }
+
+    return full_lines + previous_full_lines;
 };
 
 // Fix current figure's position on the board if we can't move further:
