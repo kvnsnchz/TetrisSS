@@ -12,6 +12,7 @@
 #define LEVEL_APP_MATHS 5
 #define LEVEL_MAX 30
 #define LINES_TO_LEVEL_UP 1
+#define GLOBAL_GAME_OVER_TICKS 6
 
 // new button initialization function (for code reduction):
 Text create_button(Font& font, const string title, const double& button_size,

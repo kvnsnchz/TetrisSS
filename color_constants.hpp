@@ -10,7 +10,13 @@ namespace colors {
     const Color COLOR_DARK_VIOLET = Color(144, 12, 63, 255); // also J figure's color
     const Color COLOR_LIGHT_GREEN = Color(218, 247, 166, 255);
     const Color COLOR_YELLOW = Color(255, 195, 0, 255); // also O figure's color
-    const Color COLOR_DARK_BLUE = Color(8, 0, 93, 255); 
+    const Color COLOR_DARK_BLUE = Color(8, 0, 93, 255);
+
+    // Blank cell color:
+    const Color COLOR_TRANSPARENT_WHITE = Color(121, 163, 249, 180);
+
+    // Shadow cell color:
+    const Color COLOR_TRANSPARENT_GREY = Color(208, 227, 255, 215);
 
     // Colors of figures:
     const Color COLOR_CYAN = Color(28, 230, 199, 255);

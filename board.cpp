@@ -166,13 +166,13 @@ void Board::set_descend_thread(Thread* new_thread) {
 };
 
 // print game board:
-void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const string& nickname, const unsigned& board_index) {
+void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const string& nickname, const bool& game_is_over, const unsigned& board_index) {
     for(int i = 0; i < x_dimension; i++) {
         for(int j = FIGURE_GRID_HEIGHT; j < y_dimension; j++) {
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
             if (board_index > 0)
-                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 3) * 10.0f + 30.0f,
+                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 3) * 10.0f + (float) font_size * 12,
                     (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
             else
                 grid[i][j].setPosition(i * (cell_size.x + 1) + 5.0f,
@@ -181,26 +181,26 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
             // Update cell color:
             switch(map[i][j]) {
                 case 0:
-                    grid[i][j].setFillColor(Color(121, 163, 249, 180));
+                    grid[i][j].setFillColor(COLOR_TRANSPARENT_WHITE);
                     break;
                 case SHADOW_COLOR_CODE:
-                    grid[i][j].setFillColor(Color(208, 227, 255, 215));
+                    grid[i][j].setFillColor(COLOR_TRANSPARENT_GREY);
                     break;
                 case FIGURE_O_COLOR_CODE:
                 case FIGURE_O_COLOR_CODE * STOP_FIGURE_FACTOR:
-                    grid[i][j].setFillColor(Color(255, 216, 0, 255));
+                    grid[i][j].setFillColor(COLOR_YELLOW);
                     break;
                 case FIGURE_I_COLOR_CODE:
                 case FIGURE_I_COLOR_CODE * STOP_FIGURE_FACTOR:
-                    grid[i][j].setFillColor(Color(28, 230, 199, 255));
+                    grid[i][j].setFillColor(COLOR_CYAN);
                     break;
                 case FIGURE_T_COLOR_CODE:
                 case FIGURE_T_COLOR_CODE * STOP_FIGURE_FACTOR:
-                    grid[i][j].setFillColor(Color(248, 131, 6, 255));
+                    grid[i][j].setFillColor(COLOR_ORANGE);
                     break;
                 case FIGURE_L_COLOR_CODE:
                 case FIGURE_L_COLOR_CODE * STOP_FIGURE_FACTOR:
-                    grid[i][j].setFillColor(Color(248, 6, 248, 255));
+                    grid[i][j].setFillColor(COLOR_PINK);
                     break;
                 case FIGURE_J_COLOR_CODE:
                 case FIGURE_J_COLOR_CODE * STOP_FIGURE_FACTOR:
@@ -208,11 +208,11 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
                     break;
                 case FIGURE_Z_COLOR_CODE:
                 case FIGURE_Z_COLOR_CODE * STOP_FIGURE_FACTOR:
-                    grid[i][j].setFillColor(Color(220, 0, 20, 255));
+                    grid[i][j].setFillColor(COLOR_RED);
                     break;
                 case FIGURE_S_COLOR_CODE:
                 case FIGURE_S_COLOR_CODE * STOP_FIGURE_FACTOR:
-                    grid[i][j].setFillColor(Color(46, 228, 25, 255));
+                    grid[i][j].setFillColor(COLOR_GREEN_SALAD);
                     break;
                 default:
                     break;
@@ -248,14 +248,21 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setStyle(Text::Bold);
     score_title.setFillColor(COLOR_LIGHT_GREEN);
     if (board_index == 0) {
-        if (nickname == "")
+        if (nickname == "" && !game_is_over)
             score_title.setString("My Score:\n" + to_string(score));
-        else
+        else if (nickname == "" && game_is_over)
+            score_title.setString("Final Score:\n" + to_string(score));
+        else if (nickname != "" && !game_is_over)
             score_title.setString(nickname + "\nScore:\n" + to_string(score));
+        else if (nickname != "" && game_is_over)
+            score_title.setString(nickname + "\nFinal Score:\n" + to_string(score));
         score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
             next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     } else {
-        score_title.setString(nickname + "\nScore:\n" + to_string(score));
+        if (!game_is_over)
+            score_title.setString(nickname + "\nScore:\n" + to_string(score));
+        else if (game_is_over)
+            score_title.setString(nickname + "\nFinal Score:\n" + to_string(score));
         score_title.setPosition(grid[0][y_dimension - 1].getPosition().x + (grid[x_dimension - 1][y_dimension - 1].getPosition().x + 20.0f - grid[0][y_dimension - 1].getPosition().x - score_title.getGlobalBounds().width) / 2,
             (y_dimension - FIGURE_GRID_HEIGHT) * (cell_size.y + 1) + 4.0f);
     }

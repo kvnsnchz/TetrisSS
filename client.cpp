@@ -390,7 +390,7 @@ void Client::game_over() {
     Packet packet_send;
 
     //Client game over:
-    packet_send << CLIENT_GAME_OVER;
+    packet_send << (Uint32) CLIENT_GAME_OVER;
     
     //Sending client game over: 
     if (socket.send(packet_send, _server_data.address, SERVER_PORT) != sf::Socket::Done)
