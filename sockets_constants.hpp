@@ -58,7 +58,8 @@ struct client_data {
     IpAddress address;
     string nickname;
     client_status status;
-    Uint64 score;
+    Int64 score;
+    Uint32 complexity;
     unsigned map[BOARD_GRID_WIDTH][BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT];
     bool operator == (client_data other_client){
        return address == other_client.address;

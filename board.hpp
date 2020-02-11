@@ -78,6 +78,8 @@ class Board {
         void set_next_figure(Figure* figure);
         void set_descend_thread(Thread*);
 
+        void increment_complexity(const int& increment_value = 1);
+
         // draw game board:
         void print_board(RenderWindow& window, const Font& font, const double& font_size, const string& nickname = "", const bool& game_is_over = false, const unsigned& board_index = 0);
 
@@ -89,7 +91,7 @@ class Board {
         void rotate(bool right);
         void shadow();
         // Check for the full lines and erase them if they are:
-        unsigned erase_lines(const unsigned& complexity);
+        unsigned erase_lines();
         // Fix current figure's position on the board if we can't move further:
         void fix_current_figure();
         // adding game over condition function:

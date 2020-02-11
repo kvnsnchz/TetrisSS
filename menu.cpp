@@ -36,7 +36,7 @@ bool captured_button(RenderWindow& window, Text& button) {
         return false;                               
 };
 
-void Menu::game(unsigned complexity) {
+void Menu::game(const unsigned& initial_complexity) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // button size:
@@ -47,22 +47,40 @@ void Menu::game(unsigned complexity) {
                     min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
     // create the game board: 
-    Board* game_board = new Board(window, complexity, cell_size);
+    Board* game_board = new Board(window, initial_complexity, cell_size);
+
+    // set the level_up image:
+    Texture texture;
+    try {
+        if (!texture.loadFromFile("images/level_up.png")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, level up image is not found!" << endl;
+    }
+
+    // create a level_up itself:
+    Sprite level_up;
+    level_up.setTexture(texture);
+    level_up.setPosition((BOARD_GRID_WIDTH * (cell_size.x + 1) - level_up.getGlobalBounds().width) / 2 + 4,
+        (BOARD_GRID_HEIGHT * (cell_size.y + 1) - level_up.getGlobalBounds().height) / 2 + 4);
+    level_up.setColor(Color(255, 255, 255, 200));
 
     // Initialize pause button:
     Text pause = create_button(font, "Pause", button_size,
-        Vector2f((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
+        Vector2f((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 25 * button_size / 6 + 30.0f), true, 0);
 
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
     unsigned descend_counter = 0;
     unsigned deleted_lines = 0;
+    unsigned level_up_counter = 0;
 
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
         for ( ; window.isOpen(); descend_counter++) {
-            if (descend_counter >= LEVEL_MAX / complexity || _figure_state == CHANGE_FIGURE) {
+            if (descend_counter >= LEVEL_MAX / game_board->get_complexity() || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -76,12 +94,14 @@ void Menu::game(unsigned complexity) {
                     _figure_state = DESCEND_FIGURE;
                     // check for the full lines:
                     game_board->fix_current_figure();
-                    deleted_lines += game_board->erase_lines(complexity);
+                    deleted_lines += game_board->erase_lines();
 
-                    if(deleted_lines >= LINES_TO_LEVEL_UP && complexity < LEVEL_MAX){
-                        deleted_lines -= LINES_TO_LEVEL_UP;
-                        complexity++;
+                    if (deleted_lines >= LINES_TO_LEVEL_UP && game_board->get_complexity() < LEVEL_MAX) {
+                        game_board->increment_complexity(deleted_lines / LINES_TO_LEVEL_UP);
+                        deleted_lines = deleted_lines % LINES_TO_LEVEL_UP;  
+                        level_up_counter++;
                     }
+
                     // putting next figure into a current figure:
                     game_board->set_current_figure(game_board->get_next_figure());
                     // adding new current figure on the board:
@@ -131,7 +151,7 @@ void Menu::game(unsigned complexity) {
                             if (captured_button(window, pause)) {
                                 game_board->get_descend_thread()->terminate();
                                 // execute pause button:
-                                pause_menu(game_board);
+                                pause_menu(game_board, initial_complexity);
                                 game_board->get_descend_thread()->launch();
                                         
                                 // update cell size:
@@ -181,7 +201,7 @@ void Menu::game(unsigned complexity) {
                                     if (event.key.code == Keyboard::Return) {
                                         game_board->get_descend_thread()->terminate();
                                         // execute pause button:
-                                        pause_menu(game_board);
+                                        pause_menu(game_board, initial_complexity);
                                         game_board->get_descend_thread()->launch();
 
                                         // update cell size:
@@ -211,7 +231,7 @@ void Menu::game(unsigned complexity) {
                         case Keyboard::Escape:
                             game_board->get_descend_thread()->terminate();
                             // execute pause button:
-                            pause_menu(game_board);
+                            pause_menu(game_board, initial_complexity);
                             game_board->get_descend_thread()->launch();
 
                             // update cell size:
@@ -295,13 +315,17 @@ void Menu::game(unsigned complexity) {
                     cell_size.y = min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20));
                     game_board->set_cell_size(cell_size);
 
+                    // update level up size:
+                    level_up.setPosition((BOARD_GRID_WIDTH * (cell_size.x + 1) - level_up.getGlobalBounds().width) / 2 + 4,
+                        (BOARD_GRID_HEIGHT * (cell_size.y + 1) - level_up.getGlobalBounds().height) / 2 + 4);
+
                     // update button size:
                     button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                     // update all the buttons and their positions:
                     pause.setCharacterSize(5 * button_size / 6);
                     pause.setOutlineThickness(button_size / 6);
-                    pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                    pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 25 * button_size / 6 + 30.0f);
                     break;
                 default:
                     break;
@@ -319,10 +343,19 @@ void Menu::game(unsigned complexity) {
         // draw pause button:
         window.draw(pause);
 
+        // if we have reached level up:
+        if (level_up_counter > 0) {
+            window.draw(level_up);
+            level_up_counter++;
+
+            if (level_up_counter > 500)
+                level_up_counter = 0;
+        }
+
         // if we have reached game over condition:
         if (game_board->game_over()) {
             game_board->get_descend_thread()->terminate();
-            game_over_menu(game_board);
+            game_over_menu(game_board, initial_complexity);
         }
 
         // display what we have just drawn:
@@ -332,7 +365,7 @@ void Menu::game(unsigned complexity) {
     delete game_board;
 }
 
-void Menu::game_over_menu(Board* game_board) {
+void Menu::game_over_menu(Board* game_board, const unsigned& initial_complexity) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -433,7 +466,7 @@ void Menu::game_over_menu(Board* game_board) {
                             // If appropriate mouse position was captured:
                             // 1) Restart game:
                             if (captured_button(window, restart))
-                                game(game_board->get_complexity());
+                                game(initial_complexity);
                             // 2) Go to cemplexity menu:
                             else if (captured_button(window, choose_complexity))
                                 complexity_menu();
@@ -471,7 +504,7 @@ void Menu::game_over_menu(Board* game_board) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return)
                                         // execute restart button:
-                                        game(game_board->get_complexity());
+                                        game(initial_complexity);
 
                                     // unfocus restart button:
                                     restart.setFillColor(COLOR_DARK_VIOLET);
@@ -602,7 +635,7 @@ void Menu::game_over_menu(Board* game_board) {
     }
 }
 
-void Menu::pause_menu(Board* game_board) {
+void Menu::pause_menu(Board* game_board, const unsigned& initial_complexity) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -711,7 +744,7 @@ void Menu::pause_menu(Board* game_board) {
                             // 2) Restart game:
                             else if (captured_button(window, restart)) {
                                 game_board->get_descend_thread()->terminate();
-                                game(game_board->get_complexity());
+                                game(initial_complexity);
                             // 3) Go to main menu:
                             } else if (captured_button(window, to_main_menu)) {
                                 game_board->get_descend_thread()->terminate();
@@ -764,7 +797,7 @@ void Menu::pause_menu(Board* game_board) {
                                     if (event.key.code == Keyboard::Return) {
                                         game_board->get_descend_thread()->terminate();
                                         // execute restart button:
-                                        game(game_board->get_complexity());
+                                        game(initial_complexity);
                                     }
 
                                     // unfocus restart button:
@@ -925,6 +958,23 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
         complexity = current_client->get_server_data().level;
     }
 
+    // set the level_up image:
+    Texture level_up_texture;
+    try {
+        if (!level_up_texture.loadFromFile("images/level_up.png")) 
+            throw 0;
+    } catch (int e) {
+        if (e == 0)
+            cout << "Sorry, level up image is not found!" << endl;
+    }
+
+    // create a level_up itself:
+    Sprite level_up;
+    level_up.setTexture(level_up_texture);
+    level_up.setPosition((BOARD_GRID_WIDTH * (own_cell_size.x + 1) - level_up.getGlobalBounds().width) / 2 + 4,
+        (BOARD_GRID_HEIGHT * (own_cell_size.y + 1) - level_up.getGlobalBounds().height) / 2 + 4);
+    level_up.setColor(Color(255, 255, 255, 200));
+
     // create the game board: 
     Board* game_board = new Board(window, complexity, own_cell_size);
 
@@ -991,12 +1041,13 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
     // Initialize pause button:
     Text pause = create_button(font, "Pause", button_size,
-        Vector2f((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f), true, 0);
+        Vector2f((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 25 * button_size / 6 + 30.0f), true, 0);
 
     figure_state _figure_state = DESCEND_FIGURE;
     int count_change_figure = DEF_COU_CHA_FIG;
 
     unsigned descend_counter = 0;
+    unsigned level_up_counter = 0;
 
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
@@ -1015,9 +1066,11 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 if (i >= current_player_index) {
                     other_game_boards[i]->set_map(player_list->at(i + 1).map);
                     other_game_boards[i]->set_score(player_list->at(i + 1).score);
+                    other_game_boards[i]->set_complexity(player_list->at(i + 1).complexity);
                 } else {
                     other_game_boards[i]->set_map(player_list->at(i).map);
                     other_game_boards[i]->set_score(player_list->at(i).score);
+                    other_game_boards[i]->set_complexity(player_list->at(i).complexity);
                 }
             }
 
@@ -1036,7 +1089,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
 
             if (!game_board->game_over() &&
-                (descend_counter >= LEVEL_MAX / complexity || _figure_state == CHANGE_FIGURE)) {
+                (descend_counter >= LEVEL_MAX / game_board->get_complexity() || _figure_state == CHANGE_FIGURE)) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
@@ -1050,11 +1103,12 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     _figure_state = DESCEND_FIGURE;
                     // check for the full lines:
                     game_board->fix_current_figure();
-                    deleted_lines += game_board->erase_lines(complexity);
+                    deleted_lines += game_board->erase_lines();
 
-                    if(deleted_lines >= LINES_TO_LEVEL_UP && complexity < LEVEL_MAX){
-                        deleted_lines -= LINES_TO_LEVEL_UP;
-                        complexity++;
+                    if(deleted_lines >= LINES_TO_LEVEL_UP && game_board->get_complexity() < LEVEL_MAX){
+                        game_board->increment_complexity(deleted_lines / LINES_TO_LEVEL_UP);
+                        deleted_lines = deleted_lines % LINES_TO_LEVEL_UP;
+                        level_up_counter++;
                     }
                     // putting next figure into a current figure:
                     game_board->set_current_figure(game_board->get_next_figure());
@@ -1310,13 +1364,17 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                     for (unsigned i = 0; i < number_of_players - 1; i++)
                         other_game_boards[i]->set_cell_size(other_cell_size);
 
+                    // update level up size:
+                    level_up.setPosition((BOARD_GRID_WIDTH * (own_cell_size.x + 1) - level_up.getGlobalBounds().width) / 2 + 4,
+                        (BOARD_GRID_HEIGHT * (own_cell_size.y + 1) - level_up.getGlobalBounds().height) / 2 + 4);
+
                     // update button size:
                     button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
                     // update all the buttons and their positions:
                     pause.setCharacterSize(5 * button_size / 6);
                     pause.setOutlineThickness(button_size / 6);
-                    pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                    pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 25 * button_size / 6 + 30.0f);
                     break;
                 default:
                     break;
@@ -1381,6 +1439,15 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
             }  
         }
 
+        // if we have reached level up:
+        if (level_up_counter > 0) {
+            window.draw(level_up);
+            level_up_counter++;
+
+            if (level_up_counter > 500)
+                level_up_counter = 0;
+        }
+
         // display what we have just drawn:
         window.display();
     }
@@ -1424,7 +1491,7 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
     pause.setScale((float) window.getSize().x / texture.getSize().x, (float) window.getSize().y / texture.getSize().y / 1.5);
     pause.setColor(Color(255, 255, 255, 100));
 
-    // Create a list of clients and initialize server name and complexity:
+    // Create a list of clients:
     vector<client_data> *player_list = nullptr;
     if (current_client == nullptr)
         player_list = new vector<client_data>(current_session->get_clients());
@@ -2390,8 +2457,8 @@ void Menu::create_session(const string& nickname) {
     
     // Initialize the number of maximum players: 
     unsigned max_number_of_players = 2;
-    // Initialize the game complexity:
-    unsigned complexity = 0;
+    // Initialize the game initial complexity:
+    unsigned initial_complexity = 0;
 
     // Max players capture boolean identificator:
     bool max_number_of_players_captured = false;
@@ -2477,15 +2544,15 @@ void Menu::create_session(const string& nickname) {
                     // unfocus all the buttons:
                     max_number_of_players_title.setFillColor(COLOR_DARK_VIOLET);
                     max_number_of_players_title.setOutlineColor(COLOR_LIGHT_GREEN);
-                    if (complexity != LEVEL_MECHANICS) {
+                    if (initial_complexity != LEVEL_MECHANICS) {
                         mechanics.setFillColor(COLOR_DARK_VIOLET);
                         mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
-                    if (complexity != LEVEL_STIC) {
+                    if (initial_complexity != LEVEL_STIC) {
                         STIC.setFillColor(COLOR_DARK_VIOLET);
                         STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
-                    if (complexity != LEVEL_APP_MATHS) {
+                    if (initial_complexity != LEVEL_APP_MATHS) {
                         applied_maths.setFillColor(COLOR_DARK_VIOLET);
                         applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                     }
@@ -2557,27 +2624,27 @@ void Menu::create_session(const string& nickname) {
                                 // focus mechanics button:
                                 mechanics.setFillColor(COLOR_YELLOW);
                                 mechanics.setOutlineColor(COLOR_DARK_BLUE);
-                                complexity = LEVEL_MECHANICS;
+                                initial_complexity = LEVEL_MECHANICS;
                             // 3) Choose a normal mode:
                             } else if (captured_button(window, STIC)) {
                                 // focus STIC button:
                                 STIC.setFillColor(COLOR_YELLOW);
                                 STIC.setOutlineColor(COLOR_DARK_BLUE);
-                                complexity = LEVEL_STIC;
+                                initial_complexity = LEVEL_STIC;
                             // 4) Choose a hard mode:
                             } else if (captured_button(window, applied_maths)) {
                                 // focus applied Maths button:
                                 applied_maths.setFillColor(COLOR_YELLOW);
                                 applied_maths.setOutlineColor(COLOR_DARK_BLUE);
-                                complexity = LEVEL_APP_MATHS;
+                                initial_complexity = LEVEL_APP_MATHS;
                             // 5) Go back:
                             } else if (captured_button(window, back)) {
                                 blink_thread->terminate();
                                 return;
                             // 6) Create a new session (if all required information is entered):
-                            } else if (captured_button(window, create) && complexity != 0 && max_number_of_players != 0) {
+                            } else if (captured_button(window, create) && initial_complexity != 0 && max_number_of_players != 0) {
                                 blink_thread->terminate();
-                                Server* current_session = new Server(false, nickname, max_number_of_players, complexity);
+                                Server* current_session = new Server(false, nickname, max_number_of_players, initial_complexity);
                                 session_menu(current_session, nullptr);
                                 blink_thread->launch();
                             }
@@ -2628,7 +2695,7 @@ void Menu::create_session(const string& nickname) {
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
                                         // set complexity:
-                                        complexity = LEVEL_MECHANICS;
+                                        initial_complexity = LEVEL_MECHANICS;
 
                                         // unfocus STIC button:
                                         STIC.setFillColor(COLOR_DARK_VIOLET);
@@ -2637,7 +2704,7 @@ void Menu::create_session(const string& nickname) {
                                         applied_maths.setFillColor(COLOR_DARK_VIOLET);
                                         applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
-                                        if (complexity != LEVEL_MECHANICS) {
+                                        if (initial_complexity != LEVEL_MECHANICS) {
                                             // unfocus mechanics button:
                                             mechanics.setFillColor(COLOR_DARK_VIOLET);
                                             mechanics.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -2652,8 +2719,8 @@ void Menu::create_session(const string& nickname) {
                                 case 3:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        // set complexity:
-                                        complexity = LEVEL_STIC;
+                                        // set initial_complexity:
+                                        initial_complexity = LEVEL_STIC;
 
                                         // unfocus mechanics button:
                                         mechanics.setFillColor(COLOR_DARK_VIOLET);
@@ -2662,7 +2729,7 @@ void Menu::create_session(const string& nickname) {
                                         applied_maths.setFillColor(COLOR_DARK_VIOLET);
                                         applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
-                                        if (complexity != LEVEL_STIC) {
+                                        if (initial_complexity != LEVEL_STIC) {
                                             // unfocus STIC button:
                                             STIC.setFillColor(COLOR_DARK_VIOLET);
                                             STIC.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -2677,8 +2744,8 @@ void Menu::create_session(const string& nickname) {
                                 case 4:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        // set complexity:
-                                        complexity = LEVEL_APP_MATHS;
+                                        // set initial_complexity:
+                                        initial_complexity = LEVEL_APP_MATHS;
 
                                         // unfocus mechanics button:
                                         mechanics.setFillColor(COLOR_DARK_VIOLET);
@@ -2687,7 +2754,7 @@ void Menu::create_session(const string& nickname) {
                                         STIC.setFillColor(COLOR_DARK_VIOLET);
                                         STIC.setOutlineColor(COLOR_LIGHT_GREEN);
                                     } else {
-                                        if (complexity != LEVEL_APP_MATHS) {
+                                        if (initial_complexity != LEVEL_APP_MATHS) {
                                             // unfocus applied Maths button:
                                             applied_maths.setFillColor(COLOR_DARK_VIOLET);
                                             applied_maths.setOutlineColor(COLOR_LIGHT_GREEN);
@@ -2717,9 +2784,9 @@ void Menu::create_session(const string& nickname) {
                                     break;
                                 case 6:
                                     // if we have pressed Enter:
-                                    if (event.key.code == Keyboard::Return && complexity != 0 && max_number_of_players != 0) {
+                                    if (event.key.code == Keyboard::Return && initial_complexity != 0 && max_number_of_players != 0) {
                                         blink_thread->terminate();
-                                        Server* current_session = new Server(false, nickname, max_number_of_players, complexity);
+                                        Server* current_session = new Server(false, nickname, max_number_of_players, initial_complexity);
                                         session_menu(current_session, nullptr);
                                         blink_thread->launch();
                                     } else {

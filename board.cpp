@@ -165,6 +165,10 @@ void Board::set_descend_thread(Thread* new_thread) {
     descend_thread = new_thread;
 };
 
+void Board::increment_complexity(const int& increment_value) {
+    complexity += increment_value;
+};
+
 // print game board:
 void Board::print_board(RenderWindow& window, const Font& font, const double& font_size, const string& nickname, const bool& game_is_over, const unsigned& board_index) {
     for(int i = 0; i < x_dimension; i++) {
@@ -249,20 +253,20 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
     score_title.setFillColor(COLOR_LIGHT_GREEN);
     if (board_index == 0) {
         if (nickname == "" && !game_is_over)
-            score_title.setString("My Score:\n" + to_string(score));
+            score_title.setString("My Score:\n" + to_string(score) + "\nLevel:\n" + to_string(complexity));
         else if (nickname == "" && game_is_over)
-            score_title.setString("Final Score:\n" + to_string(score));
+            score_title.setString("Final Score:\n" + to_string(score) + "\nLevel:\n" + to_string(complexity));
         else if (nickname != "" && !game_is_over)
-            score_title.setString(nickname + "\nScore:\n" + to_string(score));
+            score_title.setString(nickname + "\nScore:\n" + to_string(score) + "\nLevel:\n" + to_string(complexity));
         else if (nickname != "" && game_is_over)
-            score_title.setString(nickname + "\nFinal Score:\n" + to_string(score));
+            score_title.setString(nickname + "\nFinal Score:\n" + to_string(score) + "\nLevel:\n" + to_string(complexity));
         score_title.setPosition(x_dimension * (cell_size.x + 1) + x_dimension + 5.0f, 
             next_figure_title.getGlobalBounds().height + next_figure_title.getGlobalBounds().top + FIGURE_GRID_HEIGHT * cell_size.y + 30.0f);
     } else {
         if (!game_is_over)
-            score_title.setString(nickname + "\nScore:\n" + to_string(score));
+            score_title.setString(nickname + "\nScore:\n" + to_string(score) + "\nLevel:\n" + to_string(complexity));
         else if (game_is_over)
-            score_title.setString(nickname + "\nFinal Score:\n" + to_string(score));
+            score_title.setString(nickname + "\nFinal Score:\n" + to_string(score) + "\nLevel:\n" + to_string(complexity));
         score_title.setPosition(grid[0][y_dimension - 1].getPosition().x + (grid[x_dimension - 1][y_dimension - 1].getPosition().x + 20.0f - grid[0][y_dimension - 1].getPosition().x - score_title.getGlobalBounds().width) / 2,
             (y_dimension - FIGURE_GRID_HEIGHT) * (cell_size.y + 1) + 4.0f);
     }
@@ -526,7 +530,7 @@ void Board::rotate(bool right){
 }
 
 // Check for the full lines and erase them if they exist:
-unsigned Board::erase_lines(const unsigned& complexity) {
+unsigned Board::erase_lines() {
     // initialize the indexes of the highest and lowest possible full lines
     // (according to the y coordinates of the current figure):
     int begin = y_dimension + FIGURE_GRID_HEIGHT;

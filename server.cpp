@@ -281,12 +281,13 @@ void Server::send_clients_board_data(Board& board) {
 
         packet_send << (Uint32) clients[i].status;
         packet_send << clients[i].score;
+        packet_send << clients[i].complexity;
 
         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
             for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
                 if(clients[i].address == local_ip_address)
                     clients[i].map[j][k] = board.get_map()[j][k];
-                packet_send << (Uint32)clients[i].map[j][k];
+                packet_send << (Uint32) clients[i].map[j][k];
             }
         }
     }
@@ -311,9 +312,9 @@ void Server::listen_game(Board& game_board, request_status& status){
     IpAddress sender;
     unsigned short port;
 
-    while(true){
+    while (true) {
         //Check if there is a message:
-        if (socket.receive(packet_recv, sender, port) == Socket::Done){
+        if (socket.receive(packet_recv, sender, port) == Socket::Done) {
             datatype _datatype;
             Uint32 datatype_value;
             //Get the buffer information:
@@ -329,6 +330,7 @@ void Server::listen_game(Board& game_board, request_status& status){
                         break;
 
                     packet_recv >> (*it).score;
+                    packet_recv >> (*it).complexity;
 
                     for(unsigned i = 0; i < BOARD_GRID_WIDTH; i++){
                         for(unsigned j = 0; j < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; j++){

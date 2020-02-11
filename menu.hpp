@@ -41,12 +41,12 @@ class Menu {
         };
         
         // Function to play:
-        void game(unsigned complexity);
+        void game(const unsigned& increment_complexity);
 
-        void game_over_menu(Board* game_board);
+        void game_over_menu(Board* game_board, const unsigned& initial_complexity);
 
         // Pause menu:
-        void pause_menu(Board* game_board);
+        void pause_menu(Board* game_board, const unsigned& initial_complexity);
 
         // Multiplayer game function:
         void multiplayer_game(Server* current_session, Client* current_client);

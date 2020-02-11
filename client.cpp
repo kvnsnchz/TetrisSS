@@ -296,17 +296,18 @@ void Client::ready(bool is_ready){
 }
 
 //Sending board data
-void Client::send_board_data(Board& board){
+void Client::send_board_data(Board& board) {
     //Filling send buffer:
     Packet packet_send;
     
     packet_send << CLIENT_GAME_UPDATE;
-    packet_send << (Int64)board.get_score();
+    packet_send << (Int64) board.get_score();
+    packet_send << (Uint32) board.get_complexity();
 
     unsigned** map = board.get_map();
     for(int i = 0; i < board.get_x_dim(); i ++){
         for(int j = 0; j < board.get_y_dim(); j ++){
-            packet_send << (Int32)map[i][j];
+            packet_send << (Uint32) map[i][j];
         }
     }
     
@@ -322,7 +323,7 @@ void Client::listen_game(Board& game_board, request_status& status){
     status = NOT_CHANGED;
     socket.setBlocking(false);
     
-    Packet packet_recv;;
+    Packet packet_recv;
     IpAddress sender;
     unsigned short port;
 
@@ -342,8 +343,9 @@ void Client::listen_game(Board& game_board, request_status& status){
                     for(unsigned i = 0; i < _server_data.clients_quantity; i ++){
                         Uint32 status;
                         packet_recv >> status;
-                        _server_data.clients[i].status = (client_status)status;
+                        _server_data.clients[i].status = (client_status) status;
                         packet_recv >> _server_data.clients[i].score;
+                        packet_recv >> _server_data.clients[i].complexity;
                         
                         for(unsigned j = 0; j < BOARD_GRID_WIDTH; j ++){
                             for(unsigned k = 0; k < BOARD_GRID_HEIGHT + FIGURE_GRID_HEIGHT; k ++){
