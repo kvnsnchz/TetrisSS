@@ -56,7 +56,7 @@ class Menu {
         void multiplayer_menu(const string& initial_nickname = "");
 
         // Multiplayer pause menu:
-        void multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client);
+        void multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client, request_status& status);
 
         // Set up and create a new session as a server:
         void create_session(const string& nickname);

@@ -1002,7 +1002,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Initialize the number of players in the current session:
     unsigned number_of_players = player_list->size();
 
-    window.setSize(Vector2u (VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
+    window.setSize(Vector2u (VideoMode::getDesktopMode().width * 0.95, VideoMode::getDesktopMode().height * 0.95));
     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // initalize the game over background:
@@ -1143,14 +1143,14 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 if (current_session->get_clients()[i].status == STATUS_PAUSED) {
                     game_board->get_descend_thread()->terminate();
                     // execute pause button:
-                    multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr);
+                    multiplayer_pause_menu(game_board, other_game_boards, current_session, nullptr, status);
                     game_board->get_descend_thread()->launch();
                 }
             } else if (current_session == nullptr) {
                 if (current_client->get_server_data().clients[i].status == STATUS_PAUSED) {
                     game_board->get_descend_thread()->terminate();
                     // execute pause button:
-                    multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client);
+                    multiplayer_pause_menu(game_board, other_game_boards, nullptr, current_client, status);
                     game_board->get_descend_thread()->launch();
                 }
             }
@@ -1295,51 +1295,57 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                         // while we want to move a current figure to the right:
                         case Keyboard::D:
                         case Keyboard::Right:
-                            if(_figure_state == STOP_FIGURE){
-                                bool step_done = game_board->step_right(true);
-                                if(step_done)
-                                    count_change_figure++;
-                                else
-                                    count_change_figure = 0;
-                                break;
+                            if(!game_board->game_over()) {
+                                if(_figure_state == STOP_FIGURE) {
+                                    bool step_done = game_board->step_right(true);
+                                    if(step_done)
+                                        count_change_figure++;
+                                    else
+                                        count_change_figure = 0;
+                                    break;
+                                }
+                                
+                                game_board->step_right(false);
                             }
-                            
-                            game_board->step_right(false);
+            
                             break;
                         // while we want to move a current figure to the left:
                         case Keyboard::A:
                         case Keyboard::Q:
                         case Keyboard::Left:
-                            if(_figure_state == STOP_FIGURE){
-                                bool step_done = game_board->step_left(true);
-                                if(step_done)
-                                    count_change_figure++;
-                                else
-                                   count_change_figure = 0;
-                                break;
-                            }
+                            if (!game_board->game_over()) {
+                                if(!game_board->game_over() && _figure_state == STOP_FIGURE){
+                                    bool step_done = game_board->step_left(true);
+                                    if(step_done)
+                                        count_change_figure++;
+                                    else
+                                    count_change_figure = 0;
+                                    break;
+                                }
 
-                            game_board->step_left(false);
+                                game_board->step_left(false);
+                            }
+                            
                             break;
                         // while we want to fall faster:
                         case Keyboard::S:
                         case Keyboard::Down:
-                            if(_figure_state != STOP_FIGURE)
+                            if(!game_board->game_over() && _figure_state != STOP_FIGURE)
                                 game_board->step_down();
                             break;
                         case Keyboard::Space:
-                            if(_figure_state != STOP_FIGURE){
+                            if(!game_board->game_over() && _figure_state != STOP_FIGURE){
                                 game_board->hard_drop();
                                 _figure_state = CHANGE_FIGURE;
                             }
                             break;
                         case Keyboard::G:
                         case Keyboard::Up:
-                            if(_figure_state != STOP_FIGURE)
+                            if(!game_board->game_over() && _figure_state != STOP_FIGURE)
                                 game_board->rotate(false);
                             break;
                         case Keyboard::H:
-                            if(_figure_state != STOP_FIGURE)
+                            if(!game_board->game_over() && _figure_state != STOP_FIGURE)
                                 game_board->rotate(true);
                             break;
                         default:
@@ -1463,7 +1469,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 };
 
 // Multiplayer pause menu:
-void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client) {
+void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client, request_status& status) {
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -1475,8 +1481,6 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
     // initialize cell size according the current window size:
     Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
                     min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
-
-    request_status status;
 
     // initalize pause background:
     RectangleShape pause_background;
@@ -1531,6 +1535,14 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
 
     while (window.isOpen()) {
         Event event;
+
+        // If server has disconnected:
+        if (current_session == nullptr && status == SERVER_DISCONNECTED) {
+            current_client->disconnect_server(status);
+            current_client->disconnect_udp_socket();
+            multiplayer_menu(current_client->get_player_nickname());
+        }
+
         // If someone's pressed pause:
         bool is_pause = false;  
         if (current_client == nullptr) {
@@ -2118,7 +2130,7 @@ void Menu::main_menu(const bool& initialization) {
     }    
 }
 
-void Menu::multiplayer_menu(const string& initial_nickname = "") { 
+void Menu::multiplayer_menu(const string& initial_nickname) { 
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -3016,6 +3028,13 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                 (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 2 * button_multiplier);
 
     while(window.isOpen()) {
+        // If server has disconnected:
+        if (current_session == nullptr && status == SERVER_DISCONNECTED) {
+            current_client->disconnect_server(status);
+            current_client->disconnect_udp_socket();
+            multiplayer_menu(current_client->get_player_nickname());
+        }
+
         // If we have some changes:
         if (status == CHANGED) {
             player_list->clear();

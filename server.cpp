@@ -378,14 +378,14 @@ void Server::listen_game(Board& game_board, request_status& status){
                         packet_send << (Uint32) (it - clients.begin());
 
                         //Removing the client of the client list:
-                        clients.erase(it);
-                        cout << "Delete client " << sender << endl;
-                        status = CHANGED;
+                        // clients.erase(it);
+                        // cout << "Delete client " << sender << endl;
+                        // status = CHANGED;
                     
-                        for(unsigned i = 0; i < clients.size(); i++){
-                            if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
-                                cout << "Server: Send error" << endl;
-                        }
+                        // for(unsigned i = 0; i < clients.size(); i++){
+                        //     if (socket.send(packet_send, clients[i].address, CLIENT_PORT) != sf::Socket::Done)
+                        //         cout << "Server: Send error" << endl;
+                        // }
                     }
                     break;
                 }
