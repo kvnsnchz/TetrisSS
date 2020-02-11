@@ -4,9 +4,9 @@
 #include <unistd.h>
 #include "server.hpp"
 #include "client.hpp"
+#include "board.hpp"
 
 #define DEF_COU_CHA_FIG 1 
-#define MAX_NICKNAME_LENGTH 12
 #define GLOBAL_GAME_OVER_TICKS 6
 
 // new button initialization function (for code reduction):

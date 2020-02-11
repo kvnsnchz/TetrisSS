@@ -172,7 +172,7 @@ void Board::print_board(RenderWindow& window, const Font& font, const double& fo
             // Update cell size and position:
             grid[i][j].setSize(cell_size);
             if (board_index > 0)
-                grid[i][j].setPosition(((x_dimension + FIGURE_GRID_WIDTH) * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 3) * 10.0f + (float) font_size * 12,
+                grid[i][j].setPosition((x_dimension * (2 * cell_size.x + 1.0f) - 1.0f) + (board_index - 1) * ((x_dimension * (cell_size.x + 1.0f) - 1.0f)) + i * (cell_size.x + 1) + (board_index + 3) * 10.0f + (float) font_size * MAX_NICKNAME_LENGTH / 2.15,
                     (j - FIGURE_GRID_HEIGHT) * cell_size.y + j - FIGURE_GRID_HEIGHT + 5.0f);
             else
                 grid[i][j].setPosition(i * (cell_size.x + 1) + 5.0f,
