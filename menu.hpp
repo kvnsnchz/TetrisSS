@@ -12,7 +12,7 @@
 #define LEVEL_STIC 3
 #define LEVEL_APP_MATHS 5
 #define LEVEL_MAX 30
-#define LINES_TO_LEVEL_UP 1
+#define LINES_TO_LEVEL_UP 8
 #define GLOBAL_GAME_OVER_TICKS 6
 
 // new button initialization function (for code reduction):
@@ -53,7 +53,7 @@ class Menu {
         void main_menu(const bool& initialization = false);
 
         // Menu for multiplayer:
-        void multiplayer_menu();
+        void multiplayer_menu(const string& initial_nickname = "");
 
         // Multiplayer pause menu:
         void multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards, Server* current_session, Client* current_client);

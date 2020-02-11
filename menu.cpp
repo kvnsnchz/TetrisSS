@@ -1476,6 +1476,8 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
     Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
                     min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
+    request_status status;
+
     // initalize pause background:
     RectangleShape pause_background;
     pause_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
@@ -1548,6 +1550,7 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                 }
             }
         }
+
         if(!is_pause)
             return;
 
@@ -1598,13 +1601,15 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                                 }
                             // 2) Go to multiplayer menu:
                             } else if (captured_button(window, disconnect)) {
-                                // if (current_client == nullptr) {
-                                //     current_session->disconnect_udp_socket();
-                                //     multiplayer_menu();
-                                // } else if (current_session == nullptr) {
-                                //     current_client->disconnect_udp_socket();
-                                //     multiplayer_menu();
-                                // }
+                                if (current_client == nullptr) {
+                                    current_session->disconnect();
+                                    current_session->disconnect_udp_socket();
+                                    multiplayer_menu(current_session->get_player_nickname());
+                                } else if (current_session == nullptr) {
+                                    current_client->disconnect_server(status);
+                                    current_client->disconnect_udp_socket();
+                                    multiplayer_menu(current_client->get_player_nickname());
+                                }
                                 break;
                             // 3) Exit:
                             } else if (captured_button(window, exit)) {
@@ -1656,14 +1661,15 @@ void Menu::multiplayer_pause_menu(Board* game_board, vector<Board*> other_boards
                                 case 2:
                                     // if we have pressed Enter:
                                     if (event.key.code == Keyboard::Return) {
-                                        // execute disconnect button:
-                                        // if (current_client == nullptr) {
-                                        //     current_session->disconnect_udp_socket();
-                                        //     multiplayer_menu();
-                                        // } else if (current_session == nullptr) {
-                                        //     current_client->disconnect_udp_socket();
-                                        //     multiplayer_menu();
-                                        // }
+                                        if (current_client == nullptr) {
+                                            current_session->disconnect();
+                                            current_session->disconnect_udp_socket();
+                                            multiplayer_menu(current_session->get_player_nickname());
+                                        } else if (current_session == nullptr) {
+                                            current_client->disconnect_server(status);
+                                            current_client->disconnect_udp_socket();
+                                            multiplayer_menu(current_client->get_player_nickname());
+                                        }
                                         break;
                                     }
 
@@ -2112,7 +2118,7 @@ void Menu::main_menu(const bool& initialization) {
     }    
 }
 
-void Menu::multiplayer_menu() { 
+void Menu::multiplayer_menu(const string& initial_nickname = "") { 
     // counter of the currently chosen button:
     unsigned focused_button_counter = 0;
     // number of buttons:
@@ -2132,7 +2138,7 @@ void Menu::multiplayer_menu() {
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), true, 4);
     
     // Initialize nickname display field:
-    Text nickname_display = create_button(font, "", button_size,
+    Text nickname_display = create_button(font, initial_nickname, button_size,
         Vector2f(3 * window.getSize().x / 4,
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + button_size + 20.0f), false, 4);
 
@@ -2152,7 +2158,7 @@ void Menu::multiplayer_menu() {
             (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 4 + 10.0f));
    
     // Initialize nickname itself and its capture indicator:
-    string nickname = "";
+    string nickname = initial_nickname;
     bool nickname_captured = false;
 
     // Using a thread to display blinking text bar during the active text field:
@@ -3503,7 +3509,7 @@ void Menu::find_servers(const string& nickname) {
                                 search_thread->terminate();
 
                                 current_client->disconnect_udp_socket();
-                                return;
+                                multiplayer_menu(current_client->get_player_nickname());
                             // current_client->get_servers().size() + 2) Refresh list of servers:
                             } else if (captured_button(window, refresh) && status != NOT_READY) {
                                 search_thread->terminate();
@@ -3558,7 +3564,7 @@ void Menu::find_servers(const string& nickname) {
                                     search_thread->terminate();
 
                                     current_client->disconnect_udp_socket();
-                                    return;
+                                    multiplayer_menu(current_client->get_player_nickname());
                                 }
 
                                 // unfocus back button:
