@@ -49,6 +49,12 @@ void Menu::game(const unsigned& initial_complexity) {
     // create the game board: 
     Board* game_board = new Board(window, initial_complexity, cell_size);
 
+    // Change window size:
+    window.setSize(Vector2u ((cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 18,
+        (cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 9));
+
+    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
     // set the level_up image:
     Texture texture;
     try {
@@ -374,6 +380,8 @@ void Menu::game_over_menu(Board* game_board, const unsigned& initial_complexity)
     double button_size = min(min(60.0, 3.5 * (window.getSize().x - 10.0) / 16), 
         min((window.getSize().y - 50.0 - 15.0 * (number_of_buttons - 1)) / number_of_buttons / 3, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH));
 
+    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
+
     // initalize the game over background:
     RectangleShape game_over_background;
     game_over_background.setSize(Vector2f(window.getSize().x, window.getSize().y));
@@ -648,6 +656,11 @@ void Menu::pause_menu(Board* game_board, const unsigned& initial_complexity) {
     Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
                     min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
+    // Change window size:
+    window.setSize(Vector2u ((cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 18,
+        (cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 9));
+
+    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // initalize pause background:
     RectangleShape pause_background;
@@ -996,8 +1009,11 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Initialize the number of players in the current session:
     unsigned number_of_players = player_list->size();
 
+    // Change window size:
     window.setSize(Vector2u ((own_cell_size.x + 1) * BOARD_GRID_WIDTH + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players + (float) 5 * button_size * MAX_NICKNAME_LENGTH / 2.15 / 6,
         (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
+
+    window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // initalize the game over background:
     RectangleShape game_over_background;
