@@ -35,8 +35,7 @@ class Menu {
         friend bool captured_button(RenderWindow& window, Text& button);
     public:
         Menu(const Sprite& new_background, const Font& new_font): 
-            background(new_background), font(new_font) 
-        {
+            background(new_background), font(new_font) {
             RenderWindow window();
         };
         

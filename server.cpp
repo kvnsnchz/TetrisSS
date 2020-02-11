@@ -276,8 +276,10 @@ void Server::send_clients_board_data(Board& board) {
     packet_send << SERVER_GAME_UPDATE;
 
     for(unsigned i = 0; i < clients.size(); i ++){
-        if(clients[i].address == local_ip_address)
+        if(clients[i].address == local_ip_address) {
             clients[i].score = board.get_score();
+            clients[i].complexity = board.get_complexity();
+        }
 
         packet_send << (Uint32) clients[i].status;
         packet_send << clients[i].score;

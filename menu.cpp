@@ -49,10 +49,7 @@ void Menu::game(const unsigned& initial_complexity) {
     // create the game board: 
     Board* game_board = new Board(window, initial_complexity, cell_size);
 
-    // Change window size:
-    window.setSize(Vector2u ((cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 18,
-        (cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 9));
-
+    // Change window view:
     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // set the level_up image:
@@ -656,10 +653,6 @@ void Menu::pause_menu(Board* game_board, const unsigned& initial_complexity) {
     Vector2f cell_size(min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)),
                     min(min(40.0f, (float) (0.73 * window.getSize().x - 29.0f) / BOARD_GRID_WIDTH), min(40.0f, ((float) window.getSize().y - 29.0f) / 20)));
 
-    // Change window size:
-    window.setSize(Vector2u ((cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 18,
-        (cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + 9));
-
     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // initalize pause background:
@@ -1009,10 +1002,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Initialize the number of players in the current session:
     unsigned number_of_players = player_list->size();
 
-    // Change window size:
-    window.setSize(Vector2u ((own_cell_size.x + 1) * BOARD_GRID_WIDTH + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players + (float) 5 * button_size * MAX_NICKNAME_LENGTH / 2.15 / 6,
-        (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
-
+    window.setSize(Vector2u (VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // initalize the game over background:
@@ -1212,7 +1202,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                                 // update all the buttons and their positions:
                                 pause.setCharacterSize(5 * button_size / 6);
                                 pause.setOutlineThickness(button_size / 6);
-                                pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                                pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 25 * button_size / 6 + 30.0f);
                         
                                 // unfocus pause button:
                                 pause.setFillColor(COLOR_DARK_VIOLET);
@@ -3004,12 +2994,12 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
     // Initialize disconnect button:
     Text disconnect = create_button(font, "Disconnect", button_size,
         Vector2f(window.getSize().x / (2 * button_multiplier),
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f), true, 2 * button_multiplier);
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 2 * button_multiplier);
    
     // Initialize ready button:
     Text ready = create_button(font, "Ready", button_size,
         Vector2f(3 * window.getSize().x / (2 * button_multiplier),
-            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f), true, 2 * button_multiplier);
+            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 2 * button_multiplier);
 
     // Server has one more button:
     Text start;
@@ -3017,7 +3007,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
         // Initialize start button:
         start = create_button(font, "Start", button_size,
             Vector2f(5 * window.getSize().x / (2 * button_multiplier),
-                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f), true, 2 * button_multiplier);
+                (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f), true, 2 * button_multiplier);
 
     while(window.isOpen()) {
         // If we have some changes:
@@ -3280,18 +3270,18 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                     disconnect.setCharacterSize(5 * button_size / 6);
                     disconnect.setOutlineThickness(button_size / 6);
                     disconnect.setPosition((window.getSize().x - disconnect.getGlobalBounds().width) / (2 * button_multiplier),
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
                     
                     ready.setCharacterSize(5 * button_size / 6);
                     ready.setOutlineThickness(button_size / 6);
                     ready.setPosition(3 * (window.getSize().x - ready.getGlobalBounds().width) / (2 * button_multiplier),
-                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                        (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
                     
                     if (button_multiplier == 3) {
                         start.setCharacterSize(5 * button_size / 6);
                         start.setOutlineThickness(button_size / 6);
                         start.setPosition(5 * (window.getSize().x - start.getGlobalBounds().width) / (2 * button_multiplier),
-                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 5 + 10.0f);
+                            (window.getSize().y - number_of_buttons * (button_size + 15) - 25) / 2 + (button_size + 15.0f) * 7 + 10.0f);
                     }
                     
                     break;
