@@ -946,7 +946,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Initialize the number of players in the current session:
     unsigned number_of_players = player_list->size();
 
-    window.setSize(Vector2u ((own_cell_size.x + 1) * (BOARD_GRID_WIDTH + FIGURE_GRID_WIDTH) + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players,
+    window.setSize(Vector2u ((own_cell_size.x + 1) * BOARD_GRID_WIDTH + (number_of_players - 1) * (BOARD_GRID_WIDTH) * (other_cell_size.x + 1) + (number_of_players + 2) * 5 - number_of_players + (float) 5 * button_size * MAX_NICKNAME_LENGTH / 2.15 / 6,
         (own_cell_size.y + 1) * (BOARD_GRID_HEIGHT - FIGURE_GRID_HEIGHT) + 9));
 
     // initalize the game over background:
