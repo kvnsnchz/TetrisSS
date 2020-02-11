@@ -7,6 +7,11 @@
 
 #define DEF_COU_CHA_FIG 1 
 #define MAX_NICKNAME_LENGTH 12
+#define LEVEL_MECHANICS 1
+#define LEVEL_STIC 3
+#define LEVEL_APP_MATHS 5
+#define LEVEL_MAX 30
+#define LINES_TO_LEVEL_UP 1
 
 // new button initialization function (for code reduction):
 Text create_button(Font& font, const string title, const double& button_size,
@@ -27,12 +32,14 @@ class Menu {
 
         friend bool captured_button(RenderWindow& window, Text& button);
     public:
-        Menu(const Sprite& new_background, const Font& new_font): background(new_background), font(new_font) {
+        Menu(const Sprite& new_background, const Font& new_font): 
+            background(new_background), font(new_font) 
+        {
             RenderWindow window();
         };
         
         // Function to play:
-        void game(const unsigned& complexity);
+        void game(unsigned complexity);
 
         void game_over_menu(Board* game_board);
 
