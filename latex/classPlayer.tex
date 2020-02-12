@@ -1,0 +1,98 @@
+\hypertarget{classPlayer}{}\section{Player Class Reference}
+\label{classPlayer}\index{Player@{Player}}
+
+
+General class that generalize both servers and clients.  
+
+
+
+
+{\ttfamily \#include $<$player.\+hpp$>$}
+
+
+
+Inheritance diagram for Player\+:
+% FIG 0
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPlayer_a20d66b09b00385c7906b98e018ef3bdf}\label{classPlayer_a20d66b09b00385c7906b98e018ef3bdf}} 
+{\bfseries Player} (const string \&new\+\_\+player\+\_\+nickname)
+\item 
+\mbox{\Hypertarget{classPlayer_a583e9fd627fc8ff6ebbe2c42841f3245}\label{classPlayer_a583e9fd627fc8ff6ebbe2c42841f3245}} 
+{\bfseries Player} (const bool \&new\+\_\+player\+\_\+status, const string \&new\+\_\+player\+\_\+nickname)
+\item 
+\mbox{\Hypertarget{classPlayer_a6bf741a6aa5a96dfbbe6b317f7947e05}\label{classPlayer_a6bf741a6aa5a96dfbbe6b317f7947e05}} 
+bool {\bfseries get\+\_\+player\+\_\+status} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a44973bb240f41f65b11a0342fd463626}\label{classPlayer_a44973bb240f41f65b11a0342fd463626}} 
+string {\bfseries get\+\_\+player\+\_\+nickname} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a723b5c80169c1f8d9b6fdf9f23159f40}\label{classPlayer_a723b5c80169c1f8d9b6fdf9f23159f40}} 
+void {\bfseries set\+\_\+player\+\_\+status} (const bool \&new\+\_\+player\+\_\+status)
+\item 
+\mbox{\Hypertarget{classPlayer_a4ca84afc06901a98d589156903c865f6}\label{classPlayer_a4ca84afc06901a98d589156903c865f6}} 
+void {\bfseries set\+\_\+player\+\_\+nickname} (const string \&new\+\_\+player\+\_\+nickname)
+\item 
+\mbox{\Hypertarget{classPlayer_aae73825592fcad15da84868bcaca8b1a}\label{classPlayer_aae73825592fcad15da84868bcaca8b1a}} 
+virtual void \hyperlink{classPlayer_aae73825592fcad15da84868bcaca8b1a}{connect\+\_\+udp\+\_\+socket} ()=0
+\begin{DoxyCompactList}\small\item\em Function to initialize player\textquotesingle{}s udp socket (port number and IP address). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classPlayer_aa6feec282ee0820bb917475d56145d9e}\label{classPlayer_aa6feec282ee0820bb917475d56145d9e}} 
+virtual void \hyperlink{classPlayer_aa6feec282ee0820bb917475d56145d9e}{disconnect\+\_\+udp\+\_\+socket} ()=0
+\begin{DoxyCompactList}\small\item\em Function to unbind player\textquotesingle{}s udp socket (port number and IP address). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classPlayer_a0122743c67759e402cb32103c58dd49e}\label{classPlayer_a0122743c67759e402cb32103c58dd49e}} 
+virtual void \hyperlink{classPlayer_a0122743c67759e402cb32103c58dd49e}{ready} (bool)=0
+\begin{DoxyCompactList}\small\item\em Function to inform other players about changes of current player\textquotesingle{}s readiness. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classPlayer_a24a94f532e7ea75b3429795e34902a94}{listen\+\_\+game} (\hyperlink{classBoard}{Board} \&\hyperlink{classPlayer_ad64a3173a2f09450f91100bfcb9387a9}{game\+\_\+over}, request\+\_\+status \&status)=0
+\begin{DoxyCompactList}\small\item\em Function that receives other players\textquotesingle{} game info. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classPlayer_a28dc835372d92c9d658f8c45304796bf}\label{classPlayer_a28dc835372d92c9d658f8c45304796bf}} 
+virtual void \hyperlink{classPlayer_a28dc835372d92c9d658f8c45304796bf}{pause} (bool)=0
+\begin{DoxyCompactList}\small\item\em Informs other players about multiplayer pause re / initialization. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classPlayer_ad64a3173a2f09450f91100bfcb9387a9}\label{classPlayer_ad64a3173a2f09450f91100bfcb9387a9}} 
+virtual void \hyperlink{classPlayer_ad64a3173a2f09450f91100bfcb9387a9}{game\+\_\+over} ()=0
+\begin{DoxyCompactList}\small\item\em Informs other players about reach of game over condition. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPlayer_ac42f58fe593fbb98c0091dc924c61c12}\label{classPlayer_ac42f58fe593fbb98c0091dc924c61c12}} 
+bool {\bfseries player\+\_\+status}
+\item 
+\mbox{\Hypertarget{classPlayer_a53497b6290559a3efae0afdd5e4da5a1}\label{classPlayer_a53497b6290559a3efae0afdd5e4da5a1}} 
+string {\bfseries player\+\_\+nickname}
+\item 
+\mbox{\Hypertarget{classPlayer_a205c6f31ac48b32e32b1e3951ba28a08}\label{classPlayer_a205c6f31ac48b32e32b1e3951ba28a08}} 
+Udp\+Socket {\bfseries socket}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+General class that generalize both servers and clients. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classPlayer_a24a94f532e7ea75b3429795e34902a94}\label{classPlayer_a24a94f532e7ea75b3429795e34902a94}} 
+\index{Player@{Player}!listen\+\_\+game@{listen\+\_\+game}}
+\index{listen\+\_\+game@{listen\+\_\+game}!Player@{Player}}
+\subsubsection{\texorpdfstring{listen\+\_\+game()}{listen\_game()}}
+{\footnotesize\ttfamily virtual void Player\+::listen\+\_\+game (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} \&}]{game\+\_\+over,  }\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Function that receives other players\textquotesingle{} game info. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+\_\+over} & \\
+\hline
+{\em status} & \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classServer_aff65d0adf4570f2b1ffca2d961191901}{Server}, and \hyperlink{classClient_a3e7762d65e93ab094373c5e80506f93b}{Client}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+player.\+hpp\item 
+player.\+cpp\end{DoxyCompactItemize}

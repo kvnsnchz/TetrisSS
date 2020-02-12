@@ -1,0 +1,22 @@
+digraph "Figure"
+{
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node0 [label="Figure",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black"];
+  Node0 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 [label="Figure_J",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__J.html",tooltip="J figure class. "];
+  Node0 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="Figure_L",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__L.html",tooltip="L figure class. "];
+  Node0 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="Figure_O",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__O.html",tooltip="Squared figure class. "];
+  Node0 -> Node4 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="Figure_Simple_Rotation",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__Simple__Rotation.html",tooltip="Class that generalizes all the figures with only two possible rotations. "];
+  Node4 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="Figure_I",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__I.html",tooltip="Stick figure class. "];
+  Node4 -> Node6 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="Figure_S",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__S.html",tooltip="S figure class. "];
+  Node4 -> Node7 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="Figure_Z",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__Z.html",tooltip="Z figure class. "];
+  Node0 -> Node8 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="Figure_T",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFigure__T.html",tooltip="T figure class. "];
+}

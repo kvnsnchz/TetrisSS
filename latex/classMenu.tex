@@ -1,0 +1,292 @@
+\hypertarget{classMenu}{}\section{Menu Class Reference}
+\label{classMenu}\index{Menu@{Menu}}
+
+
+\hyperlink{classMenu}{Menu} class to initialize desktop hierarchy, distinguish and simplify the logical connection between different menus of the program.  
+
+
+
+
+{\ttfamily \#include $<$menu.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classMenu_a9c43bee337cc6e447feaf336ca6a42c6}\label{classMenu_a9c43bee337cc6e447feaf336ca6a42c6}} 
+{\bfseries Menu} (const Sprite \&new\+\_\+background, const Font \&new\+\_\+font)
+\item 
+void \hyperlink{classMenu_a99a23768dd7c2069fd638aab42776b25}{game} (const unsigned \&increment\+\_\+complexity)
+\begin{DoxyCompactList}\small\item\em Current function -\/ the singleplayer game itself. Is dedicated to draw a player\textquotesingle{}s board with the next figure, current score, level and descending figures on a board with certain delay and possibilities to be moved and rotated. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a85c7bd501d83ee524742ea546e0211d6}{game\+\_\+over\+\_\+menu} (\hyperlink{classBoard}{Board} $\ast$game\+\_\+board, const unsigned \&initial\+\_\+complexity)
+\begin{DoxyCompactList}\small\item\em \hyperlink{classMenu}{Menu} after reaching game over condition by user in the singleplayer game with possibilities to restart a game, choose another initial complexity, return to main menu or quit the program. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a565dd91e5669c0ed6d5344af85b6ff0f}{pause\+\_\+menu} (\hyperlink{classBoard}{Board} $\ast$game\+\_\+board, const unsigned \&initial\+\_\+complexity)
+\begin{DoxyCompactList}\small\item\em Function that provides pause during singleplayer game with its own corresponding menu with possibilities to resume, restart a game, return to main menu or quit the program. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_ad0ebc9b36a72588250f2be1771d27673}{multiplayer\+\_\+game} (\hyperlink{classServer}{Server} $\ast$current\+\_\+session, \hyperlink{classClient}{Client} $\ast$current\+\_\+client)
+\begin{DoxyCompactList}\small\item\em Multiplayer game function. Draws the current player\textquotesingle{}s board with the next figure, current score, level and descending figures on a board with certain delay and possibilities to be moved and rotated. Also displays the boards, scores and levels of other players in the session with their simultaneuos update. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a6879a11cc8663b9866521c262459e749}{main\+\_\+menu} (const bool \&initialization=false)
+\begin{DoxyCompactList}\small\item\em The program\textquotesingle{}s main menu, the first one the user interact with. Allows to choose either singleplayer or multiplayer menu or quit the program. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a04783a738aaaf81187b65879dfb6a693}{multiplayer\+\_\+menu} (const string \&initial\+\_\+nickname=\char`\"{}\char`\"{})
+\begin{DoxyCompactList}\small\item\em Multiplayer game menu, where the player is able to enter his nickname, which will be used in further sessions, go to the menu of the new session creation or to the menu of other sessions search menu. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_ab0d97134d6183cf65ee36f6b45171d60}{multiplayer\+\_\+pause\+\_\+menu} (\hyperlink{classBoard}{Board} $\ast$game\+\_\+board, vector$<$ \hyperlink{classBoard}{Board} $\ast$$>$ other\+\_\+boards, \hyperlink{classServer}{Server} $\ast$current\+\_\+session, \hyperlink{classClient}{Client} $\ast$current\+\_\+client, request\+\_\+status \&status)
+\begin{DoxyCompactList}\small\item\em Provides pause during multiplayer game with its own corresponding menu with pibilities to resume, disconnect from the current session or quit the program. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a14fd150a078fc9d28c681e81a4367e86}{create\+\_\+session} (const string \&nickname)
+\begin{DoxyCompactList}\small\item\em New session creation menu, where user is obliged to enter the maximal number of players and choose the initial game complexity. Afterwards, player is able to create the session with chosen parameters and go to the session menu. There is also a pssibility to return to multiplayer menu. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a653bfb1e27234641ace12aba3ed03391}{session\+\_\+menu} (\hyperlink{classServer}{Server} $\ast$current\+\_\+session, \hyperlink{classClient}{Client} $\ast$current\+\_\+client)
+\begin{DoxyCompactList}\small\item\em Current fuction displays the list of players in the current session with their nicknames and overyone\textquotesingle{}s readiness to start a game. Each player can either change his readiness or disconnect. \hyperlink{classServer}{Server} is able to start a new game once all the players are ready. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_ab31ffa63ae89778ddb474d107d2de437}{find\+\_\+servers} (const string \&nickname)
+\begin{DoxyCompactList}\small\item\em The list of currently available sessions, their initial complexities and fullnesses. There are the possibilities to go back to the multiplayer menu or to connect to the chosen session. \end{DoxyCompactList}\item 
+void \hyperlink{classMenu_a960114ed888630f8228cbed065a841c6}{complexity\+\_\+menu} ()
+\begin{DoxyCompactList}\small\item\em \hyperlink{classMenu}{Menu} to choose the initial complexity of the singleplayer game. There are 3 choises available\+: \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+Text \hyperlink{classMenu_a17db731fc4056230798f5164a4e9d7da}{create\+\_\+button} (Font \&font, const string title, const double \&button\+\_\+size, Vector2f position, const bool \&outline, const unsigned \&center\+\_\+coefficient)
+\begin{DoxyCompactList}\small\item\em New button initialization function (for code reduction). \end{DoxyCompactList}\item 
+bool \hyperlink{classMenu_a46f7d09cf27de9dcc1580cfd6d2f05d5}{captured\+\_\+button} (Render\+Window \&window, Text \&button)
+\begin{DoxyCompactList}\small\item\em Captured button identifier\+: compares current user\textquotesingle{}s mouse position with the local position and global bounds of the button. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classMenu}{Menu} class to initialize desktop hierarchy, distinguish and simplify the logical connection between different menus of the program. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classMenu_a960114ed888630f8228cbed065a841c6}\label{classMenu_a960114ed888630f8228cbed065a841c6}} 
+\index{Menu@{Menu}!complexity\+\_\+menu@{complexity\+\_\+menu}}
+\index{complexity\+\_\+menu@{complexity\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{complexity\+\_\+menu()}{complexity\_menu()}}
+{\footnotesize\ttfamily void Menu\+::complexity\+\_\+menu (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\hyperlink{classMenu}{Menu} to choose the initial complexity of the singleplayer game. There are 3 choises available\+: 
+
+
+\begin{DoxyItemize}
+\item Mechanics (level 1),
+\item S\+T\+IC (level 3),
+\item Applied Maths (level 5). It is also possible to return to main menu. 
+\end{DoxyItemize}\mbox{\Hypertarget{classMenu_a14fd150a078fc9d28c681e81a4367e86}\label{classMenu_a14fd150a078fc9d28c681e81a4367e86}} 
+\index{Menu@{Menu}!create\+\_\+session@{create\+\_\+session}}
+\index{create\+\_\+session@{create\+\_\+session}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{create\+\_\+session()}{create\_session()}}
+{\footnotesize\ttfamily void Menu\+::create\+\_\+session (\begin{DoxyParamCaption}\item[{const string \&}]{nickname }\end{DoxyParamCaption})}
+
+
+
+New session creation menu, where user is obliged to enter the maximal number of players and choose the initial game complexity. Afterwards, player is able to create the session with chosen parameters and go to the session menu. There is also a pssibility to return to multiplayer menu. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em nickname} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_ab31ffa63ae89778ddb474d107d2de437}\label{classMenu_ab31ffa63ae89778ddb474d107d2de437}} 
+\index{Menu@{Menu}!find\+\_\+servers@{find\+\_\+servers}}
+\index{find\+\_\+servers@{find\+\_\+servers}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{find\+\_\+servers()}{find\_servers()}}
+{\footnotesize\ttfamily void Menu\+::find\+\_\+servers (\begin{DoxyParamCaption}\item[{const string \&}]{nickname }\end{DoxyParamCaption})}
+
+
+
+The list of currently available sessions, their initial complexities and fullnesses. There are the possibilities to go back to the multiplayer menu or to connect to the chosen session. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em nickname} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_a99a23768dd7c2069fd638aab42776b25}\label{classMenu_a99a23768dd7c2069fd638aab42776b25}} 
+\index{Menu@{Menu}!game@{game}}
+\index{game@{game}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{game()}{game()}}
+{\footnotesize\ttfamily void Menu\+::game (\begin{DoxyParamCaption}\item[{const unsigned \&}]{increment\+\_\+complexity }\end{DoxyParamCaption})}
+
+
+
+Current function -\/ the singleplayer game itself. Is dedicated to draw a player\textquotesingle{}s board with the next figure, current score, level and descending figures on a board with certain delay and possibilities to be moved and rotated. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em initial\+\_\+complexity} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_a85c7bd501d83ee524742ea546e0211d6}\label{classMenu_a85c7bd501d83ee524742ea546e0211d6}} 
+\index{Menu@{Menu}!game\+\_\+over\+\_\+menu@{game\+\_\+over\+\_\+menu}}
+\index{game\+\_\+over\+\_\+menu@{game\+\_\+over\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{game\+\_\+over\+\_\+menu()}{game\_over\_menu()}}
+{\footnotesize\ttfamily void Menu\+::game\+\_\+over\+\_\+menu (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} $\ast$}]{game\+\_\+board,  }\item[{const unsigned \&}]{initial\+\_\+complexity }\end{DoxyParamCaption})}
+
+
+
+\hyperlink{classMenu}{Menu} after reaching game over condition by user in the singleplayer game with possibilities to restart a game, choose another initial complexity, return to main menu or quit the program. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+\_\+board} & \\
+\hline
+{\em initial\+\_\+complexity} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_a6879a11cc8663b9866521c262459e749}\label{classMenu_a6879a11cc8663b9866521c262459e749}} 
+\index{Menu@{Menu}!main\+\_\+menu@{main\+\_\+menu}}
+\index{main\+\_\+menu@{main\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{main\+\_\+menu()}{main\_menu()}}
+{\footnotesize\ttfamily void Menu\+::main\+\_\+menu (\begin{DoxyParamCaption}\item[{const bool \&}]{initialization = {\ttfamily false} }\end{DoxyParamCaption})}
+
+
+
+The program\textquotesingle{}s main menu, the first one the user interact with. Allows to choose either singleplayer or multiplayer menu or quit the program. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em initialization} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_ad0ebc9b36a72588250f2be1771d27673}\label{classMenu_ad0ebc9b36a72588250f2be1771d27673}} 
+\index{Menu@{Menu}!multiplayer\+\_\+game@{multiplayer\+\_\+game}}
+\index{multiplayer\+\_\+game@{multiplayer\+\_\+game}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{multiplayer\+\_\+game()}{multiplayer\_game()}}
+{\footnotesize\ttfamily void Menu\+::multiplayer\+\_\+game (\begin{DoxyParamCaption}\item[{\hyperlink{classServer}{Server} $\ast$}]{current\+\_\+session,  }\item[{\hyperlink{classClient}{Client} $\ast$}]{current\+\_\+client }\end{DoxyParamCaption})}
+
+
+
+Multiplayer game function. Draws the current player\textquotesingle{}s board with the next figure, current score, level and descending figures on a board with certain delay and possibilities to be moved and rotated. Also displays the boards, scores and levels of other players in the session with their simultaneuos update. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em current\+\_\+session} & \\
+\hline
+{\em current\+\_\+client} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_a04783a738aaaf81187b65879dfb6a693}\label{classMenu_a04783a738aaaf81187b65879dfb6a693}} 
+\index{Menu@{Menu}!multiplayer\+\_\+menu@{multiplayer\+\_\+menu}}
+\index{multiplayer\+\_\+menu@{multiplayer\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{multiplayer\+\_\+menu()}{multiplayer\_menu()}}
+{\footnotesize\ttfamily void Menu\+::multiplayer\+\_\+menu (\begin{DoxyParamCaption}\item[{const string \&}]{initial\+\_\+nickname = {\ttfamily \char`\"{}\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Multiplayer game menu, where the player is able to enter his nickname, which will be used in further sessions, go to the menu of the new session creation or to the menu of other sessions search menu. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em initial\+\_\+nickname} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_ab0d97134d6183cf65ee36f6b45171d60}\label{classMenu_ab0d97134d6183cf65ee36f6b45171d60}} 
+\index{Menu@{Menu}!multiplayer\+\_\+pause\+\_\+menu@{multiplayer\+\_\+pause\+\_\+menu}}
+\index{multiplayer\+\_\+pause\+\_\+menu@{multiplayer\+\_\+pause\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{multiplayer\+\_\+pause\+\_\+menu()}{multiplayer\_pause\_menu()}}
+{\footnotesize\ttfamily void Menu\+::multiplayer\+\_\+pause\+\_\+menu (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} $\ast$}]{game\+\_\+board,  }\item[{vector$<$ \hyperlink{classBoard}{Board} $\ast$$>$}]{other\+\_\+boards,  }\item[{\hyperlink{classServer}{Server} $\ast$}]{current\+\_\+session,  }\item[{\hyperlink{classClient}{Client} $\ast$}]{current\+\_\+client,  }\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})}
+
+
+
+Provides pause during multiplayer game with its own corresponding menu with pibilities to resume, disconnect from the current session or quit the program. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+\_\+board} & \\
+\hline
+{\em other\+\_\+boards} & \\
+\hline
+{\em current\+\_\+session} & \\
+\hline
+{\em current\+\_\+client} & \\
+\hline
+{\em status} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_a565dd91e5669c0ed6d5344af85b6ff0f}\label{classMenu_a565dd91e5669c0ed6d5344af85b6ff0f}} 
+\index{Menu@{Menu}!pause\+\_\+menu@{pause\+\_\+menu}}
+\index{pause\+\_\+menu@{pause\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{pause\+\_\+menu()}{pause\_menu()}}
+{\footnotesize\ttfamily void Menu\+::pause\+\_\+menu (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} $\ast$}]{game\+\_\+board,  }\item[{const unsigned \&}]{initial\+\_\+complexity }\end{DoxyParamCaption})}
+
+
+
+Function that provides pause during singleplayer game with its own corresponding menu with possibilities to resume, restart a game, return to main menu or quit the program. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+\_\+board} & \\
+\hline
+{\em initial\+\_\+complexity} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classMenu_a653bfb1e27234641ace12aba3ed03391}\label{classMenu_a653bfb1e27234641ace12aba3ed03391}} 
+\index{Menu@{Menu}!session\+\_\+menu@{session\+\_\+menu}}
+\index{session\+\_\+menu@{session\+\_\+menu}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{session\+\_\+menu()}{session\_menu()}}
+{\footnotesize\ttfamily void Menu\+::session\+\_\+menu (\begin{DoxyParamCaption}\item[{\hyperlink{classServer}{Server} $\ast$}]{current\+\_\+session,  }\item[{\hyperlink{classClient}{Client} $\ast$}]{current\+\_\+client }\end{DoxyParamCaption})}
+
+
+
+Current fuction displays the list of players in the current session with their nicknames and overyone\textquotesingle{}s readiness to start a game. Each player can either change his readiness or disconnect. \hyperlink{classServer}{Server} is able to start a new game once all the players are ready. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em current\+\_\+session} & \\
+\hline
+{\em current\+\_\+client} & \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classMenu_a46f7d09cf27de9dcc1580cfd6d2f05d5}\label{classMenu_a46f7d09cf27de9dcc1580cfd6d2f05d5}} 
+\index{Menu@{Menu}!captured\+\_\+button@{captured\+\_\+button}}
+\index{captured\+\_\+button@{captured\+\_\+button}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{captured\+\_\+button}{captured\_button}}
+{\footnotesize\ttfamily bool captured\+\_\+button (\begin{DoxyParamCaption}\item[{Render\+Window \&}]{window,  }\item[{Text \&}]{button }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Captured button identifier\+: compares current user\textquotesingle{}s mouse position with the local position and global bounds of the button. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em window} & \\
+\hline
+{\em button} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classMenu_a17db731fc4056230798f5164a4e9d7da}\label{classMenu_a17db731fc4056230798f5164a4e9d7da}} 
+\index{Menu@{Menu}!create\+\_\+button@{create\+\_\+button}}
+\index{create\+\_\+button@{create\+\_\+button}!Menu@{Menu}}
+\subsubsection{\texorpdfstring{create\+\_\+button}{create\_button}}
+{\footnotesize\ttfamily Text create\+\_\+button (\begin{DoxyParamCaption}\item[{Font \&}]{font,  }\item[{const string}]{title,  }\item[{const double \&}]{button\+\_\+size,  }\item[{Vector2f}]{position,  }\item[{const bool \&}]{outline,  }\item[{const unsigned \&}]{center\+\_\+coefficient }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+New button initialization function (for code reduction). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em font} & \\
+\hline
+{\em title} & \\
+\hline
+{\em button\+\_\+size} & \\
+\hline
+{\em position} & \\
+\hline
+{\em outline} & \\
+\hline
+{\em center\+\_\+coefficient} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Text 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+menu.\+hpp\item 
+menu.\+cpp\end{DoxyCompactItemize}

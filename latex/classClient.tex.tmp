@@ -1,0 +1,125 @@
+\hypertarget{classClient}{}\section{Client Class Reference}
+\label{classClient}\index{Client@{Client}}
+
+
+Class that implements the client (session guest) and his functions.  
+
+
+
+
+{\ttfamily \#include $<$client.\+hpp$>$}
+
+
+
+Inheritance diagram for Client\+:
+% FIG 0
+
+
+Collaboration diagram for Client\+:
+% FIG 1
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classClient_a650468c19a6b17d10d533ef0ade86c11}\label{classClient_a650468c19a6b17d10d533ef0ade86c11}} 
+{\bfseries Client} (const bool \&client\+\_\+status, const string \&client\+\_\+nickname)
+\item 
+\mbox{\Hypertarget{classClient_a1e881919cd7991ee7c97994f8c89deaa}\label{classClient_a1e881919cd7991ee7c97994f8c89deaa}} 
+\hyperlink{structserver__data}{server\+\_\+data} {\bfseries get\+\_\+server\+\_\+data} () const
+\item 
+\mbox{\Hypertarget{classClient_aea7814f6f080faac8d5725cdea32fc1c}\label{classClient_aea7814f6f080faac8d5725cdea32fc1c}} 
+vector$<$ \hyperlink{structserver__data}{server\+\_\+data} $>$ {\bfseries get\+\_\+servers} () const
+\item 
+\mbox{\Hypertarget{classClient_a8181c54b4709a523b8674b044643c9c3}\label{classClient_a8181c54b4709a523b8674b044643c9c3}} 
+void \hyperlink{classClient_a8181c54b4709a523b8674b044643c9c3}{connect\+\_\+udp\+\_\+socket} ()
+\begin{DoxyCompactList}\small\item\em Function to initialize player\textquotesingle{}s udp socket (port number and IP address). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classClient_a965d5fc1fd2764578076b1c67bf4aec5}\label{classClient_a965d5fc1fd2764578076b1c67bf4aec5}} 
+void \hyperlink{classClient_a965d5fc1fd2764578076b1c67bf4aec5}{disconnect\+\_\+udp\+\_\+socket} ()
+\begin{DoxyCompactList}\small\item\em Function to unbind player\textquotesingle{}s udp socket (port number and IP address). \end{DoxyCompactList}\item 
+void \hyperlink{classClient_a993e91717ac5be688e88ecbafd62f568}{search\+\_\+servers} (request\+\_\+status \&status)
+\begin{DoxyCompactList}\small\item\em Function that is looking for available servers to play with. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classClient_ac3a260457e5f5ea4c0109a7f2127c4f2}\label{classClient_ac3a260457e5f5ea4c0109a7f2127c4f2}} 
+void {\bfseries connect\+\_\+server} (const unsigned pos, request\+\_\+status \&status)
+\item 
+\mbox{\Hypertarget{classClient_ae4653470acbc86e7d763619a5dd0e69b}\label{classClient_ae4653470acbc86e7d763619a5dd0e69b}} 
+void {\bfseries disconnect\+\_\+server} (request\+\_\+status \&status)
+\item 
+void \hyperlink{classClient_ad92e9fcb9f018a2f01e2e31ae471d214}{listen\+\_\+server} (request\+\_\+status \&status)
+\begin{DoxyCompactList}\small\item\em Function that receives all necessary info from server before the game start. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classClient_a82cbb1796a8008af0a990d35aac8e37c}\label{classClient_a82cbb1796a8008af0a990d35aac8e37c}} 
+void \hyperlink{classClient_a82cbb1796a8008af0a990d35aac8e37c}{ready} (bool)
+\begin{DoxyCompactList}\small\item\em Function to inform other players about changes of current player\textquotesingle{}s readiness. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classClient_a5b071e4f8711ed8cddf739abdf87973b}\label{classClient_a5b071e4f8711ed8cddf739abdf87973b}} 
+void \hyperlink{classClient_a5b071e4f8711ed8cddf739abdf87973b}{send\+\_\+board\+\_\+data} (\hyperlink{classBoard}{Board} \&)
+\begin{DoxyCompactList}\small\item\em Sends current client\textquotesingle{}s game info th the server. \end{DoxyCompactList}\item 
+void \hyperlink{classClient_a3e7762d65e93ab094373c5e80506f93b}{listen\+\_\+game} (\hyperlink{classBoard}{Board} \&game\+\_\+board, request\+\_\+status \&status)
+\begin{DoxyCompactList}\small\item\em Function that receives other players\textquotesingle{} game info. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classClient_a7495b1d781d125be2033d463a10c6f4a}\label{classClient_a7495b1d781d125be2033d463a10c6f4a}} 
+void \hyperlink{classClient_a7495b1d781d125be2033d463a10c6f4a}{pause} (bool)
+\begin{DoxyCompactList}\small\item\em Informs other players about multiplayer pause re / initialization. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classClient_af4cb5a87ba5e96d3bac8ff134cb7f736}\label{classClient_af4cb5a87ba5e96d3bac8ff134cb7f736}} 
+void \hyperlink{classClient_af4cb5a87ba5e96d3bac8ff134cb7f736}{game\+\_\+over} ()
+\begin{DoxyCompactList}\small\item\em Informs other players about reach of game over condition. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Class that implements the client (session guest) and his functions. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classClient_a3e7762d65e93ab094373c5e80506f93b}\label{classClient_a3e7762d65e93ab094373c5e80506f93b}} 
+\index{Client@{Client}!listen\+\_\+game@{listen\+\_\+game}}
+\index{listen\+\_\+game@{listen\+\_\+game}!Client@{Client}}
+\subsubsection{\texorpdfstring{listen\+\_\+game()}{listen\_game()}}
+{\footnotesize\ttfamily void Client\+::listen\+\_\+game (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} \&}]{game\+\_\+over,  }\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Function that receives other players\textquotesingle{} game info. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+\_\+over} & \\
+\hline
+{\em status} & \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classPlayer_a24a94f532e7ea75b3429795e34902a94}{Player}.
+
+\mbox{\Hypertarget{classClient_ad92e9fcb9f018a2f01e2e31ae471d214}\label{classClient_ad92e9fcb9f018a2f01e2e31ae471d214}} 
+\index{Client@{Client}!listen\+\_\+server@{listen\+\_\+server}}
+\index{listen\+\_\+server@{listen\+\_\+server}!Client@{Client}}
+\subsubsection{\texorpdfstring{listen\+\_\+server()}{listen\_server()}}
+{\footnotesize\ttfamily void Client\+::listen\+\_\+server (\begin{DoxyParamCaption}\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})}
+
+
+
+Function that receives all necessary info from server before the game start. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classClient_a993e91717ac5be688e88ecbafd62f568}\label{classClient_a993e91717ac5be688e88ecbafd62f568}} 
+\index{Client@{Client}!search\+\_\+servers@{search\+\_\+servers}}
+\index{search\+\_\+servers@{search\+\_\+servers}!Client@{Client}}
+\subsubsection{\texorpdfstring{search\+\_\+servers()}{search\_servers()}}
+{\footnotesize\ttfamily void Client\+::search\+\_\+servers (\begin{DoxyParamCaption}\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})}
+
+
+
+Function that is looking for available servers to play with. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+client.\+hpp\item 
+client.\+cpp\end{DoxyCompactItemize}

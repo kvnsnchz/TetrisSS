@@ -1,0 +1,55 @@
+\hypertarget{structserver__data}{}\section{server\+\_\+data Struct Reference}
+\label{structserver__data}\index{server\+\_\+data@{server\+\_\+data}}
+
+
+Structure gathering all necessary server\textquotesingle{}s data.  
+
+
+
+
+{\ttfamily \#include $<$sockets\+\_\+constants.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structserver__data_ab60a04a611acdc33ec920ddaaf371816}\label{structserver__data_ab60a04a611acdc33ec920ddaaf371816}} 
+bool {\bfseries operator==} (\hyperlink{structserver__data}{server\+\_\+data} other\+\_\+server)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structserver__data_a712fc1b9a3898a7c4bbfc21421294db6}\label{structserver__data_a712fc1b9a3898a7c4bbfc21421294db6}} 
+Ip\+Address {\bfseries address}
+\item 
+\mbox{\Hypertarget{structserver__data_a5e27298054d5800acadfcb7e6d3c0ba1}\label{structserver__data_a5e27298054d5800acadfcb7e6d3c0ba1}} 
+string {\bfseries name}
+\item 
+\mbox{\Hypertarget{structserver__data_a5c30a0a89bca53476f5d9a2e5a066d01}\label{structserver__data_a5c30a0a89bca53476f5d9a2e5a066d01}} 
+Uint32 {\bfseries clients\+\_\+quantity}
+\item 
+\mbox{\Hypertarget{structserver__data_a4f6ea4bfecf3fff77d3f47f7cc00f673}\label{structserver__data_a4f6ea4bfecf3fff77d3f47f7cc00f673}} 
+Uint32 {\bfseries level}
+\item 
+\mbox{\Hypertarget{structserver__data_ad05787b84f4f3c555c4852d32534b5f8}\label{structserver__data_ad05787b84f4f3c555c4852d32534b5f8}} 
+Uint32 {\bfseries max\+\_\+clients}
+\item 
+\mbox{\Hypertarget{structserver__data_aa1088fc39f82747376bec3ce469c38d8}\label{structserver__data_aa1088fc39f82747376bec3ce469c38d8}} 
+vector$<$ \hyperlink{structclient__data}{client\+\_\+data} $>$ {\bfseries clients}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structserver__data_a0daeff97160e590a6f61560ce90d4a61}\label{structserver__data_a0daeff97160e590a6f61560ce90d4a61}} 
+Packet \& {\bfseries operator$<$$<$} (sf\+::\+Packet \&packet, \hyperlink{structserver__data}{server\+\_\+data} \&\+\_\+server\+\_\+data)
+\item 
+\mbox{\Hypertarget{structserver__data_aa0aa87882e9e007247e2c096a7a493e3}\label{structserver__data_aa0aa87882e9e007247e2c096a7a493e3}} 
+Packet \& {\bfseries operator$>$$>$} (sf\+::\+Packet \&packet, \hyperlink{structserver__data}{server\+\_\+data} \&\+\_\+server\+\_\+data)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Structure gathering all necessary server\textquotesingle{}s data. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+sockets\+\_\+constants.\+hpp\end{DoxyCompactItemize}

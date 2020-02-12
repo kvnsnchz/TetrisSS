@@ -1,0 +1,81 @@
+\hypertarget{classPoint}{}\section{Point Class Reference}
+\label{classPoint}\index{Point@{Point}}
+
+
+Class of the two-\/dimensional point with its coordinates.  
+
+
+
+
+{\ttfamily \#include $<$figures.\+hpp$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPoint_a4236ca5c50e800970c97974d085fe363}\label{classPoint_a4236ca5c50e800970c97974d085fe363}} 
+{\bfseries Point} (int x\+\_\+0, int y\+\_\+0)
+\item 
+\mbox{\Hypertarget{classPoint_ad791bdda02d670830ee8df4fc4c3e61e}\label{classPoint_ad791bdda02d670830ee8df4fc4c3e61e}} 
+{\bfseries Point} (const \hyperlink{classPoint}{Point} \&start\+\_\+point)
+\item 
+\mbox{\Hypertarget{classPoint_af4825d922cb65ca462daa78f759b98d6}\label{classPoint_af4825d922cb65ca462daa78f759b98d6}} 
+void {\bfseries set\+\_\+x} (int \&)
+\item 
+\mbox{\Hypertarget{classPoint_a8f33fdd9bf4ac61c123fe60a6af84823}\label{classPoint_a8f33fdd9bf4ac61c123fe60a6af84823}} 
+void {\bfseries set\+\_\+y} (int \&)
+\item 
+void \hyperlink{classPoint_a0fdf91327c2be8c48dd07dfe4106e890}{increment\+\_\+x} (const int \&value=1)
+\begin{DoxyCompactList}\small\item\em Increases x coordinate of the point. \end{DoxyCompactList}\item 
+void \hyperlink{classPoint_aa72c0088d3484f7947f2ceaf51f403b3}{increment\+\_\+y} (const int \&value=1)
+\begin{DoxyCompactList}\small\item\em Increases y coordinate of the point. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classPoint_abcf915f7c6afaa92e574b561a46bc1e1}\label{classPoint_abcf915f7c6afaa92e574b561a46bc1e1}} 
+void \hyperlink{classPoint_abcf915f7c6afaa92e574b561a46bc1e1}{rotate} (const bool \&, const \hyperlink{classPoint}{Point} $\ast$)
+\begin{DoxyCompactList}\small\item\em Changes the coordinates of a point during figure\textquotesingle{}s rotation in function of refference point. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classPoint_abb31332f93346e8a0a7bb272365488ee}\label{classPoint_abb31332f93346e8a0a7bb272365488ee}} 
+int {\bfseries get\+\_\+x} () const
+\item 
+\mbox{\Hypertarget{classPoint_a9be942f6453722dce81e12d4c3b64ca1}\label{classPoint_a9be942f6453722dce81e12d4c3b64ca1}} 
+int {\bfseries get\+\_\+y} () const
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Class of the two-\/dimensional point with its coordinates. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classPoint_a0fdf91327c2be8c48dd07dfe4106e890}\label{classPoint_a0fdf91327c2be8c48dd07dfe4106e890}} 
+\index{Point@{Point}!increment\+\_\+x@{increment\+\_\+x}}
+\index{increment\+\_\+x@{increment\+\_\+x}!Point@{Point}}
+\subsubsection{\texorpdfstring{increment\+\_\+x()}{increment\_x()}}
+{\footnotesize\ttfamily void Point\+::increment\+\_\+x (\begin{DoxyParamCaption}\item[{const int \&}]{value = {\ttfamily 1} }\end{DoxyParamCaption})}
+
+
+
+Increases x coordinate of the point. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classPoint_aa72c0088d3484f7947f2ceaf51f403b3}\label{classPoint_aa72c0088d3484f7947f2ceaf51f403b3}} 
+\index{Point@{Point}!increment\+\_\+y@{increment\+\_\+y}}
+\index{increment\+\_\+y@{increment\+\_\+y}!Point@{Point}}
+\subsubsection{\texorpdfstring{increment\+\_\+y()}{increment\_y()}}
+{\footnotesize\ttfamily void Point\+::increment\+\_\+y (\begin{DoxyParamCaption}\item[{const int \&}]{value = {\ttfamily 1} }\end{DoxyParamCaption})}
+
+
+
+Increases y coordinate of the point. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em value} & \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+figures.\+hpp\item 
+figures.\+cpp\end{DoxyCompactItemize}

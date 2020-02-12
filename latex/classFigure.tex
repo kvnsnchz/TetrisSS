@@ -1,0 +1,67 @@
+\hypertarget{classFigure}{}\section{Figure Class Reference}
+\label{classFigure}\index{Figure@{Figure}}
+
+
+Abstract class to implement general behaviour of all the figures.  
+
+
+
+
+{\ttfamily \#include $<$figures.\+hpp$>$}
+
+
+
+Inheritance diagram for Figure\+:
+% FIG 0
+
+
+Collaboration diagram for Figure\+:
+% FIG 1
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classFigure_adefab08c75354df391ff59e14416a801}\label{classFigure_adefab08c75354df391ff59e14416a801}} 
+{\bfseries Figure} (const unsigned \&code)
+\item 
+\mbox{\Hypertarget{classFigure_a02313436279f653e67f2827e2ff8b6ce}\label{classFigure_a02313436279f653e67f2827e2ff8b6ce}} 
+vector$<$ \hyperlink{classPoint}{Point} $\ast$ $>$ {\bfseries get\+\_\+points} () const
+\item 
+\mbox{\Hypertarget{classFigure_a7fea93f1461a68e658e48212972d553f}\label{classFigure_a7fea93f1461a68e658e48212972d553f}} 
+\hyperlink{classPoint}{Point} $\ast$ {\bfseries get\+\_\+point\+\_\+reference} () const
+\item 
+\mbox{\Hypertarget{classFigure_a451b83d1077400f2a5bf3b6d2ed178c0}\label{classFigure_a451b83d1077400f2a5bf3b6d2ed178c0}} 
+unsigned {\bfseries get\+\_\+color\+\_\+code} () const
+\item 
+\mbox{\Hypertarget{classFigure_afc07fa419fafde2e0af45434c44f9683}\label{classFigure_afc07fa419fafde2e0af45434c44f9683}} 
+Rectangle\+Shape $\ast$$\ast$ {\bfseries get\+\_\+grid} () const
+\item 
+\mbox{\Hypertarget{classFigure_a2db1d1a48c2e980b5958864687bff235}\label{classFigure_a2db1d1a48c2e980b5958864687bff235}} 
+void {\bfseries set\+\_\+grid} (const unsigned \&x\+\_\+dim, const Vector2f \&new\+\_\+cell\+\_\+size)
+\item 
+\mbox{\Hypertarget{classFigure_a623820756f0bea0a23410c0adb10c6f3}\label{classFigure_a623820756f0bea0a23410c0adb10c6f3}} 
+virtual void \hyperlink{classFigure_a623820756f0bea0a23410c0adb10c6f3}{initialize} (const unsigned \&, const Vector2f \&)=0
+\begin{DoxyCompactList}\small\item\em \hyperlink{classFigure}{Figure} initialization function which is called from the constructor. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classFigure_a75edaa86d6e3763da7bd5a75b6a2480c}\label{classFigure_a75edaa86d6e3763da7bd5a75b6a2480c}} 
+vector$<$ \hyperlink{classPoint}{Point} $\ast$ $>$ {\bfseries points}
+\item 
+\mbox{\Hypertarget{classFigure_acd5536a72eab8325e3082a8814a986f2}\label{classFigure_acd5536a72eab8325e3082a8814a986f2}} 
+\hyperlink{classPoint}{Point} $\ast$ {\bfseries point\+\_\+reference}
+\item 
+\mbox{\Hypertarget{classFigure_acb7cf05a2b796e1e4324fa2bebd94409}\label{classFigure_acb7cf05a2b796e1e4324fa2bebd94409}} 
+unsigned {\bfseries color\+\_\+code}
+\item 
+\mbox{\Hypertarget{classFigure_abed96d3e2685342c544250befb10be4f}\label{classFigure_abed96d3e2685342c544250befb10be4f}} 
+Rectangle\+Shape {\bfseries grid} \mbox{[}F\+I\+G\+U\+R\+E\+\_\+\+G\+R\+I\+D\+\_\+\+W\+I\+D\+TH\mbox{]}\mbox{[}F\+I\+G\+U\+R\+E\+\_\+\+G\+R\+I\+D\+\_\+\+H\+E\+I\+G\+HT\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Abstract class to implement general behaviour of all the figures. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+figures.\+hpp\item 
+figures.\+cpp\end{DoxyCompactItemize}

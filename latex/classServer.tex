@@ -1,0 +1,148 @@
+\hypertarget{classServer}{}\section{Server Class Reference}
+\label{classServer}\index{Server@{Server}}
+
+
+Class that implements the server (host player, session owner) and his functions.  
+
+
+
+
+{\ttfamily \#include $<$server.\+hpp$>$}
+
+
+
+Inheritance diagram for Server\+:
+% FIG 0
+
+
+Collaboration diagram for Server\+:
+% FIG 1
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classServer_ab472d29277b90a64ac00c6b237b9c3b9}\label{classServer_ab472d29277b90a64ac00c6b237b9c3b9}} 
+{\bfseries Server} (const bool \&new\+\_\+player\+\_\+status, const string \&server\+\_\+nickname, Uint32 max\+\_\+cli, Uint32 lvl)
+\item 
+\mbox{\Hypertarget{classServer_a0aa84b089e775943ad9127bcb32be748}\label{classServer_a0aa84b089e775943ad9127bcb32be748}} 
+void {\bfseries set\+\_\+max\+\_\+clients} (const Uint32 \&)
+\item 
+\mbox{\Hypertarget{classServer_aca05bab8b2fbdb7656ce4d2441b8772c}\label{classServer_aca05bab8b2fbdb7656ce4d2441b8772c}} 
+void {\bfseries set\+\_\+level} (const Uint32 \&)
+\item 
+\mbox{\Hypertarget{classServer_ae5db7c667dafbe369108600e6b3b9197}\label{classServer_ae5db7c667dafbe369108600e6b3b9197}} 
+vector$<$ \hyperlink{structclient__data}{client\+\_\+data} $>$ {\bfseries get\+\_\+clients} () const
+\item 
+\mbox{\Hypertarget{classServer_ac4c47dda4674c5b6767e60ab51bdb8c3}\label{classServer_ac4c47dda4674c5b6767e60ab51bdb8c3}} 
+Uint32 {\bfseries get\+\_\+max\+\_\+clients} () const
+\item 
+\mbox{\Hypertarget{classServer_a060606cc92e029d8620af54a77f89402}\label{classServer_a060606cc92e029d8620af54a77f89402}} 
+Uint32 {\bfseries get\+\_\+level} () const
+\item 
+\mbox{\Hypertarget{classServer_a32cf257754accf70802f5a64c360b876}\label{classServer_a32cf257754accf70802f5a64c360b876}} 
+void \hyperlink{classServer_a32cf257754accf70802f5a64c360b876}{connect\+\_\+udp\+\_\+socket} ()
+\begin{DoxyCompactList}\small\item\em Function to initialize player\textquotesingle{}s udp socket (port number and IP address). \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classServer_a4d278da069a2b5cde535243434999d3f}\label{classServer_a4d278da069a2b5cde535243434999d3f}} 
+void \hyperlink{classServer_a4d278da069a2b5cde535243434999d3f}{disconnect\+\_\+udp\+\_\+socket} ()
+\begin{DoxyCompactList}\small\item\em Function to unbind player\textquotesingle{}s udp socket (port number and IP address). \end{DoxyCompactList}\item 
+void \hyperlink{classServer_a4d1e997c505b0e0eae2d579eae4b5d1c}{listen\+\_\+clients} (request\+\_\+status \&status)
+\begin{DoxyCompactList}\small\item\em Function to listen and find some new potential clients and their IP addresses. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classServer_acd0114484495cfd2749816ddb12e4246}\label{classServer_acd0114484495cfd2749816ddb12e4246}} 
+void \hyperlink{classServer_acd0114484495cfd2749816ddb12e4246}{disconnect} ()
+\begin{DoxyCompactList}\small\item\em Inform all the clients about disconnection. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classServer_a5a68e06093d80b66c745f1a226e17ce7}\label{classServer_a5a68e06093d80b66c745f1a226e17ce7}} 
+void \hyperlink{classServer_a5a68e06093d80b66c745f1a226e17ce7}{ready} (bool is\+\_\+ready)
+\begin{DoxyCompactList}\small\item\em Function to inform other players about changes of current player\textquotesingle{}s readiness. \end{DoxyCompactList}\item 
+bool \hyperlink{classServer_acec935535d1d5b58d95cf24678eac014}{start} ()
+\begin{DoxyCompactList}\small\item\em Send an information about new game start to all the clients. \end{DoxyCompactList}\item 
+void \hyperlink{classServer_a3515fb61ca9272c111bd62f4f78e792a}{send\+\_\+clients\+\_\+board\+\_\+data} (\hyperlink{classBoard}{Board} \&board)
+\begin{DoxyCompactList}\small\item\em Send a game info from each client to all the clients. \end{DoxyCompactList}\item 
+void \hyperlink{classServer_aff65d0adf4570f2b1ffca2d961191901}{listen\+\_\+game} (\hyperlink{classBoard}{Board} \&game\+\_\+board, request\+\_\+status \&status)
+\begin{DoxyCompactList}\small\item\em Function that receives other players\textquotesingle{} game info. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classServer_a680289a9bc8cd933e208b6ff2b78feb7}\label{classServer_a680289a9bc8cd933e208b6ff2b78feb7}} 
+void \hyperlink{classServer_a680289a9bc8cd933e208b6ff2b78feb7}{pause} (bool)
+\begin{DoxyCompactList}\small\item\em Informs other players about multiplayer pause re / initialization. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classServer_abe43e70e1c8bdf76c5e4f062a9827eff}\label{classServer_abe43e70e1c8bdf76c5e4f062a9827eff}} 
+void \hyperlink{classServer_abe43e70e1c8bdf76c5e4f062a9827eff}{game\+\_\+over} ()
+\begin{DoxyCompactList}\small\item\em Informs other players about reach of game over condition. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classServer_a743f9090b1a517b6dd9656721685e4e8}\label{classServer_a743f9090b1a517b6dd9656721685e4e8}} 
+void {\bfseries restart\+\_\+game} ()
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Class that implements the server (host player, session owner) and his functions. 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classServer_a4d1e997c505b0e0eae2d579eae4b5d1c}\label{classServer_a4d1e997c505b0e0eae2d579eae4b5d1c}} 
+\index{Server@{Server}!listen\+\_\+clients@{listen\+\_\+clients}}
+\index{listen\+\_\+clients@{listen\+\_\+clients}!Server@{Server}}
+\subsubsection{\texorpdfstring{listen\+\_\+clients()}{listen\_clients()}}
+{\footnotesize\ttfamily void Server\+::listen\+\_\+clients (\begin{DoxyParamCaption}\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})}
+
+
+
+Function to listen and find some new potential clients and their IP addresses. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em status} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classServer_aff65d0adf4570f2b1ffca2d961191901}\label{classServer_aff65d0adf4570f2b1ffca2d961191901}} 
+\index{Server@{Server}!listen\+\_\+game@{listen\+\_\+game}}
+\index{listen\+\_\+game@{listen\+\_\+game}!Server@{Server}}
+\subsubsection{\texorpdfstring{listen\+\_\+game()}{listen\_game()}}
+{\footnotesize\ttfamily void Server\+::listen\+\_\+game (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} \&}]{game\+\_\+over,  }\item[{request\+\_\+status \&}]{status }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Function that receives other players\textquotesingle{} game info. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+\_\+over} & \\
+\hline
+{\em status} & \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classPlayer_a24a94f532e7ea75b3429795e34902a94}{Player}.
+
+\mbox{\Hypertarget{classServer_a3515fb61ca9272c111bd62f4f78e792a}\label{classServer_a3515fb61ca9272c111bd62f4f78e792a}} 
+\index{Server@{Server}!send\+\_\+clients\+\_\+board\+\_\+data@{send\+\_\+clients\+\_\+board\+\_\+data}}
+\index{send\+\_\+clients\+\_\+board\+\_\+data@{send\+\_\+clients\+\_\+board\+\_\+data}!Server@{Server}}
+\subsubsection{\texorpdfstring{send\+\_\+clients\+\_\+board\+\_\+data()}{send\_clients\_board\_data()}}
+{\footnotesize\ttfamily void Server\+::send\+\_\+clients\+\_\+board\+\_\+data (\begin{DoxyParamCaption}\item[{\hyperlink{classBoard}{Board} \&}]{board }\end{DoxyParamCaption})}
+
+
+
+Send a game info from each client to all the clients. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em board} & \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classServer_acec935535d1d5b58d95cf24678eac014}\label{classServer_acec935535d1d5b58d95cf24678eac014}} 
+\index{Server@{Server}!start@{start}}
+\index{start@{start}!Server@{Server}}
+\subsubsection{\texorpdfstring{start()}{start()}}
+{\footnotesize\ttfamily bool Server\+::start (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Send an information about new game start to all the clients. 
+
+\begin{DoxyReturn}{Returns}
+true 
+
+false 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+server.\+hpp\item 
+server.\+cpp\end{DoxyCompactItemize}
