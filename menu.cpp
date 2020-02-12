@@ -1002,7 +1002,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
     // Initialize the number of players in the current session:
     unsigned number_of_players = player_list->size();
 
-    window.setSize(Vector2u (VideoMode::getDesktopMode().width * 0.95, VideoMode::getDesktopMode().height * 0.95));
+    window.setSize(Vector2u (VideoMode::getDesktopMode().width * 0.9, VideoMode::getDesktopMode().height * 0.9));
     window.setView(View(FloatRect(0.0f, 0.0f, (float) window.getSize().x, (float) window.getSize().y)));
 
     // initalize the game over background:
@@ -1095,7 +1095,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 }
 
             if (!game_board->game_over() &&
-                (descend_counter >= LEVEL_MAX / game_board->get_complexity() || _figure_state == CHANGE_FIGURE)) {
+                (descend_counter >= LEVEL_MULTIPLICATOR * LEVEL_MAX / game_board->get_complexity() || _figure_state == CHANGE_FIGURE)) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
