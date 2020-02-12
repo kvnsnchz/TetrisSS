@@ -164,11 +164,6 @@ void Menu::game(const unsigned& initial_complexity) {
 
                                 // update button size:
                                 button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-                                // update all the buttons and their positions:
-                                pause.setCharacterSize(5 * button_size / 6);
-                                pause.setOutlineThickness(button_size / 6);
-                                pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                         
                                 // unfocus pause button:
                                 pause.setFillColor(COLOR_DARK_VIOLET);
@@ -214,11 +209,7 @@ void Menu::game(const unsigned& initial_complexity) {
 
                                         // update button size:
                                         button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-                                    
-                                        // update all the buttons and their positions:
-                                        pause.setCharacterSize(5 * button_size / 6);
-                                        pause.setOutlineThickness(button_size / 6);
-                                        pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
+                                        break;
                                     }
 
                                     // unfocus pause button:
@@ -245,10 +236,6 @@ void Menu::game(const unsigned& initial_complexity) {
                             // update button size:
                             button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
 
-                            // update all the buttons and their positions:
-                            pause.setCharacterSize(5 * button_size / 6);
-                            pause.setOutlineThickness(button_size / 6);
-                            pause.setPosition((cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                             break;
                         // while we want to move a current figure to the right:
                         case Keyboard::D:
@@ -1198,11 +1185,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
                                 // update button size:
                                 button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-                                // update all the buttons and their positions:
-                                pause.setCharacterSize(5 * button_size / 6);
-                                pause.setOutlineThickness(button_size / 6);
-                                pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 25 * button_size / 6 + 30.0f);
                         
                                 // unfocus pause button:
                                 pause.setFillColor(COLOR_DARK_VIOLET);
@@ -1252,11 +1234,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
                                         // update button size:
                                         button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-                                    
-                                        // update all the buttons and their positions:
-                                        pause.setCharacterSize(5 * button_size / 6);
-                                        pause.setOutlineThickness(button_size / 6);
-                                        pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                                     }
 
                                     // unfocus pause button:
@@ -1286,11 +1263,6 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
 
                             // update button size:
                             button_size = min(60.0, 3.75 * (0.27 * window.getSize().x - 5.0f) / BOARD_GRID_WIDTH);
-
-                            // update all the buttons and their positions:
-                            pause.setCharacterSize(5 * button_size / 6);
-                            pause.setOutlineThickness(button_size / 6);
-                            pause.setPosition((own_cell_size.x + 1) * game_board->get_x_dim() + 29.0f, 4 * button_size + 125.0f);
                             break;
                         // while we want to move a current figure to the right:
                         case Keyboard::D:
