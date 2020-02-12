@@ -8,7 +8,10 @@
 using namespace std;
 using namespace sf;
 
-
+/**
+ * @brief All possible types of data that could be sent or received.
+ * 
+ */
 enum datatype {
     SERVER_INFO_REQUEST,
     SERVER_INFO_RESPONSE,
@@ -32,6 +35,10 @@ enum datatype {
     CLIENT_GAME_OVER,
 };
 
+/**
+ * @brief All possible ttransmission statuses.
+ * 
+ */
 enum request_status {
     UNASSIGNED,
     NOT_READY,
@@ -47,6 +54,10 @@ enum request_status {
     GAME_START,
 };
 
+/**
+ * @brief All possible client statuses.
+ * 
+ */
 enum client_status {
     STATUS_READY,
     STATUS_NOT_READY,
@@ -54,6 +65,10 @@ enum client_status {
     STATUS_GAME_OVER,
 };
 
+/**
+ * @brief Structure gathering all necessary client's game info to transmit.
+ * 
+ */
 struct client_data {
     IpAddress address;
     string nickname;
@@ -68,6 +83,10 @@ struct client_data {
     friend Packet& operator >>(sf::Packet& packet, client_data& _client_data);
 };
 
+/**
+ * @brief Structure gathering all necessary server's data.
+ * 
+ */
 struct server_data {
     IpAddress address;
     string name;
@@ -83,6 +102,10 @@ struct server_data {
 };
 
 
+/**
+ * @brief Not exhaustive list of the port numbers.
+ * 
+ */
 namespace ports_number {
     const unsigned short SERVER_PORT = 2004;
     const unsigned short CLIENT_PORT = 2006;

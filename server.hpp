@@ -7,6 +7,10 @@
 
 using namespace ports_number;
 
+/**
+ * @brief Class that implements the server (host player, session owner) and his functions. 
+ * 
+ */
 class Server: public Player
 {
 private:
@@ -15,7 +19,6 @@ private:
 
     // IPv4 addresses of clients:
     vector<client_data> clients;
-    UdpSocket socket;
     IpAddress local_ip_address;
 public:
     Server(): Player(), max_clients(MAX_CLIENTS), level(0) {
@@ -47,15 +50,32 @@ public:
     void connect_udp_socket();
     //Disconnect to Socket UDP
     void disconnect_udp_socket();
-    // Listen for some new client connections:
+    /**
+     * @brief Function to listen and find some new potential clients and their IP addresses.
+     * 
+     * @param status 
+     */
     void listen_clients(request_status& status);
     //Disconnected server
+    /**
+     * @brief Inform all the clients about disconnection.
+     * 
+     */
     void disconnect();
     //Server ready or not ready to play
     void ready(bool is_ready);
-    //Game start
+    /**
+     * @brief Send an information about new game start to all the clients.
+     * 
+     * @return true 
+     * @return false 
+     */
     bool start();
-    //Sending clients board data
+    /**
+     * @brief Send a game info from each client to all the clients. 
+     * 
+     * @param board 
+     */
     void send_clients_board_data(Board& board);
     //Listen clients during the game
     void listen_game(Board& game_board, request_status& status);

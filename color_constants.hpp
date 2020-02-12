@@ -5,6 +5,10 @@ using namespace sf;
 #ifndef COLOR_CONSTANTS
 #define COLOR_CONSTANTS
 
+/**
+ * @brief Namespace of all collors that are used in the program.
+ * 
+ */
 namespace colors {
     // Colors of buttons:
     const Color COLOR_DARK_VIOLET = Color(144, 12, 63, 255); // also J figure's color

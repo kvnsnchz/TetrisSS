@@ -10,6 +10,10 @@
 
 using namespace ports_number;
 
+/**
+ * @brief Class that implements the client (session guest) and his functions. 
+ * 
+ */
 class Client: public Player
 {
 private:
@@ -17,7 +21,6 @@ private:
     server_data _server_data;
     //Vector of game servers available to connect:
     vector<server_data> servers;
-    UdpSocket socket;
 public:
     Client(): Player() {
         connect_udp_socket();
@@ -38,17 +41,28 @@ public:
     void connect_udp_socket();
     //Disconnect to Socket UDP
     void disconnect_udp_socket();
-    //Search for available game servers:
+    /**
+     * @brief Function that is looking for available servers to play with. 
+     * 
+     * @param status 
+     */
     void search_servers(request_status& status);
     //Connect to a specific game server from the available list:
     void connect_server(const unsigned pos, request_status& status);
     //Disconnect from the game server:
     void disconnect_server(request_status& status);
-    //Listen the server
+    /**
+     * @brief Function that receives all necessary info from server before the game start.
+     * 
+     * @param status 
+     */
     void listen_server(request_status& status);
     //Ready or not ready to play
     void ready(bool);
-    //Sending board data
+    /**
+     * @brief Sends current client's game info th the server.
+     * 
+     */
     void send_board_data(Board&);
     //Listen the server during the game
     void listen_game(Board& game_board, request_status& status);
