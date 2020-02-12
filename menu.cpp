@@ -83,7 +83,7 @@ void Menu::game(const unsigned& initial_complexity) {
     // Using a thread to fall down:
     game_board->set_descend_thread(new Thread([&] () {
         for ( ; window.isOpen(); descend_counter++) {
-            if (descend_counter >= LEVEL_MAX / game_board->get_complexity() || _figure_state == CHANGE_FIGURE) {
+            if (descend_counter >= LEVEL_MULTIPLICATOR * LEVEL_MAX / game_board->get_complexity() || _figure_state == CHANGE_FIGURE) {
                 if(_figure_state == STOP_FIGURE)
                     count_change_figure--;
                 if(count_change_figure <= 0)
