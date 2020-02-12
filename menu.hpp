@@ -12,8 +12,9 @@
 #define LEVEL_STIC 3
 #define LEVEL_APP_MATHS 5
 #define LEVEL_MAX 30
-#define LINES_TO_LEVEL_UP 8
+#define LINES_TO_LEVEL_UP 2
 #define GLOBAL_GAME_OVER_TICKS 6
+#define DESCEND_SLEEP_SECONDS 0.015f
 
 // new button initialization function (for code reduction):
 Text create_button(Font& font, const string title, const double& button_size,

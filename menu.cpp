@@ -116,7 +116,7 @@ void Menu::game(const unsigned& initial_complexity) {
                 descend_counter = 0;
             }
 
-            sf::sleep(seconds(0.015f));
+            sf::sleep(seconds(DESCEND_SLEEP_SECONDS));
         }
     }));
 
@@ -1127,7 +1127,7 @@ void Menu::multiplayer_game(Server* current_session, Client* current_client) {
                 descend_counter = 0;
             }
 
-            sf::sleep(seconds(0.015f));
+            sf::sleep(seconds(DESCEND_SLEEP_SECONDS));
         }
     }));
 
