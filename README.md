@@ -7,9 +7,8 @@
 - Windows: ???
 
 2. From the project's root folder:
+  execute in terminal:
 
-execute in terminal:
+  2.1. make
 
-2.1. make
-
-2.2. ./output
+  2.2. ./output
