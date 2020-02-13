@@ -3080,6 +3080,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                     listen_thread->terminate();
                                     current_session->disconnect();
                                     current_session->disconnect_udp_socket();
+                                    create_session(current_session->get_player_nickname());
                                     return;
                                 } else if (current_session == nullptr) {
                                     listen_thread->terminate();
@@ -3145,6 +3146,7 @@ void Menu::session_menu(Server* current_session, Client* current_client) {
                                             listen_thread->terminate();
                                             current_session->disconnect();
                                             current_session->disconnect_udp_socket();
+                                            create_session(current_session->get_player_nickname());
                                             return;
                                         } else if (current_session == nullptr) {
                                             request_status status;

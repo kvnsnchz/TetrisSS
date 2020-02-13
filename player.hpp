@@ -5,7 +5,6 @@
 #include <thread>
 #include <chrono>
 #include <cstring>
-#include <boost/algorithm/string.hpp>
 #include <string>
 #include "sockets_constants.hpp"
 
